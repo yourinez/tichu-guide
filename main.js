@@ -1601,6 +1601,38 @@
 (() => {
   "use strict";
 
+  const finale = document.querySelector(".round-finale");
+
+  if (!finale) {
+    return;
+  }
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const show = () => finale.classList.add("is-visible");
+
+  if (reducedMotion || !("IntersectionObserver" in window)) {
+    show();
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          show();
+          observer.unobserve(finale);
+        }
+      });
+    },
+    { threshold: 0.28 }
+  );
+
+  observer.observe(finale);
+})();
+
+(() => {
+  "use strict";
+
   const main = document.querySelector("main");
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   let activeModal = null;
