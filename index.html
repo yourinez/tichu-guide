@@ -107,6 +107,16 @@
             조합
           </button>
           <button
+            class="quick-reference-bar__button quick-reference-bar__button--bomb"
+            type="button"
+            data-open="bomb"
+            aria-haspopup="dialog"
+            aria-controls="bomb-modal"
+            aria-expanded="false"
+          >
+            💥 폭탄
+          </button>
+          <button
             class="quick-reference-bar__button"
             type="button"
             data-open="special"
@@ -324,9 +334,27 @@
       </section>
 
       <section class="game-start" aria-labelledby="game-start-title">
+        <svg
+          class="game-start__direction"
+          viewBox="0 0 440 640"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            class="game-start__arrow-line"
+            d="M 366 300 C 393 283 414 257 414 218 C 414 139 389 78 333 49 C 264 13 164 27 105 62 C 46 98 28 168 31 225 C 34 265 45 291 68 300"
+          />
+          <path
+            class="game-start__arrow-head"
+            d="M 44 282 L 68 300 L 43 311"
+          />
+        </svg>
         <div class="game-start__content">
-          <h2 id="game-start-title">참새 보유자,<br /><strong>GAME START!</strong></h2>
-          <p>참새를 가진 사람이 첫 턴을 시작해요.<br /><span>(아무 카드나 내도 OK)</span></p>
+          <img class="game-start__bird" src="참새.png" alt="참새 카드" />
+          <h2 id="game-start-title"><span>참새 보유자</span><strong>GAME START!</strong></h2>
+          <p>참새 카드 제시한 사람이 첫 카드를 내며 시작합니다 (아무 카드 &amp; 몇 장이든 OK)</p>
+          <p class="game-start__direction-label">시계 반대방향으로 진행해요</p>
           <button
             class="inline-modal-button"
             type="button"
@@ -337,6 +365,21 @@
           >
             특수카드가 뭐예요?
           </button>
+        </div>
+      </section>
+
+      <section class="play-card-sequence" aria-labelledby="play-card-sequence-title">
+        <h2 class="play-card-sequence__caption" id="play-card-sequence-title">
+          더 높은 카드로 덮으며 진행해요
+        </h2>
+        <div class="play-card-sequence__pile" aria-hidden="true">
+          <img class="play-card-sequence__card" src="별7.png" alt="" />
+          <img class="play-card-sequence__card" src="별9.png" alt="" />
+          <img class="play-card-sequence__card" src="별10.png" alt="" />
+          <img class="play-card-sequence__card" src="집J.png" alt="" />
+          <img class="play-card-sequence__card" src="집Q.png" alt="" />
+          <img class="play-card-sequence__card" src="별K.png" alt="" />
+          <img class="play-card-sequence__card" src="별A.png" alt="" />
         </div>
       </section>
 
@@ -370,32 +413,32 @@
             <article class="combo-panel" id="combo-panel-1" role="tabpanel" data-panel="1">
               <h3>1장 = 싱글</h3>
               <div class="combo-example">
-                <p>이렇게 생겼어요</p>
+                <p>앞에 이게 깔렸다면</p>
                 <div class="combo-card-row"><img src="별7.png" alt="별 7" /></div>
               </div>
               <div class="combo-example">
-                <p>받을 땐 더 높은 걸로</p>
+                <p>나는 더 높은 걸로 제시!</p>
                 <div class="combo-card-row"><img src="별10.png" alt="별 10" /></div>
               </div>
               <div class="combo-example combo-example--wrong">
-                <p>✗ 못 받아요</p>
+                <p>✗ 이건 못 내요</p>
                 <div class="combo-card-row"><img src="옥7.png" alt="옥 7" /><img src="집7.png" alt="집 7" /></div>
-                <small>페어는 못 받음</small>
+                <small>종류가 달라서 못 내요</small>
               </div>
             </article>
 
             <article class="combo-panel" id="combo-panel-2" role="tabpanel" data-panel="2" hidden>
               <h3>2장 = 페어</h3>
               <div class="combo-example">
-                <p>이렇게 생겼어요</p>
+                <p>앞에 이게 깔렸다면</p>
                 <div class="combo-card-row"><img src="옥7.png" alt="옥 7" /><img src="집7.png" alt="집 7" /></div>
               </div>
               <div class="combo-example">
-                <p>받을 땐 더 높은 걸로</p>
+                <p>나는 더 높은 걸로 제시!</p>
                 <div class="combo-card-row"><img src="별9.png" alt="별 9" /><img src="검9.png" alt="검 9" /></div>
               </div>
               <div class="combo-example combo-example--wrong">
-                <p>✗ 못 받아요</p>
+                <p>✗ 이건 못 내요</p>
                 <div class="combo-wrong-grid">
                   <div><div class="combo-card-row"><img src="별7.png" alt="별 7" /></div><small>싱글</small></div>
                   <div><div class="combo-card-row"><img src="옥7.png" alt="옥 7" /><img src="집7.png" alt="집 7" /><img src="별7.png" alt="별 7" /></div><small>트리플</small></div>
@@ -406,15 +449,15 @@
             <article class="combo-panel" id="combo-panel-3" role="tabpanel" data-panel="3" hidden>
               <h3>3장 = 트리플</h3>
               <div class="combo-example">
-                <p>이렇게 생겼어요</p>
+                <p>앞에 이게 깔렸다면</p>
                 <div class="combo-card-row"><img src="옥7.png" alt="옥 7" /><img src="집7.png" alt="집 7" /><img src="별7.png" alt="별 7" /></div>
               </div>
               <div class="combo-example">
-                <p>받을 땐 더 높은 걸로</p>
+                <p>나는 더 높은 걸로 제시!</p>
                 <div class="combo-card-row"><img src="옥9.png" alt="옥 9" /><img src="별9.png" alt="별 9" /><img src="검9.png" alt="검 9" /></div>
               </div>
               <div class="combo-example combo-example--wrong">
-                <p>✗ 못 받아요</p>
+                <p>✗ 이건 못 내요</p>
                 <div class="combo-wrong-grid">
                   <div><div class="combo-card-row"><img src="별7.png" alt="별 7" /></div><small>싱글</small></div>
                   <div><div class="combo-card-row"><img src="옥7.png" alt="옥 7" /><img src="집7.png" alt="집 7" /></div><small>페어</small></div>
@@ -425,29 +468,54 @@
             <article class="combo-panel" id="combo-panel-4" role="tabpanel" data-panel="4" hidden>
               <h3>4장+ = 연속 페어</h3>
               <div class="combo-example">
-                <p>이렇게 생겼어요</p>
-                <div class="combo-card-row"><img src="옥3.png" alt="옥 3" /><img src="집3.png" alt="집 3" /><img src="별4.png" alt="별 4" /><img src="옥4.png" alt="옥 4" /></div>
+                <p>앞에 이게 깔렸다면</p>
+                <div class="combo-card-row combo-card-row--grouped" role="group" aria-label="옥 3, 집 3 · 별 4, 옥 4">
+                  <span class="combo-card-group"><img src="옥3.png" alt="옥 3" /><img src="집3.png" alt="집 3" /></span>
+                  <span class="combo-card-divider" aria-hidden="true">·</span>
+                  <span class="combo-card-group"><img src="별4.png" alt="별 4" /><img src="옥4.png" alt="옥 4" /></span>
+                </div>
               </div>
-              <p class="combo-panel__note">숫자가 이어지는 페어 2쌍 이상 (33-44)</p>
+              <div class="combo-example">
+                <p>나는 더 높은 걸로 제시!</p>
+                <div class="combo-card-row combo-card-row--grouped" role="group" aria-label="옥 6, 집 6 · 별 7, 집 7">
+                  <span class="combo-card-group"><img src="옥6.png" alt="옥 6" /><img src="집6.png" alt="집 6" /></span>
+                  <span class="combo-card-divider" aria-hidden="true">·</span>
+                  <span class="combo-card-group"><img src="별7.png" alt="별 7" /><img src="집7.png" alt="집 7" /></span>
+                </div>
+              </div>
+              <div class="combo-run-order" aria-label="2쌍 연속 페어는 왼쪽에서 오른쪽으로 갈수록 높아져요">
+                <p class="combo-run-order__label">낮은 조합 <span aria-hidden="true">→</span> 높은 조합</p>
+                <p class="combo-run-order__sequence">
+                  2233 &lt; <strong aria-label="현재 예시 3344">3344</strong> &lt; 4455 &lt; 5566 &lt; 6677 &lt; … &lt; KKAA
+                </p>
+                <p class="combo-run-order__hint">강조한 3344보다 오른쪽 조합이 더 높아요.</p>
+              </div>
+              <p class="combo-panel__note">숫자가 이어지는 페어 2쌍 이상</p>
+              <p class="combo-panel__note combo-panel__note--run">쌍 수가 같아야 하고(2쌍↔2쌍), 그중 더 높은 숫자로만 이겨요.</p>
             </article>
 
             <article class="combo-panel" id="combo-panel-5" role="tabpanel" data-panel="5" hidden>
               <h3>5장 = 풀하우스·스트레이트</h3>
               <div class="combo-example">
-                <p>풀하우스</p>
+                <p>앞에 이게 깔렸다면 (풀하우스)</p>
                 <div class="combo-card-row"><img src="옥7.png" alt="옥 7" /><img src="집7.png" alt="집 7" /><img src="별7.png" alt="별 7" /><img src="옥3.png" alt="옥 3" /><img src="집3.png" alt="집 3" /></div>
                 <small>트리플+페어</small>
               </div>
               <div class="combo-example">
-                <p>스트레이트</p>
+                <p>앞에 이게 깔렸다면 (스트레이트)</p>
                 <div class="combo-card-row"><img src="집5.png" alt="집 5" /><img src="별6.png" alt="별 6" /><img src="검7.png" alt="검 7" /><img src="별8.png" alt="별 8" /><img src="별9.png" alt="별 9" /></div>
                 <small>5장 연속</small>
               </div>
-              <p class="combo-panel__note">풀하우스는 트리플 숫자로 비교. 스트레이트는 길이가 같아야 비교, 무늬는 섞여도 OK.</p>
+              <p class="combo-panel__note">같은 종류끼리 비교해, 더 높은 조합을 제시! 스트레이트는 길이가 같아야 비교하고 무늬는 섞여도 OK.</p>
             </article>
           </div>
 
-          <p class="combo-rule">앞 사람과 같은 종류·같은 장수로,<br /><strong>더 높게만 받을 수 있어요.</strong></p>
+          <p class="combo-rule">앞 사람과 같은 종류·같은 장수로,<br /><strong>더 높은 조합을 낼 수 있어요.</strong></p>
+
+          <aside class="combo-pass" aria-labelledby="combo-pass-title">
+            <h3 id="combo-pass-title">낼 게 없다면?</h3>
+            <p>제시할 조합이 없으면 <strong>‘패스’!</strong><br />다음 차례에 다시 낼 수 있어요.</p>
+          </aside>
 
           <button
             class="inline-modal-button"
@@ -470,13 +538,31 @@
           <div class="bomb-examples">
             <article>
               <h3>포카드</h3>
-              <div class="combo-card-row"><img src="옥7.png" alt="옥 7" /><img src="집7.png" alt="집 7" /><img src="별7.png" alt="별 7" /><img src="검7.png" alt="검 7" /></div>
+              <button class="bomb-example-button" type="button" data-open="bomb" aria-haspopup="dialog" aria-controls="bomb-modal" aria-expanded="false" aria-label="폭탄 규칙 자세히 보기: 같은 숫자 4장">
+                <span class="combo-card-row"><img src="옥7.png" alt="" /><img src="집7.png" alt="" /><img src="별7.png" alt="" /><img src="검7.png" alt="" /></span>
+              </button>
             </article>
             <article>
               <h3>같은 무늬 연속</h3>
-              <div class="combo-card-row"><img src="별6.png" alt="별 6" /><img src="별7.png" alt="별 7" /><img src="별8.png" alt="별 8" /><img src="별9.png" alt="별 9" /><img src="별10.png" alt="별 10" /></div>
+              <button class="bomb-example-button" type="button" data-open="bomb" aria-haspopup="dialog" aria-controls="bomb-modal" aria-expanded="false" aria-label="폭탄 규칙 자세히 보기: 같은 무늬 연속">
+                <span class="combo-card-row"><img src="별6.png" alt="" /><img src="별7.png" alt="" /><img src="별8.png" alt="" /><img src="별9.png" alt="" /><img src="별10.png" alt="" /></span>
+              </button>
             </article>
           </div>
+        </div>
+      </section>
+
+      <section class="trick-end" aria-labelledby="trick-end-title">
+        <div class="trick-end__inner">
+          <h2 id="trick-end-title">트릭 끝!</h2>
+          <p>조합을 낸 뒤, 나머지 세 사람이 모두 연속으로 패스하면 → 그 판(트릭) 종료!</p>
+          <div class="trick-end__pile" aria-hidden="true">
+            <img class="trick-end__card trick-end__card--left" src="뒷면.png" alt="" />
+            <img class="trick-end__card trick-end__card--right" src="뒷면.png" alt="" />
+            <img class="trick-end__card trick-end__card--top" src="뒷면.png" alt="" />
+          </div>
+          <p>마지막에 낸 사람이 바닥의 카드를 전부 가져가요 <strong>(트릭을 딴다).</strong></p>
+          <p>가져간 카드는 뒷면이 보이게 쌓아둡니다.</p>
         </div>
       </section>
     </main>
@@ -710,6 +796,49 @@
               </article>
             </div>
           </aside>
+        </section>
+      </div>
+    </div>
+
+    <div class="app-modal" id="bomb-modal" data-modal="bomb" hidden>
+      <div class="app-modal__backdrop" data-close-modal aria-hidden="true"></div>
+      <div
+        class="app-modal__dialog bomb-modal__dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="bomb-modal-title"
+        tabindex="-1"
+      >
+        <button class="app-modal__close" type="button" data-close-modal aria-label="폭탄 설명 닫기">×</button>
+        <section class="bomb-modal__content">
+          <h2 id="bomb-modal-title">폭탄은 예외!</h2>
+          <p class="bomb-modal__lead">아무 때나 낼 수 있고 모든 조합을 이겨요.</p>
+          <ol>
+            <li>① 같은 숫자 4장</li>
+            <li>② 같은 무늬 5장 이상 연속</li>
+          </ol>
+          <p class="bomb-modal__note">같은 무늬 2장 연속은 안 되지만, 5장 이상 모으면 폭탄!</p>
+          <div class="bomb-modal__examples" aria-label="폭탄 예시">
+            <article class="bomb-modal__example">
+              <h3>포카드</h3>
+              <div class="combo-card-row" role="group" aria-label="옥 7, 집 7, 별 7, 검 7">
+                <img src="옥7.png" alt="옥 7" />
+                <img src="집7.png" alt="집 7" />
+                <img src="별7.png" alt="별 7" />
+                <img src="검7.png" alt="검 7" />
+              </div>
+            </article>
+            <article class="bomb-modal__example">
+              <h3>같은 무늬 5장 연속</h3>
+              <div class="combo-card-row" role="group" aria-label="별 6, 별 7, 별 8, 별 9, 별 10">
+                <img src="별6.png" alt="별 6" />
+                <img src="별7.png" alt="별 7" />
+                <img src="별8.png" alt="별 8" />
+                <img src="별9.png" alt="별 9" />
+                <img src="별10.png" alt="별 10" />
+              </div>
+            </article>
+          </div>
         </section>
       </div>
     </div>

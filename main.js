@@ -312,8 +312,8 @@
     );
 
   timeline
-    .to(shell, { backgroundColor: "#170507", duration: 0.7, ease: "none" }, 2.25)
-    .to(shell, { backgroundColor: "#090a1b", duration: 0.8, ease: "none" }, 5.45);
+    .to(shell, { backgroundColor: "#24100e", duration: 0.7, ease: "none" }, 2.25)
+    .to(shell, { backgroundColor: "#26150f", duration: 0.8, ease: "none" }, 5.45);
 })();
 
 (() => {
@@ -452,6 +452,37 @@
 
     return { unlock };
   };
+})();
+
+(() => {
+  "use strict";
+
+  const gameStart = document.querySelector(".game-start");
+
+  if (gameStart) {
+    if (!("IntersectionObserver" in window)) {
+      gameStart.querySelectorAll(".game-start__direction path").forEach((path) => {
+        path.style.setProperty("--arrow-path-length", `${path.getTotalLength()}px`);
+        path.style.setProperty("--arrow-head-length", `${path.getTotalLength()}px`);
+      });
+      gameStart.classList.add("is-visible");
+    } else {
+      const directionObserver = new IntersectionObserver(
+        (entries, observer) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            const [line, head] = gameStart.querySelectorAll(".game-start__direction path");
+            line.style.setProperty("--arrow-path-length", `${line.getTotalLength()}px`);
+            head.style.setProperty("--arrow-head-length", `${head.getTotalLength()}px`);
+            gameStart.classList.add("is-visible");
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.2 }
+      );
+
+      directionObserver.observe(gameStart);
+    }
+  }
 })();
 
 (() => {
@@ -1119,6 +1150,33 @@
 (() => {
   "use strict";
 
+  const cardSequence = document.querySelector(".play-card-sequence");
+
+  if (cardSequence) {
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      !("IntersectionObserver" in window)
+    ) {
+      cardSequence.classList.add("is-visible");
+    } else {
+      const sequenceObserver = new IntersectionObserver(
+        (entries, observer) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            cardSequence.classList.add("is-visible");
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.35 }
+      );
+
+      sequenceObserver.observe(cardSequence);
+    }
+  }
+})();
+
+(() => {
+  "use strict";
+
   const guide = document.querySelector(".combo-guide");
 
   if (!guide) {
@@ -1162,6 +1220,37 @@
   });
 
   selectCombo("1");
+})();
+
+(() => {
+  "use strict";
+
+  const trickEnd = document.querySelector(".trick-end");
+
+  if (!trickEnd) {
+    return;
+  }
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return;
+  }
+
+  if (!("IntersectionObserver" in window)) {
+    trickEnd.classList.add("is-visible");
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        trickEnd.classList.add("is-visible");
+        observer.disconnect();
+      }
+    },
+    { threshold: 0.25 }
+  );
+
+  observer.observe(trickEnd);
 })();
 
 (() => {
