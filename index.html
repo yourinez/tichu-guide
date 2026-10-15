@@ -83,11 +83,41 @@
                   <p class="rank-rule rank-rule--main">큰 숫자가 작은 숫자를 덮습니다</p>
                   <p class="rank-rule rank-rule--sub">더 높은 숫자만 이길 수 있어요</p>
                 </div>
+
+                <div class="rank-reference-labels" aria-label="카드 참고 메뉴 안내">
+                  <span class="rank-reference-label rank-reference-label--combo">카드로 만드는 조합</span>
+                  <span class="rank-reference-label rank-reference-label--special">특별한 카드도 있어요</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      <nav class="quick-reference-bar" aria-label="카드 빠른 참고">
+        <div class="quick-reference-bar__inner">
+          <button
+            class="quick-reference-bar__button"
+            type="button"
+            data-open="combo"
+            aria-haspopup="dialog"
+            aria-controls="combo-modal"
+            aria-expanded="false"
+          >
+            조합
+          </button>
+          <button
+            class="quick-reference-bar__button"
+            type="button"
+            data-open="special"
+            aria-haspopup="dialog"
+            aria-controls="special-modal"
+            aria-expanded="false"
+          >
+            특수카드
+          </button>
+        </div>
+      </nav>
 
       <section class="deal-section" aria-labelledby="deal-title">
         <div class="deal-section__inner">
@@ -129,6 +159,9 @@
             <button class="deal-button" type="button">카드 분배하기</button>
             <p class="deal-status" aria-live="polite" aria-hidden="true">8장씩 받았어요</p>
           </div>
+          <p class="progress-gate__hint" role="status" aria-live="polite" aria-hidden="true">
+            버튼을 눌러 진행하세요
+          </p>
         </div>
       </section>
 
@@ -150,13 +183,15 @@
             <div class="large-tichu__stack-item large-tichu__controls">
               <div class="large-tichu__actions" aria-label="라지 티츄 선택">
                 <div class="large-tichu__declare-option">
-                  <span class="large-tichu__action-label">선언하기</span>
                   <button type="button" data-large-tichu-choice="declare" aria-pressed="false">
                     <strong>!!라지 티츄!!</strong>
                   </button>
                   <p class="large-tichu__score" aria-label="라지 티츄 점수">
-                    <span class="large-tichu__score-success">성공 보너스 +200</span>
-                    <span class="large-tichu__score-fail">실패 시 −200</span>
+                    <span class="large-tichu__action-label">선언하기</span>
+                    <span class="large-tichu__score-values">
+                      <span class="large-tichu__score-success">성공 보너스 +200</span>
+                      <span class="large-tichu__score-fail">실패 시 −200</span>
+                    </span>
                   </p>
                 </div>
                 <button
@@ -205,15 +240,84 @@
                 <img class="exchange-card exchange-card--weak exchange-card--left" data-exchange-target="left" src="뒷면.png" alt="" />
                 <img class="exchange-card exchange-card--good exchange-card--top" data-exchange-target="top" src="뒷면.png" alt="" />
                 <img class="exchange-card exchange-card--weak exchange-card--right" data-exchange-target="right" src="뒷면.png" alt="" />
+                <img class="exchange-card exchange-card--incoming exchange-card--received-left" data-exchange-source="left" src="뒷면.png" alt="" />
+                <img class="exchange-card exchange-card--incoming exchange-card--received-top" data-exchange-source="top" src="뒷면.png" alt="" />
+                <img class="exchange-card exchange-card--incoming exchange-card--received-right" data-exchange-source="right" src="뒷면.png" alt="" />
               </div>
 
               <button class="exchange-button" type="button">카드 교환하기</button>
-              <p class="exchange-status" aria-live="polite" aria-hidden="true">동시에 주고받아요</p>
+              <p class="exchange-status" aria-live="polite" aria-hidden="true">서로 3장씩 주고받았어요</p>
             </div>
 
             <div class="exchange-roles" aria-label="카드 교환 방향 안내">
               <p class="exchange-role exchange-role--good">· 좋은 카드 · 를 파트너에게</p>
               <p class="exchange-role exchange-role--weak">- 낮은 카드 - 는 상대팀에게</p>
+            </div>
+          </div>
+          <p class="progress-gate__hint" role="status" aria-live="polite" aria-hidden="true">
+            버튼을 눌러 진행하세요
+          </p>
+        </div>
+      </section>
+
+      <section class="large-tichu small-tichu" aria-labelledby="small-tichu-title">
+        <div class="large-tichu__stage">
+          <div class="large-tichu__content">
+            <h2 class="large-tichu__stack-item large-tichu__title" id="small-tichu-title">
+              카드 14장,<br /><strong>교환까지 끝났어요</strong>
+            </h2>
+            <p class="large-tichu__stack-item large-tichu__question">
+              <span>그래도 1등 할</span>
+              <span>자신 있나요?</span>
+            </p>
+            <p class="large-tichu__stack-item large-tichu__deadline">
+              첫 카드를 내기 전까지 선언할 수 있어요
+            </p>
+
+            <div class="large-tichu__stack-item large-tichu__controls">
+              <p
+                class="small-tichu__eligibility"
+                id="small-tichu-eligibility"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                라지 티츄를 외치지 않았다면, 지금 스몰 티츄를 외칠 수 있어요!
+              </p>
+              <p class="small-tichu__blocked-sub" hidden>
+                스몰 티츄는 외칠 수 없어요. 라지 티츄로 반드시 1등을 노리세요!&nbsp;🔥
+              </p>
+              <div class="large-tichu__actions" aria-label="스몰 티츄 선택">
+                <div class="large-tichu__declare-option">
+                  <button
+                    type="button"
+                    data-small-tichu-choice="declare"
+                    aria-pressed="false"
+                    aria-describedby="small-tichu-eligibility"
+                  >
+                    <strong>!!스몰 티츄!!</strong>
+                  </button>
+                  <p class="large-tichu__score" aria-label="스몰 티츄 점수">
+                    <span class="large-tichu__action-label">선언하기</span>
+                    <span class="large-tichu__score-values">
+                      <span class="large-tichu__score-success">성공 보너스 +100</span>
+                      <span class="large-tichu__score-fail">실패 시 −100</span>
+                    </span>
+                  </p>
+                </div>
+                <button
+                  class="large-tichu__pass-button"
+                  type="button"
+                  data-small-tichu-choice="pass"
+                  aria-pressed="false"
+                >
+                  <strong>패스</strong>
+                </button>
+              </div>
+
+              <p class="large-tichu__feedback" aria-live="polite" aria-atomic="true"></p>
+              <p class="small-tichu__difference">
+                라지 티츄(+200)보다 작지만, 교환까지 패를 다 보고 결정할 수 있어요.
+              </p>
             </div>
           </div>
         </div>
@@ -468,6 +572,145 @@
           </div>
         </div>
         </div>
+      </div>
+    </div>
+
+    <div class="app-modal" id="combo-modal" data-modal="combo" hidden>
+      <div class="app-modal__backdrop" data-close-modal aria-hidden="true"></div>
+
+      <div
+        class="app-modal__dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="combo-dictionary-title"
+        tabindex="-1"
+      >
+        <button class="app-modal__close" type="button" data-close-modal aria-label="카드 조합 닫기">×</button>
+
+        <section class="combo-dictionary" aria-labelledby="combo-dictionary-title">
+          <h2 class="combo-dictionary__title" id="combo-dictionary-title">카드 조합</h2>
+
+          <div class="combo-dictionary__table" role="table" aria-label="기본 카드 조합">
+            <article class="combo-dictionary__row" role="row">
+              <div class="combo-dictionary__name" role="cell">
+                <h3>싱글</h3>
+                <p>1장</p>
+              </div>
+              <div class="combo-dictionary__cards" role="cell" data-card-count="1">
+                <img src="별7.png" alt="별 7" />
+              </div>
+            </article>
+
+            <article class="combo-dictionary__row" role="row">
+              <div class="combo-dictionary__name" role="cell">
+                <h3>페어</h3>
+                <p>값이 같은 카드 2장</p>
+              </div>
+              <div class="combo-dictionary__cards" role="cell" data-card-count="2">
+                <img src="옥7.png" alt="옥 7" />
+                <img src="집7.png" alt="집 7" />
+              </div>
+            </article>
+
+            <article class="combo-dictionary__row" role="row">
+              <div class="combo-dictionary__name" role="cell">
+                <h3>연속 페어</h3>
+                <p>둘 이상 값이 연속한 페어</p>
+              </div>
+              <div class="combo-dictionary__cards" role="cell" data-card-count="4">
+                <span class="combo-dictionary__card-group">
+                  <img src="옥2.png" alt="옥 2" />
+                  <img src="별2.png" alt="별 2" />
+                </span>
+                <span class="combo-dictionary__divider" aria-hidden="true">·</span>
+                <span class="combo-dictionary__card-group">
+                  <img src="별3.png" alt="별 3" />
+                  <img src="집3.png" alt="집 3" />
+                </span>
+              </div>
+            </article>
+
+            <article class="combo-dictionary__row" role="row">
+              <div class="combo-dictionary__name" role="cell">
+                <h3>트리플</h3>
+                <p>값이 같은 카드 3장</p>
+              </div>
+              <div class="combo-dictionary__cards" role="cell" data-card-count="3">
+                <img src="옥9.png" alt="옥 9" />
+                <img src="집9.png" alt="집 9" />
+                <img src="별9.png" alt="별 9" />
+              </div>
+            </article>
+
+            <article class="combo-dictionary__row" role="row">
+              <div class="combo-dictionary__name" role="cell">
+                <h3>풀 하우스</h3>
+                <p>트리플 + 페어</p>
+              </div>
+              <div class="combo-dictionary__cards" role="cell" data-card-count="5">
+                <span class="combo-dictionary__card-group">
+                  <img src="옥7.png" alt="옥 7" />
+                  <img src="집7.png" alt="집 7" />
+                  <img src="별7.png" alt="별 7" />
+                </span>
+                <span class="combo-dictionary__divider" aria-hidden="true">·</span>
+                <span class="combo-dictionary__card-group">
+                  <img src="옥3.png" alt="옥 3" />
+                  <img src="집3.png" alt="집 3" />
+                </span>
+              </div>
+            </article>
+
+            <article class="combo-dictionary__row" role="row">
+              <div class="combo-dictionary__name" role="cell">
+                <h3>스트레이트</h3>
+                <p>값이 연속한 5장 이상</p>
+              </div>
+              <div class="combo-dictionary__cards" role="cell" data-card-count="5">
+                <img src="옥2.png" alt="옥 2" />
+                <img src="별3.png" alt="별 3" />
+                <img src="검4.png" alt="검 4" />
+                <img src="집5.png" alt="집 5" />
+                <img src="별6.png" alt="별 6" />
+              </div>
+            </article>
+          </div>
+
+          <aside class="combo-dictionary__tip" aria-labelledby="combo-invalid-title">
+            <h3 id="combo-invalid-title">이런 건 못 내요</h3>
+
+            <div class="combo-dictionary__tip-list">
+              <article class="combo-dictionary__tip-example">
+                <div class="combo-dictionary__tip-visual" aria-label="별 6과 별 7 두 장은 낼 수 없음">
+                  <div class="combo-dictionary__cards" data-card-count="2">
+                    <img src="별6.png" alt="별 6" />
+                    <img src="별7.png" alt="별 7" />
+                  </div>
+                  <span class="combo-dictionary__tip-x" aria-hidden="true"></span>
+                </div>
+                <p class="combo-dictionary__tip-reason">
+                  <strong>숫자가 다른 2장</strong>
+                  <span>(연속 2장은 조합이 아니에요)</span>
+                </p>
+              </article>
+
+              <article class="combo-dictionary__tip-example">
+                <div class="combo-dictionary__tip-visual" aria-label="별 3, 별 4, 별 5 세 장은 낼 수 없음">
+                  <div class="combo-dictionary__cards" data-card-count="3">
+                    <img src="별3.png" alt="별 3" />
+                    <img src="별4.png" alt="별 4" />
+                    <img src="별5.png" alt="별 5" />
+                  </div>
+                  <span class="combo-dictionary__tip-x" aria-hidden="true"></span>
+                </div>
+                <p class="combo-dictionary__tip-reason">
+                  <strong>연속이지만 3장</strong>
+                  <span>(스트레이트는 5장부터)</span>
+                </p>
+              </article>
+            </div>
+          </aside>
+        </section>
       </div>
     </div>
 
