@@ -40,9 +40,436 @@
               </p>
             </div>
           </div>
+
+          <div class="cards" aria-labelledby="cards-title">
+            <h2 class="cards__count" id="cards-title">
+              카드는 모두 <span><strong>56</strong>장</span>
+            </h2>
+
+            <div class="playing-card" aria-label="일반 카드 구성">
+              <div class="suit-intro-anchor">
+                <div class="suit-intro">
+                  <div class="cards__suits" aria-label="무늬 4종">
+                    <span class="cards__suit-box"><img class="cards__suit" src="옥.png" alt="옥" /></span>
+                    <span class="cards__suit-box"><img class="cards__suit" src="집.png" alt="집" /></span>
+                    <span class="cards__suit-box"><img class="cards__suit" src="별.png" alt="별" /></span>
+                    <span class="cards__suit-box"><img class="cards__suit" src="검.png" alt="검" /></span>
+                  </div>
+
+                  <p class="suit-intro__label">4가지 무늬</p>
+                </div>
+              </div>
+
+              <div class="rank-face">
+                <ol class="rank-line" aria-label="숫자 서열: 2부터 A까지">
+                  <li class="rank-item" style="--rank: 1"><span class="rank-number">2</span></li>
+                  <li class="rank-item" style="--rank: 2"><span class="rank-number">3</span></li>
+                  <li class="rank-item" style="--rank: 3"><span class="rank-number">4</span></li>
+                  <li class="rank-item" style="--rank: 4"><span class="rank-number">5</span></li>
+                  <li class="rank-item" style="--rank: 5"><span class="rank-number">6</span></li>
+                  <li class="rank-item" style="--rank: 6"><span class="rank-number">7</span></li>
+                  <li class="rank-item" style="--rank: 7"><span class="rank-number">8</span></li>
+                  <li class="rank-item" style="--rank: 8"><span class="rank-number">9</span></li>
+                  <li class="rank-item" style="--rank: 9"><span class="rank-number">10</span></li>
+                  <li class="rank-item" style="--rank: 10"><span class="rank-number">J</span></li>
+                  <li class="rank-item" style="--rank: 11"><span class="rank-number">Q</span></li>
+                  <li class="rank-item" style="--rank: 12"><span class="rank-number">K</span></li>
+                  <li class="rank-item" style="--rank: 13"><span class="rank-number">A</span></li>
+                </ol>
+
+                <p class="rank-face__label">2 to A</p>
+
+                <div class="rank-rules">
+                  <p class="rank-rule rank-rule--main">큰 숫자가 작은 숫자를 덮습니다</p>
+                  <p class="rank-rule rank-rule--sub">더 높은 숫자만 이길 수 있어요</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="deal-section" aria-labelledby="deal-title">
+        <div class="deal-section__inner">
+          <h2 id="deal-title">먼저 카드를 나눠요</h2>
+
+          <div class="deal-table" aria-label="네 사람에게 카드를 분배하는 자리">
+            <div class="deal-seat deal-seat--top" data-seat="top">
+              <span class="deal-seat__label">파트너</span>
+              <div class="deal-seat__pile">
+                <img class="deal-seat__fan" src="8장.png" alt="파트너가 받은 8장" />
+              </div>
+            </div>
+
+            <div class="deal-seat deal-seat--right" data-seat="right">
+              <span class="deal-seat__label">상대</span>
+              <div class="deal-seat__pile">
+                <img class="deal-seat__fan" src="8장.png" alt="오른쪽 상대가 받은 8장" />
+              </div>
+            </div>
+
+            <div class="deal-seat deal-seat--bottom" data-seat="bottom">
+              <div class="deal-seat__pile">
+                <img class="deal-seat__fan" src="8장.png" alt="내가 받은 8장" />
+              </div>
+              <span class="deal-seat__label">나</span>
+            </div>
+
+            <div class="deal-seat deal-seat--left" data-seat="left">
+              <span class="deal-seat__label">상대</span>
+              <div class="deal-seat__pile">
+                <img class="deal-seat__fan" src="8장.png" alt="왼쪽 상대가 받은 8장" />
+              </div>
+            </div>
+
+            <div class="deal-deck" aria-hidden="true">
+              <img src="뒷면.png" alt="" />
+            </div>
+            <div class="deal-flight-layer" aria-hidden="true"></div>
+            <button class="deal-button" type="button">카드 분배하기</button>
+            <p class="deal-status" aria-live="polite" aria-hidden="true">8장씩 받았어요</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="large-tichu" aria-labelledby="large-tichu-title">
+        <div class="large-tichu__stage">
+          <div class="large-tichu__content">
+            <h2 class="large-tichu__stack-item large-tichu__title" id="large-tichu-title">
+              총 14장 중,<br /><strong>8장을 먼저 봤어요</strong>
+            </h2>
+            <p class="large-tichu__stack-item large-tichu__question">
+              <span>1등으로</span>
+              <span>손을 비울 자신 있나요?</span>
+            </p>
+            <p class="large-tichu__stack-item large-tichu__deadline">
+              지금만 선언할 수 있어요!
+              <span>(나머지 6장 받기 전)</span>
+            </p>
+
+            <div class="large-tichu__stack-item large-tichu__controls">
+              <div class="large-tichu__actions" aria-label="라지 티츄 선택">
+                <div class="large-tichu__declare-option">
+                  <span class="large-tichu__action-label">선언하기</span>
+                  <button type="button" data-large-tichu-choice="declare" aria-pressed="false">
+                    <strong>!!라지 티츄!!</strong>
+                  </button>
+                  <p class="large-tichu__score" aria-label="라지 티츄 점수">
+                    <span class="large-tichu__score-success">성공 보너스 +200</span>
+                    <span class="large-tichu__score-fail">실패 시 −200</span>
+                  </p>
+                </div>
+                <button
+                  class="large-tichu__pass-button"
+                  type="button"
+                  data-large-tichu-choice="pass"
+                  aria-pressed="false"
+                >
+                  <strong>패스</strong>
+                </button>
+              </div>
+
+              <p class="large-tichu__feedback" aria-live="polite" aria-atomic="true"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="exchange-section" aria-labelledby="exchange-title">
+        <div class="exchange-section__inner">
+          <div class="exchange-receive">
+            <h2 id="exchange-title">나머지 6장을 받아,<br /><strong>14장 완성!</strong></h2>
+            <div class="exchange-receive__visual" aria-label="손의 카드가 8장에서 14장으로 늘어납니다">
+              <span class="exchange-receive__count">14장</span>
+              <div class="exchange-receive__cards" aria-hidden="true">
+                <img src="뒷면.png" alt="" />
+                <img src="뒷면.png" alt="" />
+                <img src="뒷면.png" alt="" />
+                <img src="뒷면.png" alt="" />
+                <img src="뒷면.png" alt="" />
+                <img src="뒷면.png" alt="" />
+              </div>
+            </div>
+          </div>
+
+          <div class="exchange-main">
+            <h3>이제 카드 3장을 나눠요</h3>
+
+            <div class="exchange-table" aria-label="내 카드를 세 방향으로 교환하는 자리">
+              <span class="exchange-seat exchange-seat--top">파트너</span>
+              <span class="exchange-seat exchange-seat--left">상대</span>
+              <span class="exchange-seat exchange-seat--right">상대</span>
+              <span class="exchange-seat exchange-seat--bottom">나</span>
+
+              <div class="exchange-flight-layer" aria-hidden="true">
+                <img class="exchange-card exchange-card--weak exchange-card--left" data-exchange-target="left" src="뒷면.png" alt="" />
+                <img class="exchange-card exchange-card--good exchange-card--top" data-exchange-target="top" src="뒷면.png" alt="" />
+                <img class="exchange-card exchange-card--weak exchange-card--right" data-exchange-target="right" src="뒷면.png" alt="" />
+              </div>
+
+              <button class="exchange-button" type="button">카드 교환하기</button>
+              <p class="exchange-status" aria-live="polite" aria-hidden="true">동시에 주고받아요</p>
+            </div>
+
+            <div class="exchange-roles" aria-label="카드 교환 방향 안내">
+              <p class="exchange-role exchange-role--good">· 좋은 카드 · 를 파트너에게</p>
+              <p class="exchange-role exchange-role--weak">- 낮은 카드 - 는 상대팀에게</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="game-start" aria-labelledby="game-start-title">
+        <div class="game-start__content">
+          <h2 id="game-start-title">참새 보유자,<br /><strong>GAME START!</strong></h2>
+          <p>참새를 가진 사람이 첫 턴을 시작해요.<br /><span>(아무 카드나 내도 OK)</span></p>
+          <button
+            class="inline-modal-button"
+            type="button"
+            data-open="special"
+            aria-haspopup="dialog"
+            aria-controls="special-modal"
+            aria-expanded="false"
+          >
+            특수카드가 뭐예요?
+          </button>
+        </div>
+      </section>
+
+      <section class="combo-bridge" aria-label="카드 조합 소개">
+        <p>카드는 묶어서<br /><strong>낼 수 있어요</strong></p>
+      </section>
+
+      <section class="combo-guide" aria-labelledby="combo-guide-title">
+        <div class="combo-guide__inner">
+          <h2 id="combo-guide-title">앞에 몇 장 깔렸나요?</h2>
+
+          <div class="combo-tabs" role="tablist" aria-label="카드 장수 선택">
+            <button class="combo-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="combo-panel-1" data-combo="1">
+              <strong>1장</strong><span>싱글</span>
+            </button>
+            <button class="combo-tab" type="button" role="tab" aria-selected="false" aria-controls="combo-panel-2" data-combo="2">
+              <strong>2장</strong><span>페어</span>
+            </button>
+            <button class="combo-tab" type="button" role="tab" aria-selected="false" aria-controls="combo-panel-3" data-combo="3">
+              <strong>3장</strong><span>트리플</span>
+            </button>
+            <button class="combo-tab" type="button" role="tab" aria-selected="false" aria-controls="combo-panel-4" data-combo="4">
+              <strong>4장+</strong><span>연속 페어</span>
+            </button>
+            <button class="combo-tab" type="button" role="tab" aria-selected="false" aria-controls="combo-panel-5" data-combo="5">
+              <strong>5장</strong><span>풀하우스<br />스트레이트</span>
+            </button>
+          </div>
+
+          <div class="combo-results">
+            <article class="combo-panel" id="combo-panel-1" role="tabpanel" data-panel="1">
+              <h3>1장 = 싱글</h3>
+              <div class="combo-example">
+                <p>이렇게 생겼어요</p>
+                <div class="combo-card-row"><img src="별7.png" alt="별 7" /></div>
+              </div>
+              <div class="combo-example">
+                <p>받을 땐 더 높은 걸로</p>
+                <div class="combo-card-row"><img src="별10.png" alt="별 10" /></div>
+              </div>
+              <div class="combo-example combo-example--wrong">
+                <p>✗ 못 받아요</p>
+                <div class="combo-card-row"><img src="옥7.png" alt="옥 7" /><img src="집7.png" alt="집 7" /></div>
+                <small>페어는 못 받음</small>
+              </div>
+            </article>
+
+            <article class="combo-panel" id="combo-panel-2" role="tabpanel" data-panel="2" hidden>
+              <h3>2장 = 페어</h3>
+              <div class="combo-example">
+                <p>이렇게 생겼어요</p>
+                <div class="combo-card-row"><img src="옥7.png" alt="옥 7" /><img src="집7.png" alt="집 7" /></div>
+              </div>
+              <div class="combo-example">
+                <p>받을 땐 더 높은 걸로</p>
+                <div class="combo-card-row"><img src="별9.png" alt="별 9" /><img src="검9.png" alt="검 9" /></div>
+              </div>
+              <div class="combo-example combo-example--wrong">
+                <p>✗ 못 받아요</p>
+                <div class="combo-wrong-grid">
+                  <div><div class="combo-card-row"><img src="별7.png" alt="별 7" /></div><small>싱글</small></div>
+                  <div><div class="combo-card-row"><img src="옥7.png" alt="옥 7" /><img src="집7.png" alt="집 7" /><img src="별7.png" alt="별 7" /></div><small>트리플</small></div>
+                </div>
+              </div>
+            </article>
+
+            <article class="combo-panel" id="combo-panel-3" role="tabpanel" data-panel="3" hidden>
+              <h3>3장 = 트리플</h3>
+              <div class="combo-example">
+                <p>이렇게 생겼어요</p>
+                <div class="combo-card-row"><img src="옥7.png" alt="옥 7" /><img src="집7.png" alt="집 7" /><img src="별7.png" alt="별 7" /></div>
+              </div>
+              <div class="combo-example">
+                <p>받을 땐 더 높은 걸로</p>
+                <div class="combo-card-row"><img src="옥9.png" alt="옥 9" /><img src="별9.png" alt="별 9" /><img src="검9.png" alt="검 9" /></div>
+              </div>
+              <div class="combo-example combo-example--wrong">
+                <p>✗ 못 받아요</p>
+                <div class="combo-wrong-grid">
+                  <div><div class="combo-card-row"><img src="별7.png" alt="별 7" /></div><small>싱글</small></div>
+                  <div><div class="combo-card-row"><img src="옥7.png" alt="옥 7" /><img src="집7.png" alt="집 7" /></div><small>페어</small></div>
+                </div>
+              </div>
+            </article>
+
+            <article class="combo-panel" id="combo-panel-4" role="tabpanel" data-panel="4" hidden>
+              <h3>4장+ = 연속 페어</h3>
+              <div class="combo-example">
+                <p>이렇게 생겼어요</p>
+                <div class="combo-card-row"><img src="옥3.png" alt="옥 3" /><img src="집3.png" alt="집 3" /><img src="별4.png" alt="별 4" /><img src="옥4.png" alt="옥 4" /></div>
+              </div>
+              <p class="combo-panel__note">숫자가 이어지는 페어 2쌍 이상 (33-44)</p>
+            </article>
+
+            <article class="combo-panel" id="combo-panel-5" role="tabpanel" data-panel="5" hidden>
+              <h3>5장 = 풀하우스·스트레이트</h3>
+              <div class="combo-example">
+                <p>풀하우스</p>
+                <div class="combo-card-row"><img src="옥7.png" alt="옥 7" /><img src="집7.png" alt="집 7" /><img src="별7.png" alt="별 7" /><img src="옥3.png" alt="옥 3" /><img src="집3.png" alt="집 3" /></div>
+                <small>트리플+페어</small>
+              </div>
+              <div class="combo-example">
+                <p>스트레이트</p>
+                <div class="combo-card-row"><img src="집5.png" alt="집 5" /><img src="별6.png" alt="별 6" /><img src="검7.png" alt="검 7" /><img src="별8.png" alt="별 8" /><img src="별9.png" alt="별 9" /></div>
+                <small>5장 연속</small>
+              </div>
+              <p class="combo-panel__note">풀하우스는 트리플 숫자로 비교. 스트레이트는 길이가 같아야 비교, 무늬는 섞여도 OK.</p>
+            </article>
+          </div>
+
+          <p class="combo-rule">앞 사람과 같은 종류·같은 장수로,<br /><strong>더 높게만 받을 수 있어요.</strong></p>
+
+          <button
+            class="inline-modal-button"
+            type="button"
+            data-open="special"
+            aria-haspopup="dialog"
+            aria-controls="special-modal"
+            aria-expanded="false"
+          >
+            다른 모양의 카드가 있나요?
+          </button>
+        </div>
+      </section>
+
+      <section class="bomb-guide" aria-labelledby="bomb-guide-title">
+        <div class="bomb-guide__inner">
+          <h2 id="bomb-guide-title">단, 폭탄은 예외!</h2>
+          <p class="bomb-guide__lead">장수·종류 상관없이 아무 때나, 다 이겨요.</p>
+
+          <div class="bomb-examples">
+            <article>
+              <h3>포카드</h3>
+              <div class="combo-card-row"><img src="옥7.png" alt="옥 7" /><img src="집7.png" alt="집 7" /><img src="별7.png" alt="별 7" /><img src="검7.png" alt="검 7" /></div>
+            </article>
+            <article>
+              <h3>같은 무늬 연속</h3>
+              <div class="combo-card-row"><img src="별6.png" alt="별 6" /><img src="별7.png" alt="별 7" /><img src="별8.png" alt="별 8" /><img src="별9.png" alt="별 9" /><img src="별10.png" alt="별 10" /></div>
+            </article>
+          </div>
         </div>
       </section>
     </main>
+
+    <div class="app-modal" id="special-modal" data-modal="special" hidden>
+      <div class="app-modal__backdrop" data-close-modal aria-hidden="true"></div>
+
+      <div
+        class="app-modal__dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="special-cards-title"
+        tabindex="-1"
+      >
+        <button class="app-modal__close" type="button" data-close-modal aria-label="특수카드 닫기">×</button>
+
+        <div class="special-cards" aria-labelledby="special-cards-title">
+        <div class="special-cards__stage">
+          <h2 class="special-cards__title" id="special-cards-title">특수카드</h2>
+
+          <div
+            class="special-carousel"
+            role="region"
+            aria-roledescription="carousel"
+            aria-label="특수카드 4장"
+            tabindex="0"
+          >
+            <div class="special-carousel__track">
+              <article class="special-slide is-active" aria-label="1 / 4: 마작">
+                <img class="special-slide__image" src="참새.png" alt="마작" draggable="false" />
+              </article>
+              <article class="special-slide" aria-label="2 / 4: 개" aria-hidden="true">
+                <img class="special-slide__image" src="개.png" alt="개" draggable="false" />
+              </article>
+              <article class="special-slide" aria-label="3 / 4: 봉황" aria-hidden="true">
+                <img class="special-slide__image" src="봉황.png" alt="봉황" draggable="false" />
+              </article>
+              <article class="special-slide" aria-label="4 / 4: 용" aria-hidden="true">
+                <img class="special-slide__image" src="용.png" alt="용" draggable="false" />
+              </article>
+            </div>
+          </div>
+
+          <div class="special-descriptions" aria-live="polite">
+            <article class="special-description is-active">
+              <p class="special-description__name">참새 <span>(雀)</span></p>
+              <h3>카드 내기 / 가장 낮은 숫자 1</h3>
+              <ul>
+                <li>참새 보유자 → GAME START! (아무 카드나 OK)</li>
+                <li>"참새콜" — 원하는 숫자 하나 외치기</li>
+                <li>예: "8!" → 그 숫자 가진 다음 사람은 반드시 내야 함</li>
+                <li>(누군가 낼 때까지 유효)</li>
+              </ul>
+            </article>
+            <article class="special-description" aria-hidden="true">
+              <p class="special-description__name">개 <span>(犬)</span></p>
+              <h3>차례를 파트너에게</h3>
+              <ul>
+                <li>바로 맞은편 파트너에게 차례 넘기기</li>
+                <li>다른 카드를 이기는 힘 X</li>
+                <li>파트너가 편하게 내도록 돕는 카드</li>
+                <li>(파트너가 이미 다 냈으면, 차례는 그 다음 사람에게)</li>
+              </ul>
+            </article>
+            <article class="special-description" aria-hidden="true">
+              <p class="special-description__name">봉황 <span>(鳳)</span></p>
+              <h3>!!만능 카드!! 뭐든 변신!</h3>
+              <ul>
+                <li>아무 카드로나 변신 (예: A인 척, A 두 장과 함께)</li>
+                <li>혼자 한 장만 낼 땐 앞 카드보다 +0.5 (먼저 낼 땐 1.5)</li>
+                <li>예: 앞사람 K 한 장 → 봉황 한 장 내면 K.5, K를 이김</li>
+                <li>보유 시 마지막 집계에서 −25점</li>
+                <li>폭탄 제조 X</li>
+              </ul>
+            </article>
+            <article class="special-description" aria-hidden="true">
+              <p class="special-description__name">용 <span>(龍)</span></p>
+              <h3>!!가장 강력!!</h3>
+              <ul>
+                <li>오직 폭탄만 용을 이길 수 있음</li>
+                <li>+25점 (획득 시 이득)</li>
+                <li>단, 용으로 얻은 카드 더미는 상대편에게 줘야 함</li>
+                <li>점수 적을 때 쓰는 게 좋음</li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="special-dots" aria-label="특수카드 위치">
+            <button class="special-dot is-active" type="button" aria-label="마작 카드 보기" aria-current="true"></button>
+            <button class="special-dot" type="button" aria-label="개 카드 보기"></button>
+            <button class="special-dot" type="button" aria-label="봉황 카드 보기"></button>
+            <button class="special-dot" type="button" aria-label="용 카드 보기"></button>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
