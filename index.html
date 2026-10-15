@@ -10,6 +10,17 @@
       content="처음 만나는 티츄 — 네 명이 함께 시작하는 테이블 가이드"
     />
     <title>티츄 — 게임 시작</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -185,24 +196,34 @@
               <span>1등으로</span>
               <span>손을 비울 자신 있나요?</span>
             </p>
-            <p class="large-tichu__stack-item large-tichu__deadline">
-              지금만 선언할 수 있어요!
-              <span>(나머지 6장 받기 전)</span>
-            </p>
+            <div class="large-tichu__stack-item large-tichu__deadline large-tichu__deadline-block">
+              <p class="large-tichu__deadline-copy">
+                지금만 선언할 수 있어요!
+                <span>(나머지 6장 받기 전)</span>
+              </p>
+              <p class="tichu__score-line" aria-label="라지 티츄 성공 보너스 200점, 실패 시 마이너스 200점">
+                <span class="large-tichu__score-success">성공 보너스 +200</span>
+                <span class="tichu__score-divider" aria-hidden="true">|</span>
+                <span class="large-tichu__score-fail">실패 시 −200</span>
+              </p>
+            </div>
 
             <div class="large-tichu__stack-item large-tichu__controls">
+              <button
+                class="large-tichu__tip-trigger"
+                type="button"
+                data-open="tichu-tip"
+                aria-haspopup="dialog"
+                aria-controls="tichu-tip-modal"
+                aria-expanded="false"
+              >
+                티츄, 외쳐도 될까? 🤔
+              </button>
               <div class="large-tichu__actions" aria-label="라지 티츄 선택">
                 <div class="large-tichu__declare-option">
                   <button type="button" data-large-tichu-choice="declare" aria-pressed="false">
                     <strong>!! 라지 티츄 !!</strong>
                   </button>
-                  <p class="large-tichu__score" aria-label="라지 티츄 점수">
-                    <span class="large-tichu__action-label">선언하기</span>
-                    <span class="large-tichu__score-values">
-                      <span class="large-tichu__score-success">성공 보너스 +200</span>
-                      <span class="large-tichu__score-fail">실패 시 −200</span>
-                    </span>
-                  </p>
                 </div>
                 <button
                   class="large-tichu__pass-button"
@@ -262,6 +283,16 @@
             <div class="exchange-roles" aria-label="카드 교환 방향 안내">
               <p class="exchange-role exchange-role--good">· 좋은 카드 · 를 파트너에게</p>
               <p class="exchange-role exchange-role--weak">- 낮은 카드 - 는 상대팀에게</p>
+              <button
+                class="large-tichu__tip-trigger exchange-tip-trigger"
+                type="button"
+                data-open="exchange-tip"
+                aria-haspopup="dialog"
+                aria-controls="exchange-tip-modal"
+                aria-expanded="false"
+              >
+                어떤 카드가 좋은 카드일까? 🤔
+              </button>
             </div>
           </div>
           <p class="progress-gate__hint" role="status" aria-live="polite" aria-hidden="true">
@@ -277,12 +308,17 @@
               카드 14장,<br /><strong>교환까지 끝났어요</strong>
             </h2>
             <p class="large-tichu__stack-item large-tichu__question">
-              <span>그래도 1등 할</span>
+              <span>그래도 1등</span>
               <span>자신 있나요?</span>
             </p>
-            <p class="large-tichu__stack-item large-tichu__deadline">
-              첫 카드를 내기 전까지 선언할 수 있어요
-            </p>
+            <div class="large-tichu__stack-item large-tichu__deadline small-tichu__deadline-block">
+              <p class="small-tichu__deadline-copy">첫 카드를 내기 전까지 선언할 수 있어요</p>
+              <p class="tichu__score-line" aria-label="스몰 티츄 성공 보너스 100점, 실패 시 마이너스 100점">
+                <span class="large-tichu__score-success">성공 보너스 +100</span>
+                <span class="tichu__score-divider" aria-hidden="true">|</span>
+                <span class="large-tichu__score-fail">실패 시 −100</span>
+              </p>
+            </div>
 
             <div class="large-tichu__stack-item large-tichu__controls">
               <p
@@ -296,6 +332,16 @@
               <p class="small-tichu__blocked-sub" hidden>
                 스몰 티츄는 외칠 수 없어요. 라지 티츄로 반드시 1등을 노리세요!&nbsp;🔥
               </p>
+              <button
+                class="large-tichu__tip-trigger"
+                type="button"
+                data-open="tichu-tip"
+                aria-haspopup="dialog"
+                aria-controls="tichu-tip-modal"
+                aria-expanded="false"
+              >
+                티츄, 외쳐도 될까? 🤔
+              </button>
               <div class="large-tichu__actions" aria-label="스몰 티츄 선택">
                 <div class="large-tichu__declare-option">
                   <button
@@ -306,13 +352,6 @@
                   >
                     <strong>!! 스몰 티츄 !!</strong>
                   </button>
-                  <p class="large-tichu__score" aria-label="스몰 티츄 점수">
-                    <span class="large-tichu__action-label">선언하기</span>
-                    <span class="large-tichu__score-values">
-                      <span class="large-tichu__score-success">성공 보너스 +100</span>
-                      <span class="large-tichu__score-fail">실패 시 −100</span>
-                    </span>
-                  </p>
                 </div>
                 <button
                   class="large-tichu__pass-button"
@@ -334,37 +373,43 @@
       </section>
 
       <section class="game-start" aria-labelledby="game-start-title">
-        <svg
-          class="game-start__direction"
-          viewBox="0 0 440 640"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <path
-            class="game-start__arrow-line"
-            d="M 366 300 C 393 283 414 257 414 218 C 414 139 389 78 333 49 C 264 13 164 27 105 62 C 46 98 28 168 31 225 C 34 265 45 291 68 300"
-          />
-          <path
-            class="game-start__arrow-head"
-            d="M 44 282 L 68 300 L 43 311"
-          />
-        </svg>
+        <div class="game-start__backdrop" aria-hidden="true"></div>
         <div class="game-start__content">
           <img class="game-start__bird" src="참새.png" alt="참새 카드" />
-          <h2 id="game-start-title"><span>참새 보유자</span><strong>GAME START!</strong></h2>
-          <p>참새 카드 제시한 사람이 첫 카드를 내며 시작합니다 (아무 카드 &amp; 몇 장이든 OK)</p>
-          <p class="game-start__direction-label">시계 반대방향으로 진행해요</p>
-          <button
-            class="inline-modal-button"
-            type="button"
-            data-open="special"
-            aria-haspopup="dialog"
-            aria-controls="special-modal"
-            aria-expanded="false"
-          >
-            특수카드가 뭐예요?
-          </button>
+          <h2 id="game-start-title">
+            <span class="game-start__holder">참새 보유자</span>
+            <strong class="game-start__launch">GAME START!</strong>
+          </h2>
+          <div class="game-start__details">
+            <svg
+              class="game-start__direction"
+              viewBox="0 0 440 640"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                class="game-start__arrow-line"
+                d="M 344 268 C 382 260 400 228 400 184 C 400 116 330 83 220 82 C 110 81 40 115 40 184 C 40 228 58 259 96 268"
+              />
+              <path
+                class="game-start__arrow-head"
+                d="M 72 252 L 96 268 L 71 281"
+              />
+            </svg>
+            <p>참새 카드 제시한 사람이 첫 카드를 내며 시작합니다 (아무 카드 &amp; 몇 장이든 OK)</p>
+            <p class="game-start__direction-label">시계 반대방향으로 진행해요</p>
+            <button
+              class="inline-modal-button"
+              type="button"
+              data-open="special"
+              aria-haspopup="dialog"
+              aria-controls="special-modal"
+              aria-expanded="false"
+            >
+              특수카드가 뭐예요?
+            </button>
+          </div>
         </div>
       </section>
 
@@ -385,16 +430,16 @@
 
       <section class="combo-bridge" aria-label="카드 조합 소개">
         <div class="combo-bridge__content">
-          <p>카드는 묶어서<br /><strong>낼 수 있어요</strong></p>
           <button
-            class="inline-modal-button"
+            class="combo-bridge__button"
             type="button"
             data-open="combo"
             aria-haspopup="dialog"
             aria-controls="combo-modal"
             aria-expanded="false"
           >
-            조합
+            <span>카드는 묶어서</span>
+            <strong>낼 수 있어요</strong>
           </button>
         </div>
       </section>
@@ -635,7 +680,6 @@
                   <img src="옥9.png" alt="" />
                 </span>
                 <span>손에 남은 카드</span>
-                <small>꼴찌</small>
               </div>
               <span class="round-end__transfer-arrow" aria-hidden="true">→</span>
               <div class="round-end__recipient">
@@ -651,7 +695,6 @@
                   <img src="뒷면.png" alt="" />
                 </span>
                 <span>그동안 딴 트릭</span>
-                <small>꼴찌</small>
               </div>
               <span class="round-end__transfer-arrow" aria-hidden="true">→</span>
               <div class="round-end__recipient">
@@ -680,6 +723,20 @@
         </div>
       </section>
     </main>
+
+    <button
+      class="floating-tip-button"
+      type="button"
+      data-open="general-tip"
+      aria-haspopup="dialog"
+      aria-controls="general-tip-modal"
+      aria-expanded="false"
+      aria-hidden="true"
+      tabindex="-1"
+    >
+      <span aria-hidden="true">💡</span>
+      <span>팁</span>
+    </button>
 
     <div class="app-modal" id="special-modal" data-modal="special" hidden>
       <div class="app-modal__backdrop" data-close-modal aria-hidden="true"></div>
@@ -715,7 +772,7 @@
               <article class="special-slide" aria-label="3 / 4: 봉황" aria-hidden="true" data-card-name="봉황">
                 <img class="special-slide__image" src="봉황.png" alt="봉황" draggable="false" />
               </article>
-              <article class="special-slide" aria-label="4 / 4: 용" aria-hidden="true" data-card-name="용">
+              <article class="special-slide" aria-label="4 / 4: 용 (龍)" aria-hidden="true" data-card-name="용 (龍)">
                 <img class="special-slide__image" src="용.png" alt="용" draggable="false" />
               </article>
             </div>
@@ -753,12 +810,15 @@
               </ul>
             </article>
             <article class="special-description" aria-hidden="true">
-              <h3>!!가장 강력!!</h3>
+              <h3>싱글 최강! 단, 트릭은 상대에게</h3>
               <ul>
-                <li>오직 폭탄만 용을 이길 수 있음</li>
-                <li>+25점 (획득 시 이득)</li>
-                <li>단, 용으로 얻은 카드 더미는 상대편에게 줘야 함</li>
-                <li>점수 적을 때 쓰는 게 좋음</li>
+                <li>싱글 중 가장 강함 (폭탄만 용을 이김)</li>
+                <li>+25점</li>
+                <li>용으로 딴 트릭은 상대팀에게 넘김</li>
+                <li>게임이 끝나는 게 아니라, 그 '한 트릭'만 넘기는 것</li>
+                <li>👎 잃는 것: 그 트릭의 점수</li>
+                <li>+ 얻는 것: 리드권(다음 트릭 내가 시작) + 상대 공격 차단</li>
+                <li>팁: 점수 적게 쌓였을 때 쓰면 이득!</li>
               </ul>
             </article>
           </div>
@@ -926,14 +986,9 @@
         <section class="bomb-modal__content">
           <h2 id="bomb-modal-title">폭탄은 예외!</h2>
           <p class="bomb-modal__lead">아무 때나 낼 수 있고 모든 조합을 이겨요.</p>
-          <ol>
-            <li>① 같은 숫자 4장</li>
-            <li>② 같은 무늬 5장 이상 연속</li>
-          </ol>
-          <p class="bomb-modal__note">같은 무늬 2장 연속은 안 되지만, 5장 이상 모으면 폭탄!</p>
-          <div class="bomb-modal__examples" aria-label="폭탄 예시">
-            <article class="bomb-modal__example">
-              <h3>포카드</h3>
+          <div class="bomb-modal__rules" aria-label="폭탄 두 종류와 예시">
+            <article class="bomb-modal__rule">
+              <h3><span aria-hidden="true">①</span> 같은 숫자 4장</h3>
               <div class="combo-card-row" role="group" aria-label="옥 7, 집 7, 별 7, 검 7">
                 <img src="옥7.png" alt="옥 7" />
                 <img src="집7.png" alt="집 7" />
@@ -941,8 +996,8 @@
                 <img src="검7.png" alt="검 7" />
               </div>
             </article>
-            <article class="bomb-modal__example">
-              <h3>같은 무늬 5장 연속</h3>
+            <article class="bomb-modal__rule">
+              <h3><span aria-hidden="true">②</span> 같은 무늬 5장 이상 연속</h3>
               <div class="combo-card-row" role="group" aria-label="별 6, 별 7, 별 8, 별 9, 별 10">
                 <img src="별6.png" alt="별 6" />
                 <img src="별7.png" alt="별 7" />
@@ -950,6 +1005,14 @@
                 <img src="별9.png" alt="별 9" />
                 <img src="별10.png" alt="별 10" />
               </div>
+              <div class="combo-card-row" role="group" aria-label="검 9, 검 10, 검 J, 검 Q, 검 K">
+                <img src="검9.png" alt="검 9" />
+                <img src="검10.png" alt="검 10" />
+                <img src="검J.png" alt="검 J" />
+                <img src="검Q.png" alt="검 Q" />
+                <img src="검K.png" alt="검 K" />
+              </div>
+              <p class="bomb-modal__note">같은 무늬 2장 연속은 X, 5장 이상 모았다면 ! 폭탄 !</p>
             </article>
           </div>
         </section>
@@ -975,31 +1038,60 @@
               <article class="score-sheet__card">
                 <img src="집5.png" alt="집 5" />
                 <strong>+5점</strong>
-                <span>5</span>
               </article>
               <article class="score-sheet__card">
                 <img src="별10.png" alt="별 10" />
                 <strong>+10점</strong>
-                <span>10</span>
               </article>
               <article class="score-sheet__card">
                 <img src="별K.png" alt="별 K" />
                 <strong>+10점</strong>
-                <span>K</span>
               </article>
               <article class="score-sheet__card">
                 <img src="용.png" alt="용" />
                 <strong>+25점</strong>
-                <span>용</span>
               </article>
               <article class="score-sheet__card">
                 <img src="봉황.png" alt="봉황" />
                 <strong>−25점</strong>
-                <span>봉황</span>
               </article>
             </div>
             <p class="score-sheet__note">나머지 카드(2·3·4·6·7·8·9·J·Q·A·참새·개)는 0점</p>
-            <p class="score-sheet__total">한 라운드 카드 점수 합은 100점</p>
+            <details class="score-sheet__total">
+              <summary>한 라운드 카드 점수 합 = 무조건 100점</summary>
+              <div class="score-breakdown">
+                <h4>왜 항상 100점일까요?</h4>
+                <div class="score-breakdown__rows">
+                  <div class="score-breakdown__row">
+                    <img src="집5.png" alt="5 카드" />
+                    <span>5 × 4장</span>
+                    <strong>= 20</strong>
+                  </div>
+                  <div class="score-breakdown__row">
+                    <img src="별10.png" alt="10 카드" />
+                    <span>10 × 4장</span>
+                    <strong>= 40</strong>
+                  </div>
+                  <div class="score-breakdown__row">
+                    <img src="별K.png" alt="K 카드" />
+                    <span>K × 4장</span>
+                    <strong>= 40</strong>
+                  </div>
+                  <div class="score-breakdown__row">
+                    <img src="용.png" alt="용" />
+                    <span>용</span>
+                    <strong>= +25</strong>
+                  </div>
+                  <div class="score-breakdown__row">
+                    <img src="봉황.png" alt="봉황" />
+                    <span>봉황</span>
+                    <strong>= −25</strong>
+                  </div>
+                </div>
+                <p class="score-breakdown__sum">합계 = 100점</p>
+                <p class="score-breakdown__conclusion">그래서 두 팀의 카드 점수를 더하면 항상 100점!</p>
+              </div>
+            </details>
           </section>
 
           <section class="score-sheet__section" aria-labelledby="score-tichu-title">
@@ -1020,8 +1112,116 @@
       </div>
     </div>
 
+    <div class="app-modal" id="tichu-tip-modal" data-modal="tichu-tip" hidden>
+      <div class="app-modal__backdrop" data-close-modal aria-hidden="true"></div>
+      <div
+        class="app-modal__dialog tichu-tip-modal__dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tichu-tip-title"
+        tabindex="-1"
+      >
+        <button class="app-modal__close" type="button" data-close-modal aria-label="티츄 판단 팁 닫기">×</button>
+        <section class="tichu-tip" aria-labelledby="tichu-tip-title">
+          <h2 id="tichu-tip-title">티츄, 외쳐도 될까?</h2>
+
+          <div class="tichu-tip__group tichu-tip__group--challenge">
+            <h3>이런 패면 도전!</h3>
+            <ul>
+              <li>에이스·K·용·봉황 같은 센 카드가 많다</li>
+              <li>폭탄이 있다 (거의 확정!)</li>
+              <li>스트레이트·연속페어로 한 번에 많이 털 수 있다</li>
+              <li>2·3·4 같은 외톨이 약한 카드가 적다</li>
+            </ul>
+          </div>
+
+          <div class="tichu-tip__group tichu-tip__group--pass">
+            <h3>이런 패면 패스</h3>
+            <ul>
+              <li>낮은 외톨이 카드가 많다 (마지막에 안 빠져요)</li>
+              <li>센 카드가 거의 없다</li>
+            </ul>
+          </div>
+
+          <p class="tichu-tip__beginner"><strong>처음이라면?</strong> 처음 몇 판은 패스하며 감 익히기!</p>
+        </section>
+      </div>
+    </div>
+
+    <div class="app-modal" id="exchange-tip-modal" data-modal="exchange-tip" hidden>
+      <div class="app-modal__backdrop" data-close-modal aria-hidden="true"></div>
+      <div
+        class="app-modal__dialog tichu-tip-modal__dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="exchange-tip-title"
+        tabindex="-1"
+      >
+        <button class="app-modal__close" type="button" data-close-modal aria-label="카드 교환 팁 닫기">×</button>
+        <section class="tichu-tip" aria-labelledby="exchange-tip-title">
+          <h2 id="exchange-tip-title">어떤 카드를 줄까? 🤔</h2>
+
+          <div class="tichu-tip__group tichu-tip__group--challenge">
+            <h3>· 좋은 카드 (파트너에게)</h3>
+            <ul>
+              <li>에이스·K 같은 높은 숫자</li>
+              <li>용·봉황 같은 특수카드</li>
+            </ul>
+          </div>
+
+          <div class="tichu-tip__group tichu-tip__group--pass">
+            <h3>👎 낮은 카드 (상대팀에게)</h3>
+            <ul>
+              <li>2·3·4 같은 낮은 숫자</li>
+              <li>혼자 남는 외톨이 카드</li>
+            </ul>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="app-modal" id="general-tip-modal" data-modal="general-tip" hidden>
+      <div class="app-modal__backdrop" data-close-modal aria-hidden="true"></div>
+      <div
+        class="app-modal__dialog tichu-tip-modal__dialog general-tip-modal__dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="general-tip-title"
+        tabindex="-1"
+      >
+        <button class="app-modal__close" type="button" data-close-modal aria-label="꿀팁과 자주 하는 실수 닫기">×</button>
+        <section class="tichu-tip general-tip" aria-labelledby="general-tip-title">
+          <h2 id="general-tip-title">처음이라면?<br />꿀팁 &amp; 자주 하는 실수</h2>
+
+          <div class="tichu-tip__group general-tip__group general-tip__group--mistakes">
+            <h3>⚠️ 자주 하는 실수</h3>
+            <ul>
+              <li>패스해도 끝이 아니에요 — 다음 차례에 또 낼 수 있어요</li>
+              <li>같은 숫자는 못 내요 — 7 위에 7은 안 되고, 더 높아야 이겨요</li>
+              <li>같은 종류·장수로만 받아요 — 페어엔 페어, 트리플엔 트리플</li>
+              <li>같은 무늬 2장 연속은 조합이 아니에요 — 5장 이상 모아야 폭탄</li>
+              <li>딴 카드는 다시 못 내요 — 점수용으로 쌓아둘 뿐</li>
+              <li>개는 바닥이 비었을 때만 — 받을 때는 못 내요</li>
+              <li>티츄는 선언한 본인이 1등이어야 성공</li>
+            </ul>
+          </div>
+
+          <div class="tichu-tip__group general-tip__group general-tip__group--tips">
+            <h3>💡 꿀팁</h3>
+            <ul>
+              <li>낮은 외톨이 카드(2·3·4)부터 털어내기</li>
+              <li>에이스·폭탄은 아껴뒀다 급할 때</li>
+              <li>파트너가 티츄 외쳤으면 센 카드로 길 열어주기</li>
+              <li>용은 점수가 적게 쌓였을 때 쓰기</li>
+              <li>처음엔 티츄를 패스하며 감 익히기</li>
+            </ul>
+          </div>
+        </section>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
-    <script src="main.js"></script>
+    <script src="main.js" charset="UTF-8"></script>
   </body>
 </html>

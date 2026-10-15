@@ -469,37 +469,6 @@
 (() => {
   "use strict";
 
-  const gameStart = document.querySelector(".game-start");
-
-  if (gameStart) {
-    if (!("IntersectionObserver" in window)) {
-      gameStart.querySelectorAll(".game-start__direction path").forEach((path) => {
-        path.style.setProperty("--arrow-path-length", `${path.getTotalLength()}px`);
-        path.style.setProperty("--arrow-head-length", `${path.getTotalLength()}px`);
-      });
-      gameStart.classList.add("is-visible");
-    } else {
-      const directionObserver = new IntersectionObserver(
-        (entries, observer) => {
-          if (entries.some((entry) => entry.isIntersecting)) {
-            const [line, head] = gameStart.querySelectorAll(".game-start__direction path");
-            line.style.setProperty("--arrow-path-length", `${line.getTotalLength()}px`);
-            head.style.setProperty("--arrow-head-length", `${head.getTotalLength()}px`);
-            gameStart.classList.add("is-visible");
-            observer.disconnect();
-          }
-        },
-        { threshold: 0.2 }
-      );
-
-      directionObserver.observe(gameStart);
-    }
-  }
-})();
-
-(() => {
-  "use strict";
-
   const section = document.querySelector(".deal-section");
 
   if (!section) {
@@ -1180,6 +1149,22 @@
     gsap.registerPlugin(ScrollTrigger);
 
     const quickReferenceBar = document.querySelector(".quick-reference-bar");
+    const backdrop = gameStart.querySelector(".game-start__backdrop");
+    const bird = gameStart.querySelector(".game-start__bird");
+    const holder = gameStart.querySelector(".game-start__holder");
+    const launch = gameStart.querySelector(".game-start__launch");
+    const details = gameStart.querySelector(".game-start__details");
+    const direction = gameStart.querySelector(".game-start__direction");
+    const [arrowLine, arrowHead] = direction.querySelectorAll("path");
+
+    [arrowLine, arrowHead].forEach((path) => {
+      const length = path.getTotalLength();
+      path.style.strokeDasharray = `${length}px`;
+      path.style.strokeDashoffset = `${length}px`;
+    });
+
+    gsap.set(backdrop, { yPercent: 100 });
+    gsap.set([bird, holder, launch, details], { y: 34, autoAlpha: 0 });
     const updateReferenceBarHeight = () => {
       gameStart.style.setProperty(
         "--quick-reference-bar-height",
@@ -1192,47 +1177,53 @@
 
     gsap
       .timeline({
+        defaults: { ease: "power2.inOut" },
         scrollTrigger: {
           trigger: gameStart,
           start: () => `top top+=${quickReferenceBar?.offsetHeight ?? 0}`,
-          end: "+=150%",
+          end: "+=300%",
           pin: true,
           pinSpacing: true,
-          scrub: 0.55,
+          scrub: 0.7,
+          anticipatePin: 1,
           invalidateOnRefresh: true
         }
       })
+      .to(backdrop, { yPercent: 0, duration: 0.9 }, 0)
+      .to(bird, { y: 0, autoAlpha: 1, duration: 0.5, ease: "power2.out" }, 0.95)
+      .to(holder, { y: 0, autoAlpha: 1, duration: 0.46, ease: "power2.out" }, 1.48)
+      .to(launch, { y: 0, autoAlpha: 1, duration: 0.5, ease: "power2.out" }, 1.98)
+      .to(details, { y: 0, autoAlpha: 1, duration: 0.55, ease: "power2.out" }, 2.52)
+      .to(arrowLine, { strokeDashoffset: 0, duration: 0.76, ease: "power1.inOut" }, 2.6)
+      .to(arrowHead, { strokeDashoffset: 0, duration: 0.18, ease: "power1.out" }, 3.25)
       .to(
         gameStart.querySelector(".game-start__content"),
         {
           y: () => -Math.max(window.innerHeight, 560) * 0.16,
           opacity: 0,
-          duration: 0.25,
-          ease: "none"
+          duration: 0.48
         },
-        0.75
+        3.82
       )
       .to(
-        gameStart.querySelector(".game-start__direction"),
+        backdrop,
         {
-          y: () => -Math.max(window.innerHeight, 560) * 0.12,
           opacity: 0,
-          duration: 0.25,
-          ease: "none"
+          duration: 0.42
         },
-        0.75
+        3.9
       )
       .fromTo(
         cardSequence.querySelector(".play-card-sequence__caption"),
         { y: 44, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.25, ease: "none" },
-        0.75
+        { y: 0, opacity: 1, duration: 0.42, ease: "power2.out" },
+        3.9
       )
       .fromTo(
         cardSequence.querySelector(".play-card-sequence__pile"),
         { y: 52, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.25, ease: "none" },
-        0.82
+        { y: 0, opacity: 1, duration: 0.42, ease: "power2.out" },
+        4.02
       );
   }
 
@@ -1770,4 +1761,43 @@
 
   window.openModal = openModal;
   window.closeModal = closeModal;
+})();
+
+(() => {
+  "use strict";
+
+  const button = document.querySelector(".floating-tip-button");
+  const gameStart = document.querySelector(".game-start");
+
+  if (!button || !gameStart) {
+    return;
+  }
+
+  const setVisible = (visible) => {
+    button.classList.toggle("is-visible", visible);
+    button.setAttribute("aria-hidden", String(!visible));
+    button.tabIndex = visible ? 0 : -1;
+  };
+
+  setVisible(false);
+
+  if (window.ScrollTrigger) {
+    window.gsap?.registerPlugin(window.ScrollTrigger);
+    window.ScrollTrigger.create({
+      trigger: gameStart,
+      start: "top 72%",
+      onEnter: () => setVisible(true),
+      onLeaveBack: () => setVisible(false),
+      onRefresh: (self) => setVisible(self.scroll() >= self.start)
+    });
+    return;
+  }
+
+  const update = () => {
+    setVisible(gameStart.getBoundingClientRect().top <= window.innerHeight * 0.72);
+  };
+
+  window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", update);
+  update();
 })();
