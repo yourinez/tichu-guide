@@ -34,6 +34,7 @@
   const rankFaceLabel = document.querySelector(".rank-face__label");
   const rankItems = gsap.utils.toArray(".rank-item");
   const rankRules = gsap.utils.toArray(".rank-rule");
+  const rankReferenceLabels = gsap.utils.toArray(".rank-reference-label");
   const quickReferenceBar = document.querySelector(".quick-reference-bar");
 
   const timeline = gsap.timeline({
@@ -300,6 +301,17 @@
         ease: "power2.out"
       },
       10.62
+    )
+    .to(
+      rankReferenceLabels,
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.3,
+        stagger: 0.1,
+        ease: "power2.out"
+      },
+      11.12
     )
     .to(
       playingCard,
@@ -1025,6 +1037,7 @@
   const slides = Array.from(section.querySelectorAll(".special-slide"));
   const descriptions = Array.from(section.querySelectorAll(".special-description"));
   const dots = Array.from(section.querySelectorAll(".special-dot"));
+  const currentName = section.querySelector(".special-cards__current-name");
   const lastIndex = slides.length - 1;
 
   let currentIndex = 0;
@@ -1038,6 +1051,9 @@
   const render = (nextIndex, immediate = false) => {
     currentIndex = Math.max(0, Math.min(lastIndex, nextIndex));
     section.classList.toggle("is-complete", currentIndex === lastIndex);
+    if (currentName) {
+      currentName.textContent = slides[currentIndex].dataset.cardName ?? "";
+    }
 
     if (immediate || reducedMotion) {
       track.style.transitionDuration = "0s";
@@ -1062,6 +1078,7 @@
     dots.forEach((dot, index) => {
       const active = index === currentIndex;
       dot.classList.toggle("is-active", active);
+      dot.setAttribute("aria-label", `${slides[index].dataset.cardName ?? "특수"} 카드 보기`);
       if (active) {
         dot.setAttribute("aria-current", "true");
       } else {
@@ -1151,25 +1168,118 @@
   "use strict";
 
   const cardSequence = document.querySelector(".play-card-sequence");
+  const gameStart = document.querySelector(".game-start");
+
+  if (
+    cardSequence &&
+    gameStart &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
+    window.gsap &&
+    window.ScrollTrigger
+  ) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const quickReferenceBar = document.querySelector(".quick-reference-bar");
+    const updateReferenceBarHeight = () => {
+      gameStart.style.setProperty(
+        "--quick-reference-bar-height",
+        `${quickReferenceBar?.offsetHeight ?? 0}px`
+      );
+    };
+
+    updateReferenceBarHeight();
+    ScrollTrigger.addEventListener("refreshInit", updateReferenceBarHeight);
+
+    gsap
+      .timeline({
+        scrollTrigger: {
+          trigger: gameStart,
+          start: () => `top top+=${quickReferenceBar?.offsetHeight ?? 0}`,
+          end: "+=150%",
+          pin: true,
+          pinSpacing: true,
+          scrub: 0.55,
+          invalidateOnRefresh: true
+        }
+      })
+      .to(
+        gameStart.querySelector(".game-start__content"),
+        {
+          y: () => -Math.max(window.innerHeight, 560) * 0.16,
+          opacity: 0,
+          duration: 0.25,
+          ease: "none"
+        },
+        0.75
+      )
+      .to(
+        gameStart.querySelector(".game-start__direction"),
+        {
+          y: () => -Math.max(window.innerHeight, 560) * 0.12,
+          opacity: 0,
+          duration: 0.25,
+          ease: "none"
+        },
+        0.75
+      )
+      .fromTo(
+        cardSequence.querySelector(".play-card-sequence__caption"),
+        { y: 44, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.25, ease: "none" },
+        0.75
+      )
+      .fromTo(
+        cardSequence.querySelector(".play-card-sequence__pile"),
+        { y: 52, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.25, ease: "none" },
+        0.82
+      );
+  }
 
   if (cardSequence) {
-    if (
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-      !("IntersectionObserver" in window)
-    ) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       cardSequence.classList.add("is-visible");
-    } else {
+    } else if (window.gsap && window.ScrollTrigger) {
+      gsap.registerPlugin(ScrollTrigger);
+
+      const playSequence = () => {
+        cardSequence.classList.remove("is-visible");
+        void cardSequence.offsetWidth;
+        cardSequence.classList.add("is-visible");
+      };
+
+      const resetSequence = () => {
+        cardSequence.classList.remove("is-visible");
+      };
+
+      ScrollTrigger.create({
+        trigger: cardSequence,
+        start: "top 70%",
+        end: "bottom 20%",
+        onEnter: playSequence,
+        onEnterBack: playSequence,
+        onLeave: resetSequence,
+        onLeaveBack: resetSequence
+      });
+    } else if ("IntersectionObserver" in window) {
       const sequenceObserver = new IntersectionObserver(
-        (entries, observer) => {
-          if (entries.some((entry) => entry.isIntersecting)) {
-            cardSequence.classList.add("is-visible");
-            observer.disconnect();
-          }
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              cardSequence.classList.remove("is-visible");
+              void cardSequence.offsetWidth;
+              cardSequence.classList.add("is-visible");
+            } else {
+              cardSequence.classList.remove("is-visible");
+            }
+          });
         },
-        { threshold: 0.35 }
+        { threshold: 0.2 }
       );
 
       sequenceObserver.observe(cardSequence);
+    } else {
+      cardSequence.classList.add("is-visible");
     }
   }
 })();
@@ -1231,26 +1341,270 @@
     return;
   }
 
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    return;
-  }
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  if (!("IntersectionObserver" in window)) {
+  if (reducedMotion) {
     trickEnd.classList.add("is-visible");
     return;
   }
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) {
-        trickEnd.classList.add("is-visible");
-        observer.disconnect();
-      }
-    },
-    { threshold: 0.25 }
-  );
+  const playCollection = () => {
+    trickEnd.classList.remove("is-visible");
+    void trickEnd.offsetWidth;
+    trickEnd.classList.add("is-visible");
+  };
 
-  observer.observe(trickEnd);
+  const resetCollection = () => {
+    trickEnd.classList.remove("is-visible");
+  };
+
+  if (window.gsap && window.ScrollTrigger) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap
+      .timeline({
+        scrollTrigger: {
+          trigger: trickEnd,
+          start: "top 82%",
+          end: "bottom 18%",
+          scrub: 0.5,
+          invalidateOnRefresh: true
+        }
+      })
+      .fromTo(
+        trickEnd.querySelector(".trick-end__inner"),
+        { y: 38, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.22, ease: "none" },
+        0
+      )
+      .to(
+        trickEnd.querySelector(".trick-end__inner"),
+        { y: -38, opacity: 0, duration: 0.22, ease: "none" },
+        0.78
+      );
+
+    ScrollTrigger.create({
+      trigger: trickEnd,
+      start: "top 82%",
+      end: "bottom 18%",
+      onEnter: playCollection,
+      onEnterBack: playCollection,
+      onLeave: resetCollection,
+      onLeaveBack: resetCollection
+    });
+  } else if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            playCollection();
+          } else {
+            resetCollection();
+          }
+        });
+      },
+      { threshold: 0.25 }
+    );
+
+    observer.observe(trickEnd);
+  } else {
+    trickEnd.classList.add("is-visible");
+  }
+})();
+
+(() => {
+  "use strict";
+
+  const bombGuide = document.querySelector(".bomb-guide");
+
+  if (
+    !bombGuide ||
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+    !window.gsap ||
+    !window.ScrollTrigger
+  ) {
+    return;
+  }
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  gsap
+    .timeline({
+      scrollTrigger: {
+        trigger: bombGuide,
+        start: "top 82%",
+        end: "bottom 18%",
+        scrub: 0.5,
+        invalidateOnRefresh: true
+      }
+    })
+    .fromTo(
+      bombGuide.querySelector(".bomb-guide__inner"),
+      { y: 38, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.22, ease: "none" },
+      0
+    )
+    .to(
+      bombGuide.querySelector(".bomb-guide__inner"),
+      { y: -38, opacity: 0, duration: 0.22, ease: "none" },
+      0.78
+    );
+})();
+
+(() => {
+  "use strict";
+
+  const trickRepeat = document.querySelector(".trick-repeat");
+
+  if (!trickRepeat) {
+    return;
+  }
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (reducedMotion) {
+    trickRepeat.classList.add("is-visible");
+    return;
+  }
+
+  const playLoop = () => {
+    trickRepeat.classList.remove("is-visible");
+    void trickRepeat.offsetWidth;
+    trickRepeat.classList.add("is-visible");
+  };
+
+  const resetLoop = () => trickRepeat.classList.remove("is-visible");
+
+  if (window.gsap && window.ScrollTrigger) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap
+      .timeline({
+        scrollTrigger: {
+          trigger: trickRepeat,
+          start: "top 82%",
+          end: "bottom 18%",
+          scrub: 0.5,
+          invalidateOnRefresh: true
+        }
+      })
+      .fromTo(
+        trickRepeat.querySelector(".trick-repeat__inner"),
+        { y: 38, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.22, ease: "none" },
+        0
+      )
+      .to(
+        trickRepeat.querySelector(".trick-repeat__inner"),
+        { y: -38, opacity: 0, duration: 0.22, ease: "none" },
+        0.78
+      );
+
+    ScrollTrigger.create({
+      trigger: trickRepeat,
+      start: "top 82%",
+      end: "bottom 18%",
+      onEnter: playLoop,
+      onEnterBack: playLoop,
+      onLeave: resetLoop,
+      onLeaveBack: resetLoop
+    });
+  } else if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            playLoop();
+          } else {
+            resetLoop();
+          }
+        });
+      },
+      { threshold: 0.25 }
+    );
+
+    observer.observe(trickRepeat);
+  } else {
+    trickRepeat.classList.add("is-visible");
+  }
+})();
+
+(() => {
+  "use strict";
+
+  const roundEnd = document.querySelector(".round-end");
+
+  if (!roundEnd) {
+    return;
+  }
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (reducedMotion) {
+    roundEnd.classList.add("is-visible");
+    return;
+  }
+
+  const playTransfers = () => {
+    roundEnd.classList.remove("is-visible");
+    void roundEnd.offsetWidth;
+    roundEnd.classList.add("is-visible");
+  };
+
+  const resetTransfers = () => roundEnd.classList.remove("is-visible");
+
+  if (window.gsap && window.ScrollTrigger) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap
+      .timeline({
+        scrollTrigger: {
+          trigger: roundEnd,
+          start: "top 82%",
+          end: "bottom 18%",
+          scrub: 0.5,
+          invalidateOnRefresh: true
+        }
+      })
+      .fromTo(
+        roundEnd.querySelector(".round-end__inner"),
+        { y: 38, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.22, ease: "none" },
+        0
+      )
+      .to(
+        roundEnd.querySelector(".round-end__inner"),
+        { y: -38, opacity: 0, duration: 0.22, ease: "none" },
+        0.78
+      );
+
+    ScrollTrigger.create({
+      trigger: roundEnd,
+      start: "top 82%",
+      end: "bottom 18%",
+      onEnter: playTransfers,
+      onEnterBack: playTransfers,
+      onLeave: resetTransfers,
+      onLeaveBack: resetTransfers
+    });
+  } else if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            playTransfers();
+          } else {
+            resetTransfers();
+          }
+        });
+      },
+      { threshold: 0.25 }
+    );
+
+    observer.observe(roundEnd);
+  } else {
+    roundEnd.classList.add("is-visible");
+  }
 })();
 
 (() => {

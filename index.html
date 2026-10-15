@@ -83,12 +83,12 @@
                   <p class="rank-rule rank-rule--main">큰 숫자가 작은 숫자를 덮습니다</p>
                   <p class="rank-rule rank-rule--sub">더 높은 숫자만 이길 수 있어요</p>
                 </div>
-
-                <div class="rank-reference-labels" aria-label="카드 참고 메뉴 안내">
-                  <span class="rank-reference-label rank-reference-label--combo">카드로 만드는 조합</span>
-                  <span class="rank-reference-label rank-reference-label--special">특별한 카드도 있어요</span>
-                </div>
               </div>
+            </div>
+
+            <div class="rank-reference-labels" aria-label="카드 참고 메뉴 안내">
+              <span class="rank-reference-label rank-reference-label--combo">카드로 만드는 조합</span>
+              <span class="rank-reference-label rank-reference-label--special">특별한 카드도 있어요</span>
             </div>
           </div>
         </div>
@@ -194,7 +194,7 @@
               <div class="large-tichu__actions" aria-label="라지 티츄 선택">
                 <div class="large-tichu__declare-option">
                   <button type="button" data-large-tichu-choice="declare" aria-pressed="false">
-                    <strong>!!라지 티츄!!</strong>
+                    <strong>!! 라지 티츄 !!</strong>
                   </button>
                   <p class="large-tichu__score" aria-label="라지 티츄 점수">
                     <span class="large-tichu__action-label">선언하기</span>
@@ -304,7 +304,7 @@
                     aria-pressed="false"
                     aria-describedby="small-tichu-eligibility"
                   >
-                    <strong>!!스몰 티츄!!</strong>
+                    <strong>!! 스몰 티츄 !!</strong>
                   </button>
                   <p class="large-tichu__score" aria-label="스몰 티츄 점수">
                     <span class="large-tichu__action-label">선언하기</span>
@@ -384,7 +384,19 @@
       </section>
 
       <section class="combo-bridge" aria-label="카드 조합 소개">
-        <p>카드는 묶어서<br /><strong>낼 수 있어요</strong></p>
+        <div class="combo-bridge__content">
+          <p>카드는 묶어서<br /><strong>낼 수 있어요</strong></p>
+          <button
+            class="inline-modal-button"
+            type="button"
+            data-open="combo"
+            aria-haspopup="dialog"
+            aria-controls="combo-modal"
+            aria-expanded="false"
+          >
+            조합
+          </button>
+        </div>
       </section>
 
       <section class="combo-guide" aria-labelledby="combo-guide-title">
@@ -422,9 +434,18 @@
               </div>
               <div class="combo-example combo-example--wrong">
                 <p>✗ 이건 못 내요</p>
-                <div class="combo-card-row"><img src="옥7.png" alt="옥 7" /><img src="집7.png" alt="집 7" /></div>
-                <small>종류가 달라서 못 내요</small>
+                <div class="combo-wrong-grid combo-wrong-grid--single">
+                  <article class="combo-wrong-case">
+                    <div class="combo-card-row"><img src="집7.png" alt="집 7, 싱글" /></div>
+                    <small>7 = 7 — 같아서 못 내요<br />(더 높아야 함)</small>
+                  </article>
+                  <article class="combo-wrong-case">
+                    <div class="combo-card-row"><img src="옥7.png" alt="옥 7" /><img src="집7.png" alt="집 7, 페어" /></div>
+                    <small>2장이라 못 내요<br />(싱글엔 싱글로만)</small>
+                  </article>
+                </div>
               </div>
+              <p class="combo-panel__note combo-panel__note--single">같은 종류(장수) + 더 높은 숫자, 둘 다 맞아야 낼 수 있어요.</p>
             </article>
 
             <article class="combo-panel" id="combo-panel-2" role="tabpanel" data-panel="2" hidden>
@@ -514,7 +535,8 @@
 
           <aside class="combo-pass" aria-labelledby="combo-pass-title">
             <h3 id="combo-pass-title">낼 게 없다면?</h3>
-            <p>제시할 조합이 없으면 <strong>‘패스’!</strong><br />다음 차례에 다시 낼 수 있어요.</p>
+            <p class="combo-pass__call">패스!</p>
+            <p class="combo-pass__note">다음 차례에 다시 낼 수 있어요.</p>
           </aside>
 
           <button
@@ -527,6 +549,33 @@
           >
             다른 모양의 카드가 있나요?
           </button>
+        </div>
+      </section>
+
+      <section class="trick-end" aria-labelledby="trick-end-title">
+        <div class="trick-end__inner">
+          <h2 id="trick-end-title">
+            <span>3명이 연속으로 패스하면</span>
+            <strong>트릭 종료!</strong>
+          </h2>
+          <div class="trick-end__pile" aria-hidden="true">
+            <span class="trick-end__card trick-end__card--left">
+              <img class="trick-end__card-face trick-end__card-face--front" src="별7.png" alt="" />
+              <img class="trick-end__card-face trick-end__card-face--back" src="뒷면.png" alt="" />
+            </span>
+            <span class="trick-end__card trick-end__card--right">
+              <img class="trick-end__card-face trick-end__card-face--front" src="옥9.png" alt="" />
+              <img class="trick-end__card-face trick-end__card-face--back" src="뒷면.png" alt="" />
+            </span>
+            <span class="trick-end__card trick-end__card--top">
+              <img class="trick-end__card-face trick-end__card-face--front" src="별10.png" alt="" />
+              <img class="trick-end__card-face trick-end__card-face--back" src="뒷면.png" alt="" />
+            </span>
+          </div>
+          <div class="trick-end__collection-copy">
+            <p>마지막에 낸 사람이 전부 가져가요 <strong>'트릭을 딴다'</strong></p>
+            <p>가져간 카드는 플레이어 앞에 뒷면으로 쌓아둡니다.</p>
+          </div>
         </div>
       </section>
 
@@ -552,17 +601,82 @@
         </div>
       </section>
 
-      <section class="trick-end" aria-labelledby="trick-end-title">
-        <div class="trick-end__inner">
-          <h2 id="trick-end-title">트릭 끝!</h2>
-          <p>조합을 낸 뒤, 나머지 세 사람이 모두 연속으로 패스하면 → 그 판(트릭) 종료!</p>
-          <div class="trick-end__pile" aria-hidden="true">
-            <img class="trick-end__card trick-end__card--left" src="뒷면.png" alt="" />
-            <img class="trick-end__card trick-end__card--right" src="뒷면.png" alt="" />
-            <img class="trick-end__card trick-end__card--top" src="뒷면.png" alt="" />
+      <section class="trick-repeat" aria-labelledby="trick-repeat-title">
+        <div class="trick-repeat__inner">
+          <h2 id="trick-repeat-title">트릭을 딴 사람이 다음 트릭을 새로 시작해요</h2>
+          <div class="trick-repeat__loop" aria-hidden="true">
+            <span class="trick-repeat__arrow">↻</span>
+            <img class="trick-repeat__card trick-repeat__card--left" src="별7.png" alt="" />
+            <img class="trick-repeat__card trick-repeat__card--center" src="옥9.png" alt="" />
+            <img class="trick-repeat__card trick-repeat__card--right" src="별10.png" alt="" />
           </div>
-          <p>마지막에 낸 사람이 바닥의 카드를 전부 가져가요 <strong>(트릭을 딴다).</strong></p>
-          <p>가져간 카드는 뒷면이 보이게 쌓아둡니다.</p>
+          <p>이렇게 트릭을 계속 반복합니다</p>
+          <aside class="trick-repeat__warning" aria-labelledby="trick-repeat-warning-title">
+            <h3 id="trick-repeat-warning-title">⚠️ 딴 카드는 다시 못 내요!</h3>
+            <p>트릭으로 가져간 카드는 점수용으로 쌓아둘 뿐, 다시 손에 넣어 내는 게 아니에요.</p>
+            <p>플레이는 내 손패로만. 딴 트릭은 라운드 끝까지 뒷면으로 쌓아둬요.</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="round-end" aria-labelledby="round-end-title">
+        <div class="round-end__inner">
+          <p class="round-end__eyebrow">라운드 종료</p>
+          <h2 id="round-end-title">한 명만 카드가 남으면 <strong>라운드 끝!</strong></h2>
+          <p class="round-end__lead">네 명 중 세 명이 카드를 다 비우면 끝나요.</p>
+
+          <div class="round-end__transfers" aria-label="꼴찌가 넘기는 두 가지">
+            <p class="round-end__transfer-intro">마지막까지 남은 사람(꼴찌)은 두 가지를 넘겨요</p>
+
+            <article class="round-end__transfer round-end__transfer--hand">
+              <div class="round-end__player">
+                <span class="round-end__cards" aria-hidden="true">
+                  <img src="별7.png" alt="" />
+                  <img src="옥9.png" alt="" />
+                </span>
+                <span>손에 남은 카드</span>
+                <small>꼴찌</small>
+              </div>
+              <span class="round-end__transfer-arrow" aria-hidden="true">→</span>
+              <div class="round-end__recipient">
+                <span class="round-end__team-mark" aria-hidden="true">2</span>
+                <span>상대팀에게</span>
+              </div>
+            </article>
+
+            <article class="round-end__transfer round-end__transfer--tricks">
+              <div class="round-end__player">
+                <span class="round-end__cards round-end__cards--backs" aria-hidden="true">
+                  <img src="뒷면.png" alt="" />
+                  <img src="뒷면.png" alt="" />
+                </span>
+                <span>그동안 딴 트릭</span>
+                <small>꼴찌</small>
+              </div>
+              <span class="round-end__transfer-arrow" aria-hidden="true">→</span>
+              <div class="round-end__recipient">
+                <span class="round-end__team-mark round-end__team-mark--first" aria-hidden="true">1</span>
+                <span>1등에게</span>
+              </div>
+            </article>
+          </div>
+
+          <aside class="round-end__double" aria-labelledby="round-end-double-title">
+            <p class="round-end__double-label">특별 케이스</p>
+            <h3 id="round-end-double-title">같은 팀이 1등·2등을 모두 하면? <strong>더블승!</strong></h3>
+            <p>그 즉시 라운드 끝, 그 팀이 <strong>200점!</strong></p>
+            <small>카드 점수 계산은 생략해요.</small>
+          </aside>
+          <button
+            class="round-end__score-button"
+            type="button"
+            data-open="score"
+            aria-haspopup="dialog"
+            aria-controls="score-modal"
+            aria-expanded="false"
+          >
+            점수 표 보기
+          </button>
         </div>
       </section>
     </main>
@@ -582,6 +696,7 @@
         <div class="special-cards" aria-labelledby="special-cards-title">
         <div class="special-cards__stage">
           <h2 class="special-cards__title" id="special-cards-title">특수카드</h2>
+          <p class="special-cards__current-name" aria-live="polite">참새</p>
 
           <div
             class="special-carousel"
@@ -591,16 +706,16 @@
             tabindex="0"
           >
             <div class="special-carousel__track">
-              <article class="special-slide is-active" aria-label="1 / 4: 마작">
-                <img class="special-slide__image" src="참새.png" alt="마작" draggable="false" />
+              <article class="special-slide is-active" aria-label="1 / 4: 참새" data-card-name="참새">
+                <img class="special-slide__image" src="참새.png" alt="참새" draggable="false" />
               </article>
-              <article class="special-slide" aria-label="2 / 4: 개" aria-hidden="true">
+              <article class="special-slide" aria-label="2 / 4: 개" aria-hidden="true" data-card-name="개">
                 <img class="special-slide__image" src="개.png" alt="개" draggable="false" />
               </article>
-              <article class="special-slide" aria-label="3 / 4: 봉황" aria-hidden="true">
+              <article class="special-slide" aria-label="3 / 4: 봉황" aria-hidden="true" data-card-name="봉황">
                 <img class="special-slide__image" src="봉황.png" alt="봉황" draggable="false" />
               </article>
-              <article class="special-slide" aria-label="4 / 4: 용" aria-hidden="true">
+              <article class="special-slide" aria-label="4 / 4: 용" aria-hidden="true" data-card-name="용">
                 <img class="special-slide__image" src="용.png" alt="용" draggable="false" />
               </article>
             </div>
@@ -608,27 +723,26 @@
 
           <div class="special-descriptions" aria-live="polite">
             <article class="special-description is-active">
-              <p class="special-description__name">참새 <span>(雀)</span></p>
-              <h3>카드 내기 / 가장 낮은 숫자 1</h3>
+              <h3>보유 플레이어가 라운드를 시작</h3>
+              <p class="special-description__lead">아무 카드나 내도 OK</p>
               <ul>
-                <li>참새 보유자 → GAME START! (아무 카드나 OK)</li>
-                <li>"참새콜" — 원하는 숫자 하나 외치기</li>
-                <li>예: "8!" → 그 숫자 가진 다음 사람은 반드시 내야 함</li>
+                <li>가장 낮은 카드 (숫자 1)</li>
+                <li>"참새콜" : 값 하나를 요구</li>
+                <li>예: "8!" → 다음 사람은 그 값을 반드시 내야 함</li>
                 <li>(누군가 낼 때까지 유효)</li>
               </ul>
             </article>
             <article class="special-description" aria-hidden="true">
-              <p class="special-description__name">개 <span>(犬)</span></p>
               <h3>차례를 파트너에게</h3>
               <ul>
-                <li>바로 맞은편 파트너에게 차례 넘기기</li>
+                <li>바닥이 비었을 때만 낼 수 있어요 (내가 새로 시작하는 차례)</li>
+                <li>내 차례를 파트너에게 바로 넘기기</li>
                 <li>다른 카드를 이기는 힘 X</li>
                 <li>파트너가 편하게 내도록 돕는 카드</li>
                 <li>(파트너가 이미 다 냈으면, 차례는 그 다음 사람에게)</li>
               </ul>
             </article>
             <article class="special-description" aria-hidden="true">
-              <p class="special-description__name">봉황 <span>(鳳)</span></p>
               <h3>!!만능 카드!! 뭐든 변신!</h3>
               <ul>
                 <li>아무 카드로나 변신 (예: A인 척, A 두 장과 함께)</li>
@@ -639,7 +753,6 @@
               </ul>
             </article>
             <article class="special-description" aria-hidden="true">
-              <p class="special-description__name">용 <span>(龍)</span></p>
               <h3>!!가장 강력!!</h3>
               <ul>
                 <li>오직 폭탄만 용을 이길 수 있음</li>
@@ -651,7 +764,7 @@
           </div>
 
           <div class="special-dots" aria-label="특수카드 위치">
-            <button class="special-dot is-active" type="button" aria-label="마작 카드 보기" aria-current="true"></button>
+            <button class="special-dot is-active" type="button" aria-label="참새 카드 보기" aria-current="true"></button>
             <button class="special-dot" type="button" aria-label="개 카드 보기"></button>
             <button class="special-dot" type="button" aria-label="봉황 카드 보기"></button>
             <button class="special-dot" type="button" aria-label="용 카드 보기"></button>
@@ -839,6 +952,70 @@
               </div>
             </article>
           </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="app-modal" id="score-modal" data-modal="score" hidden>
+      <div class="app-modal__backdrop" data-close-modal aria-hidden="true"></div>
+      <div
+        class="app-modal__dialog score-modal__dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="score-modal-title"
+        tabindex="-1"
+      >
+        <button class="app-modal__close" type="button" data-close-modal aria-label="점수 표 닫기">×</button>
+        <section class="score-sheet" aria-labelledby="score-modal-title">
+          <h2 class="score-sheet__title" id="score-modal-title">점수 표</h2>
+
+          <section class="score-sheet__section" aria-labelledby="score-card-title">
+            <h3 id="score-card-title">① 카드 점수</h3>
+            <div class="score-sheet__cards">
+              <article class="score-sheet__card">
+                <img src="집5.png" alt="집 5" />
+                <strong>+5점</strong>
+                <span>5</span>
+              </article>
+              <article class="score-sheet__card">
+                <img src="별10.png" alt="별 10" />
+                <strong>+10점</strong>
+                <span>10</span>
+              </article>
+              <article class="score-sheet__card">
+                <img src="별K.png" alt="별 K" />
+                <strong>+10점</strong>
+                <span>K</span>
+              </article>
+              <article class="score-sheet__card">
+                <img src="용.png" alt="용" />
+                <strong>+25점</strong>
+                <span>용</span>
+              </article>
+              <article class="score-sheet__card">
+                <img src="봉황.png" alt="봉황" />
+                <strong>−25점</strong>
+                <span>봉황</span>
+              </article>
+            </div>
+            <p class="score-sheet__note">나머지 카드(2·3·4·6·7·8·9·J·Q·A·참새·개)는 0점</p>
+            <p class="score-sheet__total">한 라운드 카드 점수 합은 100점</p>
+          </section>
+
+          <section class="score-sheet__section" aria-labelledby="score-tichu-title">
+            <h3 id="score-tichu-title">② 티츄 정산</h3>
+            <ul class="score-sheet__tichu">
+              <li><strong>라지 티츄</strong><span>성공 +200 / 실패 −200</span></li>
+              <li><strong>스몰 티츄</strong><span>성공 +100 / 실패 −100</span></li>
+            </ul>
+            <p class="score-sheet__note">선언한 사람이 1등으로 비웠으면 성공!</p>
+          </section>
+
+          <section class="score-sheet__section score-sheet__summary" aria-labelledby="score-summary-title">
+            <h3 id="score-summary-title">③ 합산</h3>
+            <p>① 딴 카드 점수 세기 → ② 티츄 점수 더하기 → ③ 두 팀 각각 합산</p>
+            <strong>그 라운드 팀 점수를 누적해서,<br />1000점 먼저 넘으면 승리!</strong>
+          </section>
         </section>
       </div>
     </div>
