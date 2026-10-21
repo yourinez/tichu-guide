@@ -24,18 +24,112 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="app-shell">
-      <section class="hero" aria-label="티츄 게임 시작 안내">
-        <div class="hero__stage">
-          <div class="hero__visual" aria-hidden="false">
-            <div class="hero__dragon" role="img" aria-label="용"></div>
-            <img class="hero__logo" src="tichu.png" alt="티츄 로고" />
-          </div>
+    <div class="splash-screen" aria-label="티츄 시작 화면">
+      <div class="splash-screen__dragon" role="img" aria-label="용"></div>
+      <img class="splash-screen__logo" src="tichu.png" alt="티츄 로고" />
+    </div>
 
+    <main class="app-shell">
+      <nav class="chapter-menu" aria-labelledby="chapter-menu-title">
+        <h1 class="chapter-menu__title" id="chapter-menu-title">티츄 시작하기</h1>
+        <div class="chapter-menu__links">
+          <a href="#game-intro" data-hero-time="0.72">게임 소개</a>
+          <a href="#card-guide" data-hero-time="5.55">카드 알기</a>
+          <a href="#game-setup">게임 준비</a>
+          <a href="#game-play" data-skip-gates>게임 진행</a>
+          <a href="#score-victory" data-skip-gates>점수 &amp; 승리</a>
+        </div>
+      </nav>
+
+      <section class="hero" id="game-intro" aria-label="티츄 게임 시작 안내">
+        <div class="hero__stage">
           <div class="hero__copy" aria-live="off">
-            <p class="hero__line hero__line--question">네 명이 모였나요?</p>
-            <p class="hero__line hero__line--versus">2 <span>vs</span> 2</p>
-            <p class="hero__line hero__line--guide">파트너와 마주보고 앉으세요</p>
+            <div class="hero__team-layout">
+              <button
+                class="hero__scene-nav hero__scene-nav--back"
+                type="button"
+                aria-label="목차로 돌아가기"
+              >
+                <span aria-hidden="true"></span>
+              </button>
+
+              <div class="hero__intro-viewport">
+                <div class="hero__intro-track">
+                  <section class="hero__intro-slide" aria-label="4인 2팀 자리 배치">
+                    <div
+                      class="hero__team-diagram"
+                      role="img"
+                      aria-label="네 명이 두 팀으로 나뉘어 같은 팀끼리 마주보는 자리 배치"
+                    >
+                      <span class="hero__seat hero__seat--top" aria-hidden="true"></span>
+                      <span class="hero__seat hero__seat--right" aria-hidden="true"></span>
+                      <span class="hero__seat hero__seat--bottom" aria-hidden="true"></span>
+                      <span class="hero__seat hero__seat--left" aria-hidden="true"></span>
+                      <div class="hero__table"><strong>4인 2팀</strong></div>
+                    </div>
+                  </section>
+
+                  <section class="hero__intro-slide hero__deck-slide" aria-labelledby="deck-slide-title">
+                    <div class="hero__deck-content">
+                      <h2 class="hero__deck-title" id="deck-slide-title">2벌 중 1벌만 사용하세요</h2>
+                      <div class="hero__deck-cards" aria-label="사용할 수 있는 카드 뒷면 두 종류">
+                        <img src="뒷면백.png" alt="흰색 카드 뒷면" />
+                        <img src="뒷면흑.png" alt="검은색 카드 뒷면" />
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="hero__intro-slide hero__win-slide" aria-labelledby="win-slide-title">
+                    <div class="hero__win-content">
+                      <p class="hero__win-kicker">승리조건</p>
+                      <h2 class="hero__win-title" id="win-slide-title">
+                        손에 쥔 카드<br /><strong>전부 비우기!</strong>
+                      </h2>
+                      <ol class="hero__rank-order" aria-label="카드를 먼저 비우는 순서">
+                        <li><span>1</span><small>등</small></li>
+                        <li><span>2</span><small>등</small></li>
+                        <li><span>3</span><small>등</small></li>
+                        <li><span>4</span><small>등</small></li>
+                      </ol>
+                      <span class="hero__win-arrow" aria-hidden="true"></span>
+                      <p class="hero__win-goal">파트너와 1000점 도달!</p>
+                      <ul class="hero__win-rules">
+                        <li>
+                          <span>한 팀이 1000점 이상을 달성 → 게임 종료</span>
+                          <small>더 높은 점수 얻은 팀이 승리</small>
+                        </li>
+                        <li>게임은 개인으로 진행하지만<br />점수는 팀으로 계산해요</li>
+                      </ul>
+                    </div>
+                  </section>
+                </div>
+              </div>
+
+              <div class="hero__slide-dots" aria-label="게임 소개 슬라이드 선택">
+                <button type="button" data-intro-slide="0" aria-label="4인 2팀 보기" aria-current="true"></button>
+                <button type="button" data-intro-slide="1" aria-label="카드 한 벌 보기"></button>
+                <button type="button" data-intro-slide="2" aria-label="승리 조건 보기"></button>
+              </div>
+
+              <button
+                class="hero__scene-nav hero__scene-nav--previous"
+                type="button"
+                aria-label="이전 게임 소개 보기"
+                aria-hidden="true"
+                tabindex="-1"
+                disabled
+              >
+                <span aria-hidden="true"></span>
+              </button>
+
+              <button
+                class="hero__scene-nav hero__scene-nav--next"
+                type="button"
+                aria-label="다음 게임 소개 보기"
+              >
+                <span aria-hidden="true"></span>
+              </button>
+            </div>
           </div>
 
           <div class="goal" aria-labelledby="goal-title">
@@ -52,7 +146,7 @@
             </div>
           </div>
 
-          <div class="cards" aria-labelledby="cards-title">
+          <div class="cards" id="card-guide" aria-labelledby="cards-title">
             <h2 class="cards__count" id="cards-title">
               카드는 모두 <span><strong>56</strong>장</span>
             </h2>
@@ -140,7 +234,7 @@
         </div>
       </nav>
 
-      <section class="deal-section" aria-labelledby="deal-title">
+      <section class="deal-section" id="game-setup" aria-labelledby="deal-title">
         <div class="deal-section__inner">
           <h2 id="deal-title">먼저 카드를 나눠요</h2>
 
@@ -372,7 +466,7 @@
         </div>
       </section>
 
-      <section class="game-start" aria-labelledby="game-start-title">
+      <section class="game-start" id="game-play" aria-labelledby="game-start-title">
         <div class="game-start__backdrop" aria-hidden="true"></div>
         <div class="game-start__content">
           <img class="game-start__bird" src="참새.png" alt="참새 카드" />
@@ -664,7 +758,7 @@
         </div>
       </section>
 
-      <section class="round-end" aria-labelledby="round-end-title">
+      <section class="round-end" id="score-victory" aria-labelledby="round-end-title">
         <div class="round-end__inner">
           <p class="round-end__eyebrow">라운드 종료</p>
           <h2 id="round-end-title">한 명만 카드가 남으면 <strong>라운드 끝!</strong></h2>

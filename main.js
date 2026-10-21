@@ -1,24 +1,112 @@
 (() => {
   "use strict";
 
+  const splash = document.querySelector(".splash-screen");
+
+  if (!splash) {
+    return;
+  }
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (reducedMotion) {
+    splash.hidden = true;
+    splash.setAttribute("aria-hidden", "true");
+    return;
+  }
+
+  document.body.classList.add("splash-active");
+
+  window.setTimeout(() => {
+    splash.classList.add("is-leaving");
+
+    window.setTimeout(() => {
+      splash.hidden = true;
+      splash.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("splash-active");
+      window.ScrollTrigger?.refresh();
+    }, 680);
+  }, 2000);
+})();
+
+(() => {
+  "use strict";
+
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const teamLayout = document.querySelector(".hero__team-layout");
+  const introBackButton = document.querySelector(".hero__scene-nav--back");
+  const introPreviousButton = document.querySelector(".hero__scene-nav--previous");
+  const introNextButton = document.querySelector(".hero__scene-nav--next");
+  const introTrack = document.querySelector(".hero__intro-track");
+  const introDots = document.querySelectorAll("[data-intro-slide]");
+  let introSlideIndex = 0;
+
+  const showIntroSlide = (nextIndex) => {
+    introSlideIndex = Math.max(0, Math.min(2, nextIndex));
+    const isPastFirstSlide = introSlideIndex > 0;
+    teamLayout?.classList.toggle("is-showing-deck", isPastFirstSlide);
+    if (introTrack) {
+      introTrack.style.transform = `translate3d(-${introSlideIndex * 100}%, 0, 0)`;
+    }
+    if (introPreviousButton) {
+      introPreviousButton.disabled = !isPastFirstSlide;
+      introPreviousButton.tabIndex = isPastFirstSlide ? 0 : -1;
+      introPreviousButton.setAttribute("aria-hidden", String(!isPastFirstSlide));
+    }
+    introDots.forEach((dot, index) => {
+      const isCurrent = index === introSlideIndex;
+      dot.classList.toggle("is-active", isCurrent);
+      dot.setAttribute("aria-current", String(isCurrent));
+    });
+    const nextLabels = ["카드 한 벌 안내 보기", "승리 조건 보기", "게임 목표로 계속하기"];
+    introNextButton?.setAttribute(
+      "aria-label",
+      nextLabels[introSlideIndex]
+    );
+  };
+
+  showIntroSlide(0);
+
+  introDots.forEach((dot) => {
+    dot.addEventListener("click", () => showIntroSlide(Number(dot.dataset.introSlide)));
+  });
+
+  const returnToChapterMenu = () => {
+    document.querySelector(".chapter-menu")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+  };
 
   if (reducedMotion.matches) {
+    introBackButton?.addEventListener("click", returnToChapterMenu);
+    introPreviousButton?.addEventListener("click", () => showIntroSlide(introSlideIndex - 1));
+    introNextButton?.addEventListener("click", () => {
+      if (introSlideIndex < 2) {
+        showIntroSlide(introSlideIndex + 1);
+        return;
+      }
+      document.querySelector(".goal")?.scrollIntoView({ behavior: "auto", block: "start" });
+    });
     return;
   }
 
   if (!window.gsap || !window.ScrollTrigger) {
     document.documentElement.classList.add("animation-unavailable");
+    introBackButton?.addEventListener("click", returnToChapterMenu);
+    introPreviousButton?.addEventListener("click", () => showIntroSlide(introSlideIndex - 1));
+    introNextButton?.addEventListener("click", () => {
+      if (introSlideIndex < 2) {
+        showIntroSlide(introSlideIndex + 1);
+        return;
+      }
+      document.querySelector(".goal")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
     return;
   }
 
   gsap.registerPlugin(ScrollTrigger);
 
   const shell = document.querySelector(".app-shell");
-  const visual = document.querySelector(".hero__visual");
-  const dragon = document.querySelector(".hero__dragon");
   const copy = document.querySelector(".hero__copy");
-  const lines = gsap.utils.toArray(".hero__line");
   const goal = document.querySelector(".goal");
   const goalIntro = gsap.utils.toArray(".goal__time, .goal__eyebrow");
   const goalCore = document.querySelector(".goal__core");
@@ -42,7 +130,7 @@
     scrollTrigger: {
       trigger: ".hero",
       start: "top top",
-      end: "+=800%",
+      end: "+=700%",
       pin: ".hero__stage",
       pinSpacing: true,
       scrub: 0.65,
@@ -51,40 +139,17 @@
     }
   });
 
-  // 구간 A (0 → 0.5): 로고는 중앙에 고정하고 용 배경만 아래에서 차오른다.
-  timeline.to(
-    dragon,
-    {
-      y: 0,
-      scale: 1,
-      opacity: 1,
-      duration: 1,
-      ease: "power2.out"
-    },
-    0
-  );
-
-  // 구간 B (0.5 → 1): 완성된 로고+용 레이어가 함께 퇴장하며 문구가 순차 등장한다.
+  // 자동 스플래시 뒤에는 인원 안내부터 기존 스크롤 내러티브를 이어간다.
   timeline
     .to(
-      visual,
-      {
-        y: () => -Math.max(window.innerHeight, 560) * 1.08,
-        duration: 1,
-        ease: "power2.inOut"
-      },
-      1
-    )
-    .to(
-      lines,
+      teamLayout,
       {
         y: 0,
         opacity: 1,
-        duration: 0.36,
-        stagger: 0.1,
+        duration: 0.48,
         ease: "power2.out"
       },
-      1.12
+      0.12
     )
     // 구간 C: 인원 안내가 사라진 뒤 짧은 간격을 두고 게임 목표가 이어진다.
     .to(
@@ -95,7 +160,7 @@
         duration: 0.5,
         ease: "power2.inOut"
       },
-      2.05
+      1.05
     )
     .to(
       goal,
@@ -105,7 +170,7 @@
         duration: 0.55,
         ease: "power2.out"
       },
-      2.65
+      1.65
     )
     .to(
       goalIntro,
@@ -116,7 +181,7 @@
         stagger: 0.1,
         ease: "power2.out"
       },
-      2.75
+      1.75
     )
     .to(
       goalCore,
@@ -127,7 +192,7 @@
         duration: 0.48,
         ease: "power2.out"
       },
-      3.25
+      2.25
     )
     .to(
       goalWays,
@@ -138,7 +203,7 @@
         stagger: 0.1,
         ease: "power2.out"
       },
-      3.78
+      2.78
     )
     .to(
       goalStroke,
@@ -147,7 +212,7 @@
         duration: 0.38,
         ease: "power2.out"
       },
-      4.22
+      3.22
     )
     .to(
       goal,
@@ -156,7 +221,7 @@
         duration: 0.7,
         ease: "none"
       },
-      4.6
+      3.6
     )
     // 구간 D: 게임 목표를 닫고 일반 카드 구성과 숫자 서열을 소개한다.
     .to(
@@ -167,7 +232,7 @@
         duration: 0.55,
         ease: "power2.inOut"
       },
-      5.35
+      4.35
     )
     .to(
       cards,
@@ -177,7 +242,7 @@
         duration: 0.5,
         ease: "power2.out"
       },
-      6
+      5
     )
     .to(
       cardsCount,
@@ -187,7 +252,7 @@
         duration: 0.36,
         ease: "power2.out"
       },
-      6.12
+      5.12
     )
     .to(
       cardsCount,
@@ -197,7 +262,7 @@
         duration: 0.46,
         ease: "power2.inOut"
       },
-      6.9
+      5.9
     )
     .to(
       playingCard,
@@ -208,7 +273,7 @@
         duration: 0.52,
         ease: "power2.out"
       },
-      7.46
+      6.46
     )
     .to(
       quickReferenceBar,
@@ -217,7 +282,7 @@
         duration: 0.35,
         ease: "power1.out"
       },
-      7.46
+      6.46
     )
     .to(
       suitIntro,
@@ -226,7 +291,7 @@
         duration: 0.64,
         ease: "power2.out"
       },
-      7.8
+      6.8
     )
     .to(
       cardSuits,
@@ -238,7 +303,7 @@
         stagger: 0.1,
         ease: "power2.out"
       },
-      7.88
+      6.88
     )
     .to(
       suitIntroLabel,
@@ -248,7 +313,7 @@
         duration: 0.34,
         ease: "power2.out"
       },
-      8.34
+      7.34
     )
     .to(
       suitIntro,
@@ -257,7 +322,7 @@
         duration: 0.58,
         ease: "power2.inOut"
       },
-      8.92
+      7.92
     )
     .to(
       rankFace,
@@ -266,7 +331,7 @@
         duration: 0.58,
         ease: "power2.inOut"
       },
-      8.92
+      7.92
     )
     .to(
       rankItems,
@@ -279,7 +344,7 @@
         stagger: 0.04,
         ease: "power2.out"
       },
-      9.48
+      8.48
     )
     .to(
       rankFaceLabel,
@@ -289,7 +354,7 @@
         duration: 0.32,
         ease: "power2.out"
       },
-      10.24
+      9.24
     )
     .to(
       rankRules,
@@ -300,7 +365,7 @@
         stagger: 0.1,
         ease: "power2.out"
       },
-      10.62
+      9.62
     )
     .to(
       rankReferenceLabels,
@@ -311,7 +376,7 @@
         stagger: 0.1,
         ease: "power2.out"
       },
-      11.12
+      10.12
     )
     .to(
       playingCard,
@@ -320,18 +385,59 @@
         duration: 0.8,
         ease: "none"
       },
-      11.12
+      10.12
     );
 
   timeline
-    .to(shell, { backgroundColor: "#24100e", duration: 0.7, ease: "none" }, 2.25)
-    .to(shell, { backgroundColor: "#26150f", duration: 0.8, ease: "none" }, 5.45);
+    .to(shell, { backgroundColor: "#24100e", duration: 0.7, ease: "none" }, 1.25)
+    .to(shell, { backgroundColor: "#26150f", duration: 0.8, ease: "none" }, 4.45);
+
+  const scrollToHeroTime = (targetTime) => {
+    const trigger = timeline.scrollTrigger;
+
+    if (!trigger || !Number.isFinite(targetTime)) {
+      return;
+    }
+
+    const progress = targetTime / timeline.duration();
+    const targetY = trigger.start + (trigger.end - trigger.start) * progress;
+    window.scrollTo({ top: targetY, left: 0, behavior: "smooth" });
+  };
+
+  introBackButton?.addEventListener("click", returnToChapterMenu);
+  introPreviousButton?.addEventListener("click", () => showIntroSlide(introSlideIndex - 1));
+
+  introNextButton?.addEventListener("click", () => {
+    if (introSlideIndex < 2) {
+      showIntroSlide(introSlideIndex + 1);
+      return;
+    }
+    scrollToHeroTime(2.25);
+  });
+
+  document.querySelectorAll(".chapter-menu__links [data-hero-time]").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const targetTime = Number(link.dataset.heroTime);
+
+      if (!Number.isFinite(targetTime)) {
+        return;
+      }
+
+      event.preventDefault();
+      if (link.hash === "#game-intro") {
+        showIntroSlide(0);
+      }
+      scrollToHeroTime(targetTime);
+      window.history.replaceState(null, "", link.hash);
+    });
+  });
 })();
 
 (() => {
   "use strict";
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.tichuProgressGates = window.tichuProgressGates || [];
 
   window.createTichuProgressGate = (section) => {
     if (!section || reducedMotion) {
@@ -462,8 +568,16 @@
 
     window.requestAnimationFrame(updateBoundary);
 
-    return { unlock };
+    const controller = { unlock };
+    window.tichuProgressGates.push(controller);
+    return controller;
   };
+
+  document.querySelectorAll(".chapter-menu__links [data-skip-gates]").forEach((link) => {
+    link.addEventListener("click", () => {
+      window.tichuProgressGates.forEach((gate) => gate.unlock());
+    });
+  });
 })();
 
 (() => {
