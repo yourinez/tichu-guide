@@ -3737,7 +3737,7 @@ body.modal-open .quick-reference-bar {
 
 .large-tichu .large-tichu__title {
   padding: 0 8px;
-  font-size: clamp(27px, 7.7vw, 34px);
+  font-size: clamp(23px, 6.55vw, 29px);
   font-weight: 760;
   line-height: 1.14;
   word-break: keep-all;
@@ -3827,6 +3827,23 @@ body.modal-open .quick-reference-bar {
   font-size: clamp(17px, 4.9vw, 21px);
   font-weight: 850;
   box-shadow: 0 6px 14px rgb(63 42 42 / 0.12);
+  animation: tichu-tip-float 2.6s ease-in-out infinite;
+}
+
+.large-tichu .large-tichu__actions--large .large-tichu__tip-trigger:hover,
+.large-tichu .large-tichu__actions--large .large-tichu__tip-trigger:focus-visible {
+  animation-play-state: paused;
+}
+
+@keyframes tichu-tip-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
 }
 
 .large-tichu .large-tichu__actions--large .large-tichu__pass-button,
@@ -6008,6 +6025,10 @@ body.modal-open {
   .large-tichu__actions button,
   .large-tichu__feedback {
     transition: none;
+  }
+
+  .large-tichu .large-tichu__actions--large .large-tichu__tip-trigger {
+    animation: none;
   }
 
   .exchange-receive__cards img,

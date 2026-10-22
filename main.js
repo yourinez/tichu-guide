@@ -36,6 +36,8 @@
   const chapterMenu = document.querySelector(".chapter-menu");
   const stageBar = document.querySelector(".stage-tab-bar");
   const stageTabs = Array.from(document.querySelectorAll("[data-stage-target]"));
+  const introSection = document.querySelector("#game-intro");
+  const cardGuide = document.querySelector("#card-guide");
   let requestedStageTarget = null;
 
   const setActiveStage = (target) => {
@@ -120,7 +122,7 @@
       setMenuScrollLock(false);
       setStageBarVisible(true, link.hash);
       if (link.hash === "#game-setup") {
-        window.requestAnimationFrame(() => window.tichuPrepFlow?.goToPage(0));
+        window.requestAnimationFrame(() => window.tichuPrepFlow?.jumpToPage(0));
       }
     });
   });
@@ -128,20 +130,7 @@
   stageTabs.forEach((tab) => {
     tab.addEventListener("click", () => {
       const target = tab.dataset.stageTarget;
-      const menuLink = Array.from(menuLinks).find((link) => link.hash === target);
-
-      if (!menuLink) {
-        return;
-      }
-
-      if (target === "#game-play" && window.tichuPrepFlow?.isActive()) {
-        window.tichuPrepFlow.next();
-        return;
-      }
-
-      clearDetailScrollLock();
-      setActiveStage(target);
-      menuLink.click();
+      window.tichuStageNav?.goTo?.(target);
     });
   });
 
@@ -152,12 +141,21 @@
       return;
     }
 
-    const regularStages = ["#card-guide", "#game-setup", "#game-play", "#score-victory"];
-    let current = null;
+    const viewportMarker = window.innerHeight * 0.46;
+    const introRect = introSection?.getBoundingClientRect();
+    const introGroupIsActive =
+      introRect && introRect.top <= viewportMarker && introRect.bottom > viewportMarker;
+    const cardOpacity = cardGuide ? Number.parseFloat(window.getComputedStyle(cardGuide).opacity) : 0;
+    let current = introGroupIsActive
+      ? cardOpacity > 0.05
+        ? "#card-guide"
+        : "#game-intro"
+      : null;
+    const regularStages = ["#game-setup", "#game-play", "#score-victory"];
 
     regularStages.forEach((selector) => {
       const section = document.querySelector(selector);
-      if (section && section.getBoundingClientRect().top <= window.innerHeight * 0.46) {
+      if (section && section.getBoundingClientRect().top <= viewportMarker) {
         current = selector;
       }
     });
@@ -167,6 +165,7 @@
     }
   };
 
+  window.tichuStageNav.update = updateStageFromScroll;
   window.addEventListener("scroll", updateStageFromScroll, { passive: true });
   window.addEventListener("resize", updateStageFromScroll, { passive: true });
 
@@ -272,6 +271,21 @@
     gameStage.getBoundingClientRect().top > window.innerHeight * 0.55;
 
   const pagePosition = (index) => {
+    if (index === pages.length - 1) {
+      const gameStartTrigger = window.ScrollTrigger?.getAll().find(
+        (trigger) => trigger.pin && trigger.trigger === gameStage
+      );
+      if (gameStartTrigger) {
+        return Math.max(
+          0,
+          Math.min(
+            gameStartTrigger.start,
+            document.documentElement.scrollHeight - window.innerHeight
+          )
+        );
+      }
+    }
+
     let top = 0;
     let element = pages[index].element.closest(".pin-spacer") || pages[index].element;
     while (element && element !== document.body && element !== document.documentElement) {
@@ -297,18 +311,19 @@
     });
   };
 
-  const goToPage = (index) => {
+  const goToPage = (index, { allowNonAdjacent = false, instant = false } = {}) => {
     if (
       !Number.isInteger(index) ||
       index < 0 ||
       index >= pages.length ||
-      (currentIndex === null ? index !== 0 : Math.abs(index - currentIndex) !== 1) ||
+      (!allowNonAdjacent &&
+        (currentIndex === null ? index !== 0 : Math.abs(index - currentIndex) !== 1)) ||
       isTransitioning
     ) {
       return false;
     }
 
-    if (currentIndex === index) {
+    if (currentIndex === index && !instant) {
       return false;
     }
 
@@ -350,7 +365,7 @@
         window.ScrollTrigger?.refresh();
       }
       const targetY = pagePosition(index);
-      if (!reducedMotion && window.gsap) {
+      if (!instant && !reducedMotion && window.gsap) {
         const scrollState = { y: window.scrollY };
         scrollTween = window.gsap.to(scrollState, {
           y: targetY,
@@ -429,11 +444,20 @@
     }
   };
 
-  const shouldHandleInput = () =>
-    currentIndex !== null &&
-    (currentIndex < pages.length - 1 || isPrepInView()) &&
-    !document.documentElement.classList.contains("modal-open") &&
-    document.body.classList.contains("stage-tabs-visible");
+  const shouldHandleInput = () => {
+    if (
+      currentIndex === null ||
+      document.documentElement.classList.contains("modal-open") ||
+      !document.body.classList.contains("stage-tabs-visible") ||
+      !["#game-setup", "#game-play"].includes(document.body.dataset.activeStage)
+    ) {
+      return false;
+    }
+
+    const currentPage = pages[currentIndex]?.element;
+    const rect = currentPage?.getBoundingClientRect();
+    return Boolean(rect && rect.top < window.innerHeight * 0.55 && rect.bottom > window.innerHeight * 0.45);
+  };
 
   const consumeInput = (event) => {
     event.preventDefault();
@@ -538,6 +562,7 @@
   window.tichuPrepFlow = {
     steps: PREP_STEPS,
     goToPage,
+    jumpToPage: (index) => goToPage(index, { allowNonAdjacent: true, instant: true }),
     next,
     previous,
     current: () => currentIndex,
@@ -702,14 +727,8 @@
       scrub: 0.65,
       anticipatePin: 1,
       invalidateOnRefresh: true,
-      onUpdate: (self) => {
-        if (!document.body.classList.contains("stage-tabs-visible")) {
-          return;
-        }
-        if (document.querySelector("#game-setup")?.getBoundingClientRect().top <= window.innerHeight * 0.4) {
-          return;
-        }
-        window.tichuStageNav?.setActive(self.progress < 0.2 ? "#game-intro" : "#card-guide");
+      onUpdate: () => {
+        window.tichuStageNav?.update();
       }
     }
   });
@@ -791,8 +810,8 @@
       suitIntro,
       {
         y: 0,
-        duration: 0.64,
-        ease: "power2.out"
+        duration: 0.72,
+        ease: "power1.out"
       },
       3.45
     )
@@ -802,9 +821,9 @@
         y: 0,
         scale: 1,
         opacity: 1,
-        duration: 0.3,
-        stagger: 0.1,
-        ease: "power2.out"
+        duration: 0.5,
+        stagger: 0.2,
+        ease: "power1.out"
       },
       3.53
     )
@@ -813,28 +832,28 @@
       {
         y: 0,
         opacity: 1,
-        duration: 0.34,
-        ease: "power2.out"
+        duration: 0.4,
+        ease: "power1.out"
       },
-      3.99
+      4.62
     )
     .to(
       suitIntro,
       {
         y: () => -(playingCard.clientHeight * 0.32),
-        duration: 0.58,
+        duration: 0.68,
         ease: "power2.inOut"
       },
-      4.57
+      5.12
     )
     .to(
       rankFace,
       {
         y: 0,
-        duration: 0.58,
+        duration: 0.8,
         ease: "power2.inOut"
       },
-      4.57
+      5.12
     )
     .to(
       rankItems,
@@ -843,56 +862,57 @@
         y: 0,
         scale: 1,
         visibility: "visible",
-        duration: 0.22,
-        stagger: 0.04,
-        ease: "power2.out"
+        duration: 0.5,
+        stagger: 0.09,
+        ease: "power1.out"
       },
-      5.13
+      5.95
     )
     .to(
       rankFaceLabel,
       {
         y: 0,
         opacity: 1,
-        duration: 0.32,
-        ease: "power2.out"
+        duration: 0.45,
+        ease: "power1.out"
       },
-      5.89
+      7.6
     )
     .to(
       rankRules,
       {
         y: 0,
         opacity: 1,
-        duration: 0.3,
-        stagger: 0.1,
-        ease: "power2.out"
+        duration: 0.42,
+        stagger: 0.16,
+        ease: "power1.out"
       },
-      6.27
+      8.1
     )
     .to(
       rankReferenceLabels,
       {
         y: 0,
         opacity: 1,
-        duration: 0.3,
-        stagger: 0.1,
-        ease: "power2.out"
+        duration: 0.42,
+        stagger: 0.16,
+        ease: "power1.out"
       },
-      6.77
+      8.7
     )
     .to(
       playingCard,
       {
         opacity: 1,
-        duration: 0.8,
+        duration: 0.55,
         ease: "none"
       },
-      6.77
+      8
     );
 
   timeline
     .to(shell, { backgroundColor: "#26150f", duration: 0.8, ease: "none" }, 1.25);
+  timeline.to({}, { duration: 0.3 }, 9.28);
 
   const scrollToHeroTime = (targetTime, behavior = "smooth") => {
     const trigger = timeline.scrollTrigger;
@@ -906,6 +926,298 @@
     window.scrollTo({ top: targetY, left: 0, behavior });
     ScrollTrigger.update();
   };
+
+  const CARD_PAGE_TIMES = Object.freeze([2.2, 5.1, 9.28]);
+  const cardPagePosition = (index) => {
+    const trigger = timeline.scrollTrigger;
+    if (!trigger) {
+      return 0;
+    }
+
+    return trigger.start + (trigger.end - trigger.start) * (CARD_PAGE_TIMES[index] / timeline.duration());
+  };
+  const jumpToDocumentPosition = (position) => {
+    const originalBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = "auto";
+    document.scrollingElement.scrollTop = Math.max(
+      0,
+      Math.min(position, document.documentElement.scrollHeight - window.innerHeight)
+    );
+    window.ScrollTrigger?.update();
+    document.documentElement.style.scrollBehavior = originalBehavior;
+    window.tichuStageNav?.update();
+  };
+  const jumpToHeroTime = (targetTime) => {
+    const trigger = timeline.scrollTrigger;
+    if (!trigger || !Number.isFinite(targetTime)) {
+      return;
+    }
+
+    const progress = targetTime / timeline.duration();
+    jumpToDocumentPosition(trigger.start + (trigger.end - trigger.start) * progress);
+    trigger.getTween()?.progress(1);
+    timeline.progress(progress);
+    window.tichuStageNav?.update();
+  };
+
+  window.tichuStageNav.goTo = (target) => {
+    window.tichuMenuView?.unlock();
+    document.documentElement.classList.remove("detail-view-open");
+    document.body.classList.remove("detail-view-open");
+    window.tichuProgressGates?.forEach((gate) => gate.unlock());
+    window.tichuStageNav.show(target);
+    window.tichuStageNav.setActive(target);
+
+    if (target === "#game-intro") {
+      showIntroSlide(0);
+      jumpToHeroTime(0.72);
+    } else if (target === "#card-guide") {
+      jumpToHeroTime(CARD_PAGE_TIMES[0]);
+    } else if (target === "#game-setup") {
+      window.tichuPrepFlow?.jumpToPage(0);
+    } else if (target === "#game-play") {
+      window.tichuPrepFlow?.jumpToPage(5);
+    } else if (target === "#score-victory") {
+      const section = document.querySelector(target);
+      if (section) {
+        jumpToDocumentPosition(section.getBoundingClientRect().top + window.scrollY);
+      }
+    }
+  };
+
+  let cardPageIndex = -1;
+  let cardTransitioning = false;
+  let cardWheelConsumed = false;
+  let cardWheelResetTimer = 0;
+  let cardTouchStartY = null;
+  let cardScrollBehavior = "";
+
+  const getCardPageAtScroll = () => {
+    const positions = CARD_PAGE_TIMES.map((_, index) => cardPagePosition(index));
+    if (window.scrollY < positions[0] - 2) {
+      return -1;
+    }
+    if (window.scrollY < positions[1] - 2) {
+      return 0;
+    }
+    if (window.scrollY < positions[2] - 2) {
+      return 1;
+    }
+    return 2;
+  };
+
+  const moveToCardPage = (index) => {
+    if (cardTransitioning || index < 0 || index >= CARD_PAGE_TIMES.length) {
+      return false;
+    }
+
+    cardTransitioning = true;
+    cardScrollBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = "auto";
+    const scrollState = { y: window.scrollY };
+    gsap.to(scrollState, {
+      y: cardPagePosition(index),
+      duration: 2,
+      ease: "power2.inOut",
+      overwrite: true,
+      onUpdate: () => {
+        document.scrollingElement.scrollTop = scrollState.y;
+      },
+      onComplete: () => {
+        document.scrollingElement.scrollTop = cardPagePosition(index);
+        cardPageIndex = index;
+        cardTransitioning = false;
+        document.documentElement.style.scrollBehavior = cardScrollBehavior;
+        ScrollTrigger.update();
+      }
+    });
+    return true;
+  };
+
+  const advanceCardPage = (direction) => {
+    const currentIndex = cardPageIndex < 0 ? getCardPageAtScroll() : cardPageIndex;
+    if (direction > 0 && currentIndex === CARD_PAGE_TIMES.length - 1) {
+      cardPageIndex = -1;
+      window.tichuPrepFlow?.goToPage(0);
+      return;
+    }
+
+    const nextIndex = currentIndex + direction;
+    if (nextIndex >= 0 && nextIndex < CARD_PAGE_TIMES.length) {
+      moveToCardPage(nextIndex);
+    }
+  };
+
+  const isCardPageFlowActive = () => {
+    const trigger = timeline.scrollTrigger;
+    return Boolean(
+      trigger?.isActive &&
+      document.body.classList.contains("stage-tabs-visible") &&
+      !document.documentElement.classList.contains("modal-open")
+    );
+  };
+
+  const consumeCardWheelGesture = () => {
+    cardWheelConsumed = true;
+    window.clearTimeout(cardWheelResetTimer);
+    cardWheelResetTimer = window.setTimeout(() => {
+      cardWheelConsumed = false;
+    }, 420);
+  };
+
+  window.addEventListener(
+    "wheel",
+    (event) => {
+      if (!isCardPageFlowActive()) {
+        return;
+      }
+
+      const deltaY =
+        event.deltaY *
+        (event.deltaMode === WheelEvent.DOM_DELTA_LINE
+          ? 16
+          : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
+            ? window.innerHeight
+            : 1);
+      const currentIndex = cardPageIndex < 0 ? getCardPageAtScroll() : cardPageIndex;
+      const firstCardPosition = cardPagePosition(0);
+      const enteringFirstCard =
+        currentIndex < 0 &&
+        deltaY > 0 &&
+        window.scrollY < firstCardPosition &&
+        window.scrollY + deltaY >= firstCardPosition;
+      if (currentIndex < 0 && !enteringFirstCard) {
+        return;
+      }
+
+      const gestureAlreadyConsumed = cardWheelConsumed;
+      if (currentIndex === 0 && deltaY < 0) {
+        cardPageIndex = -1;
+        return;
+      }
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      consumeCardWheelGesture();
+      if (cardTransitioning || gestureAlreadyConsumed) {
+        return;
+      }
+
+      if (enteringFirstCard) {
+        moveToCardPage(0);
+      } else if (deltaY !== 0) {
+        advanceCardPage(Math.sign(deltaY));
+      }
+    },
+    { passive: false, capture: true }
+  );
+
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (cardTransitioning || !timeline.scrollTrigger?.isActive) {
+        return;
+      }
+
+      cardPageIndex = getCardPageAtScroll();
+    },
+    { passive: true }
+  );
+
+  window.addEventListener(
+    "touchstart",
+    (event) => {
+      cardTouchStartY = isCardPageFlowActive() ? event.touches[0]?.clientY ?? null : null;
+    },
+    { passive: true, capture: true }
+  );
+  window.addEventListener(
+    "touchmove",
+    (event) => {
+      if (!isCardPageFlowActive() || cardTouchStartY === null) {
+        return;
+      }
+
+      const currentY = event.touches[0]?.clientY;
+      if (currentY === undefined || Math.abs(cardTouchStartY - currentY) < 44) {
+        return;
+      }
+
+      const direction = Math.sign(cardTouchStartY - currentY);
+      const currentIndex = cardPageIndex < 0 ? getCardPageAtScroll() : cardPageIndex;
+      const enteringFirstCard =
+        currentIndex < 0 &&
+        direction > 0 &&
+        window.scrollY + Math.abs(cardTouchStartY - currentY) >= cardPagePosition(0);
+      if (currentIndex < 0 && !enteringFirstCard) {
+        return;
+      }
+
+      if (currentIndex === 0 && direction < 0) {
+        cardPageIndex = -1;
+        return;
+      }
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      cardTouchStartY = null;
+      if (cardTransitioning) {
+        return;
+      }
+
+      if (enteringFirstCard) {
+        moveToCardPage(0);
+      } else {
+        advanceCardPage(direction);
+      }
+    },
+    { passive: false, capture: true }
+  );
+  window.addEventListener(
+    "touchend",
+    () => {
+      cardTouchStartY = null;
+    },
+    { passive: true, capture: true }
+  );
+  window.addEventListener(
+    "keydown",
+    (event) => {
+      if (
+        !isCardPageFlowActive() ||
+        (event.target instanceof Element &&
+          event.target.closest("button, a, input, select, textarea"))
+      ) {
+        return;
+      }
+
+      const currentIndex = cardPageIndex < 0 ? getCardPageAtScroll() : cardPageIndex;
+      if (currentIndex < 0) {
+        return;
+      }
+
+      const direction =
+        ["ArrowDown", "PageDown"].includes(event.key) || (event.key === " " && !event.shiftKey)
+          ? 1
+          : ["ArrowUp", "PageUp"].includes(event.key) || (event.key === " " && event.shiftKey)
+            ? -1
+            : 0;
+      if (!direction) {
+        return;
+      }
+
+      if (currentIndex === 0 && direction < 0) {
+        cardPageIndex = -1;
+        return;
+      }
+
+      event.preventDefault();
+      if (!cardTransitioning) {
+        advanceCardPage(direction);
+      }
+    },
+    { capture: true }
+  );
 
   introPreviousButton?.addEventListener("click", () => showIntroSlide(introSlideIndex - 1));
 
