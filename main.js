@@ -120,7 +120,7 @@
       setMenuScrollLock(false);
       setStageBarVisible(true, link.hash);
       if (link.hash === "#game-setup") {
-        window.requestAnimationFrame(() => window.tichuPrepFlow?.goTo(0));
+        window.requestAnimationFrame(() => window.tichuPrepFlow?.goToPage(0));
       }
     });
   });
@@ -196,67 +196,48 @@
   const stepper = document.querySelector(".prep-stepper");
   const items = Array.from(document.querySelectorAll("[data-prep-step]"));
   const PREP_STEPS = Object.freeze([
-    { key: "deal", selector: "#game-setup", transitionDuration: 0.5 },
-    {
-      key: "large-tichu",
-      selector: "#prep-large-tichu",
-      settleProgress: 0.96,
-      transitionDuration: 0.5
-    },
-    {
-      key: "receive-six",
-      selector: "#prep-receive-six",
-      transitionDuration: 0.5
-    },
-    {
-      key: "exchange",
-      selector: "#prep-exchange",
-      transitionDuration: 0.5
-    },
-    {
-      key: "small-tichu",
-      selector: "#prep-small-tichu",
-      settleProgress: 0.92,
-      transitionDuration: 0.5
-    }
+    { key: "deal", selector: "#game-setup" },
+    { key: "large-tichu", selector: "#prep-large-tichu" },
+    { key: "receive-six", selector: "#prep-receive-six" },
+    { key: "exchange", selector: "#prep-exchange" },
+    { key: "small-tichu", selector: "#prep-small-tichu" },
+    { key: "game", selector: "#game-play" }
   ]);
-  const steps = PREP_STEPS.map((step) => ({
-    ...step,
-    element: document.querySelector(step.selector)
+  const pages = PREP_STEPS.map((page) => ({
+    ...page,
+    element: document.querySelector(page.selector)
   }));
-  const gameStage = document.querySelector("#game-play");
+  const gameStage = pages.at(-1)?.element;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   if (
     !stepper ||
-    items.length !== steps.length ||
+    items.length !== pages.length - 1 ||
     items.some((item, index) => item.dataset.prepTarget !== PREP_STEPS[index].selector) ||
-    steps.some((step) => !step.element) ||
+    pages.some((page) => !page.element) ||
     !gameStage
   ) {
     return;
   }
 
-  let currentIndex = 0;
-  let active = false;
-  let moving = false;
-  let settleTimer = 0;
-  let settleHandler = null;
+  let currentIndex = null;
+  let isTransitioning = false;
+  let viewportChangedDuringTransition = false;
+  let viewportRefreshCompleted = false;
+  let waitingForViewportRefresh = false;
+  let pendingTransitionFinalize = null;
   let scrollTween = null;
-  let originalScrollBehavior = null;
-  let ignoreInputUntil = 0;
+  let originalScrollBehavior = "";
   let wheelDelta = 0;
-  let wheelGestureTriggered = false;
   let wheelGestureTimer = 0;
   let touchStartY = null;
   let syncFrame = 0;
 
-  const renderStep = (nextIndex) => {
-    currentIndex = Math.max(0, Math.min(steps.length - 1, nextIndex));
+  const renderStep = () => {
     items.forEach((item, index) => {
       const isCurrent = index === currentIndex;
       item.classList.toggle("is-current", isCurrent);
-      item.classList.toggle("is-complete", index < currentIndex);
+      item.classList.toggle("is-complete", currentIndex !== null && index < currentIndex);
       if (isCurrent) {
         item.setAttribute("aria-current", "step");
       } else {
@@ -265,7 +246,7 @@
     });
   };
 
-  const announceStepArrival = (index) => {
+  const announcePageArrival = (index) => {
     if (![1, 2, 4].includes(index)) {
       return;
     }
@@ -279,39 +260,32 @@
 
   const syncVisibility = () => {
     const visible =
-      active &&
+      currentIndex !== null &&
+      currentIndex < pages.length - 1 &&
       document.body.classList.contains("stage-tabs-visible") &&
       document.body.dataset.activeStage === "#game-setup";
     stepper.setAttribute("aria-hidden", String(!visible));
   };
 
-  const scrollTriggerFor = (element) => {
-    if (!window.ScrollTrigger) {
-      return null;
+  const isPrepInView = () =>
+    pages[0].element.getBoundingClientRect().top < window.innerHeight * 0.55 &&
+    gameStage.getBoundingClientRect().top > window.innerHeight * 0.55;
+
+  const pagePosition = (index) => {
+    let top = 0;
+    let element = pages[index].element.closest(".pin-spacer") || pages[index].element;
+    while (element && element !== document.body && element !== document.documentElement) {
+      top += element.offsetTop;
+      element = element.offsetParent;
     }
-    return window.ScrollTrigger.getAll().find((trigger) => trigger.trigger === element) || null;
+    return Math.max(0, Math.min(top, document.documentElement.scrollHeight - window.innerHeight));
   };
 
-  const scrollPositionFor = (index) => {
-    const step = steps[index];
-    const trigger = scrollTriggerFor(step.element);
-
-    if (
-      trigger &&
-      Number.isFinite(trigger.start) &&
-      Number.isFinite(trigger.end) &&
-      Number.isFinite(step.settleProgress)
-    ) {
-      return trigger.start + (trigger.end - trigger.start) * step.settleProgress;
+  const unlockGateFor = (index) => {
+    const element = pages[index]?.element;
+    if (!element) {
+      return;
     }
-
-    return Math.max(
-      0,
-      step.element.getBoundingClientRect().top + window.scrollY - (step.topOffset || 0)
-    );
-  };
-
-  const unlockGateFor = (element) => {
     window.tichuProgressGates?.forEach((gate) => {
       if (
         gate.section === element ||
@@ -323,150 +297,141 @@
     });
   };
 
-  const finishMovement = () => {
-    window.clearTimeout(settleTimer);
-    if (settleHandler) {
-      window.removeEventListener("scrollend", settleHandler);
+  const goToPage = (index) => {
+    if (
+      !Number.isInteger(index) ||
+      index < 0 ||
+      index >= pages.length ||
+      (currentIndex === null ? index !== 0 : Math.abs(index - currentIndex) !== 1) ||
+      isTransitioning
+    ) {
+      return false;
     }
-    settleHandler = null;
-    scrollTween = null;
-    moving = false;
-    ignoreInputUntil = performance.now() + 180;
-    if (originalScrollBehavior !== null) {
+
+    if (currentIndex === index) {
+      return false;
+    }
+
+    unlockGateFor(currentIndex);
+    isTransitioning = true;
+    document.body.dataset.activeStage = index === pages.length - 1 ? "#game-play" : "#game-setup";
+    window.tichuStageNav?.setActive(document.body.dataset.activeStage);
+    syncVisibility();
+
+    const finalize = () => {
+      document.scrollingElement.scrollTop = pagePosition(index);
+      currentIndex = index;
+      renderStep();
+      syncVisibility();
+      scrollTween = null;
+      isTransitioning = false;
+      pendingTransitionFinalize = null;
       document.documentElement.style.scrollBehavior = originalScrollBehavior;
-      originalScrollBehavior = null;
-    }
-    window.ScrollTrigger?.update();
-    syncVisibility();
-  };
-
-  const startMovement = (top, behavior, onSettled, duration = 0.68) => {
-    window.clearTimeout(settleTimer);
-    scrollTween?.kill();
-    scrollTween = null;
-    if (settleHandler) {
-      window.removeEventListener("scrollend", settleHandler);
-    }
-    if (originalScrollBehavior === null) {
-      originalScrollBehavior = document.documentElement.style.scrollBehavior;
-    }
-    document.documentElement.style.scrollBehavior = "auto";
-    moving = true;
-    settleHandler = () => {
-      onSettled?.();
-      finishMovement();
+      announcePageArrival(index);
+      window.ScrollTrigger?.update();
     };
-    if (behavior === "smooth" && window.gsap) {
-      const scrollState = { y: window.scrollY };
-      scrollTween = window.gsap.to(scrollState, {
-        y: top,
-        duration,
-        ease: "power3.inOut",
-        overwrite: true,
-        onUpdate: () => window.scrollTo(0, scrollState.y),
-        onComplete: () => {
-          window.scrollTo(0, top);
-          settleHandler();
+    const finish = () => {
+      if (viewportChangedDuringTransition && window.ScrollTrigger && !viewportRefreshCompleted) {
+        waitingForViewportRefresh = true;
+        pendingTransitionFinalize = finalize;
+        return;
+      }
+      finalize();
+    };
+
+    originalScrollBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = "auto";
+    viewportChangedDuringTransition = false;
+    viewportRefreshCompleted = false;
+    waitingForViewportRefresh = false;
+    pendingTransitionFinalize = null;
+    const startTransition = () => {
+      if (currentIndex === null) {
+        window.ScrollTrigger?.refresh();
+      }
+      const targetY = pagePosition(index);
+      if (!reducedMotion && window.gsap) {
+        const scrollState = { y: window.scrollY };
+        scrollTween = window.gsap.to(scrollState, {
+          y: targetY,
+          duration: 0.62,
+          ease: "power3.inOut",
+          overwrite: true,
+          onUpdate: () => {
+            document.scrollingElement.scrollTop = scrollState.y;
+          },
+          onComplete: finish
+        });
+      } else {
+        document.scrollingElement.scrollTop = targetY;
+        finish();
+      }
+    };
+    const splash = document.querySelector(".splash-screen");
+    if (currentIndex === null && splash && !splash.hidden) {
+      const waitForSplash = () => {
+        if (!splash.hidden) {
+          window.requestAnimationFrame(waitForSplash);
+          return;
         }
-      });
-      settleTimer = window.setTimeout(settleHandler, duration * 1000 + 240);
-      return;
+        startTransition();
+      };
+      window.requestAnimationFrame(waitForSplash);
+    } else {
+      startTransition();
     }
 
-    window.addEventListener("scrollend", settleHandler, { once: true });
-    window.scrollTo({ top, left: 0, behavior });
-    settleTimer = window.setTimeout(settleHandler, behavior === "smooth" ? 1050 : 80);
+    return true;
   };
 
-  const goTo = (nextIndex, behavior = reducedMotion ? "auto" : "smooth") => {
-    const safeIndex = Math.max(0, Math.min(steps.length - 1, nextIndex));
-    unlockGateFor(steps[currentIndex].element);
-    active = true;
-    if (document.body.dataset.activeStage !== "#game-setup") {
-      window.tichuStageNav?.setActive("#game-setup");
+  window.addEventListener(
+    "resize",
+    () => {
+      if (isTransitioning) {
+        viewportChangedDuringTransition = true;
+        viewportRefreshCompleted = false;
+      }
+    },
+    { passive: true }
+  );
+  window.ScrollTrigger?.addEventListener("refresh", () => {
+    if (isTransitioning && viewportChangedDuringTransition) {
+      viewportRefreshCompleted = true;
+      if (waitingForViewportRefresh) {
+        waitingForViewportRefresh = false;
+        pendingTransitionFinalize?.();
+      }
     }
-    renderStep(safeIndex);
-    syncVisibility();
-    startMovement(
-      scrollPositionFor(safeIndex),
-      behavior,
-      () => {
-        renderStep(safeIndex);
-        announceStepArrival(safeIndex);
-      },
-      steps[safeIndex].transitionDuration || 0.68
-    );
-  };
-
-  const goToGame = (behavior = reducedMotion ? "auto" : "smooth") => {
-    unlockGateFor(steps[currentIndex].element);
-    active = false;
-    syncVisibility();
-    startMovement(
-      Math.max(0, gameStage.getBoundingClientRect().top + window.scrollY),
-      behavior,
-      () => window.tichuStageNav?.setActive("#game-play")
-    );
-  };
+  });
 
   const next = () => {
-    if (currentIndex < steps.length - 1) {
-      goTo(currentIndex + 1);
-    } else {
-      goToGame();
-    }
+    return goToPage((currentIndex ?? -1) + 1);
   };
 
   const previous = () => {
-    if (currentIndex > 0) {
-      goTo(currentIndex - 1);
-      return true;
-    }
-    return false;
-  };
-
-  const syncFromViewport = () => {
-    if (moving) {
-      return;
-    }
-
-    const marker = window.innerHeight * 0.45;
-    const insidePrep =
-      steps[0].element.getBoundingClientRect().top <= marker &&
-      gameStage.getBoundingClientRect().top > marker;
-
-    active = insidePrep;
-    if (!insidePrep) {
-      syncVisibility();
-      return;
-    }
-
-    if (document.body.dataset.activeStage !== "#game-setup") {
-      window.tichuStageNav?.setActive("#game-setup");
-    }
-    const nearestIndex = steps.reduce(
-      (nearest, step, index) =>
-        Math.abs(window.scrollY - scrollPositionFor(index)) <
-        Math.abs(window.scrollY - scrollPositionFor(nearest))
-          ? index
-          : nearest,
-      0
-    );
-    renderStep(nearestIndex);
-    syncVisibility();
+    return currentIndex !== null && goToPage(currentIndex - 1);
   };
 
   const requestSync = () => {
     if (!syncFrame) {
       syncFrame = window.requestAnimationFrame(() => {
         syncFrame = 0;
-        syncFromViewport();
+        syncVisibility();
+        if (
+          currentIndex === null &&
+          !isTransitioning &&
+          document.body.dataset.activeStage === "#game-setup" &&
+          isPrepInView()
+        ) {
+          goToPage(0);
+        }
       });
     }
   };
 
   const shouldHandleInput = () =>
-    (active || moving) &&
+    currentIndex !== null &&
+    (currentIndex < pages.length - 1 || isPrepInView()) &&
     !document.documentElement.classList.contains("modal-open") &&
     document.body.classList.contains("stage-tabs-visible");
 
@@ -484,11 +449,10 @@
     consumeInput(event);
     window.clearTimeout(wheelGestureTimer);
     wheelGestureTimer = window.setTimeout(() => {
-      wheelGestureTriggered = false;
       wheelDelta = 0;
-    }, 180);
+    }, 220);
 
-    if (moving || performance.now() < ignoreInputUntil || wheelGestureTriggered) {
+    if (isTransitioning) {
       return;
     }
 
@@ -499,24 +463,22 @@
 
     const direction = Math.sign(wheelDelta);
     wheelDelta = 0;
-    wheelGestureTriggered = true;
     if (direction > 0) {
       next();
-    } else if (!previous()) {
-      active = false;
-      syncVisibility();
+    } else {
+      previous();
     }
   };
 
   const onTouchStart = (event) => {
-    touchStartY = event.touches[0]?.clientY ?? null;
+    touchStartY = shouldHandleInput() ? event.touches[0]?.clientY ?? null : null;
   };
 
   const onTouchMove = (event) => {
     if (!shouldHandleInput() || touchStartY === null) {
       return;
     }
-    if (moving || performance.now() < ignoreInputUntil) {
+    if (isTransitioning) {
       consumeInput(event);
       return;
     }
@@ -531,16 +493,15 @@
     consumeInput(event);
     if (direction > 0) {
       next();
-    } else if (!previous()) {
-      active = false;
-      syncVisibility();
+    } else {
+      previous();
     }
   };
 
   const onKeyDown = (event) => {
     if (
       !shouldHandleInput() ||
-      event.target instanceof Element && event.target.closest("button, a, input, select, textarea")
+      (event.target instanceof Element && event.target.closest("button, a, input, select, textarea"))
     ) {
       return;
     }
@@ -550,12 +511,10 @@
     }
     if (["ArrowDown", "PageDown"].includes(event.key) || (event.key === " " && !event.shiftKey)) {
       consumeInput(event);
-      if (!moving) next();
+      next();
     } else if (["ArrowUp", "PageUp"].includes(event.key) || (event.key === " " && event.shiftKey)) {
-      if (currentIndex > 0) {
-        consumeInput(event);
-        if (!moving) previous();
-      }
+      consumeInput(event);
+      previous();
     }
   };
 
@@ -576,20 +535,16 @@
   window.addEventListener("resize", requestSync, { passive: true });
   window.addEventListener("load", requestSync, { once: true });
 
-  if (window.ScrollTrigger) {
-    window.ScrollTrigger.addEventListener("refresh", requestSync);
-  }
-
   window.tichuPrepFlow = {
     steps: PREP_STEPS,
-    goTo,
+    goToPage,
     next,
     previous,
     current: () => currentIndex,
-    isActive: () => active
+    isActive: () => currentIndex !== null && currentIndex < pages.length - 1 && isPrepInView()
   };
 
-  renderStep(0);
+  renderStep();
   syncVisibility();
   requestSync();
 })();
@@ -1154,15 +1109,7 @@
 
   const goToNextStep = () => {
     progressGate?.unlock();
-    if (window.tichuPrepFlow) {
-      window.tichuPrepFlow.goTo(1, reducedMotion ? "auto" : "smooth");
-      return;
-    }
-    document.querySelector("#prep-large-tichu")?.scrollIntoView({
-      behavior: reducedMotion ? "auto" : "smooth",
-      block: "start"
-    });
-    window.requestAnimationFrame(() => window.ScrollTrigger?.update());
+    window.tichuPrepFlow?.next();
   };
 
   nextButton?.addEventListener("click", goToNextStep);
@@ -1334,42 +1281,20 @@
   if (reducedMotion || !window.gsap) {
     section.classList.add("is-static");
   } else {
-    const title = section.querySelector(".large-tichu__title");
-    const question = section.querySelector(".large-tichu__question");
-    const deadline = section.querySelector(".large-tichu__deadline");
+    const stackItems = Array.from(section.querySelectorAll(".large-tichu__stack-item"));
     const controls = section.querySelector(".large-tichu__controls");
-    const entryY = () => Math.min(window.innerHeight * 0.18, 145);
-    const controlsY = () => (window.innerHeight <= 720 ? 115 : 105);
-
-    gsap.set([title, question], {
-      xPercent: -50,
-      yPercent: -50,
-      y: entryY,
-      autoAlpha: 0
-    });
-    gsap.set(deadline, {
-      xPercent: -50,
-      yPercent: -50,
-      y: 26,
-      autoAlpha: 0
-    });
     gsap.set(controls, {
-      xPercent: -50,
-      yPercent: -50,
-      y: 184,
-      autoAlpha: 0,
       pointerEvents: "none"
     });
+    gsap.set(stackItems, { y: 18, autoAlpha: 0 });
 
     introTimeline = gsap
       .timeline({ paused: true, defaults: { ease: "power2.inOut" } })
-      .to(title, { y: 0, autoAlpha: 1, duration: 0.78, ease: "power2.inOut" }, 0)
-      .to(title, { y: -180, scale: 0.68, duration: 0.76, ease: "power2.inOut" }, 0.92)
-      .to(question, { y: -80, autoAlpha: 1, duration: 0.62, ease: "power2.inOut" }, 1.66)
-      .to(deadline, { y: 2, autoAlpha: 1, duration: 0.62, ease: "power2.inOut" }, 2.24)
-      .to(controls, { y: controlsY, autoAlpha: 1, duration: 0.62, ease: "power2.inOut" }, 2.24)
-      .set(controls, { pointerEvents: "auto" }, 2.86)
-      .to({}, { duration: 0.2 });
+      .to(stackItems[0], { y: 0, autoAlpha: 1, duration: 0.56 }, 0)
+      .to(stackItems[1], { y: 0, autoAlpha: 1, duration: 0.56 }, 0.65)
+      .to(stackItems[2], { y: 0, autoAlpha: 1, duration: 0.56 }, 1.3)
+      .to(stackItems[3], { y: 0, autoAlpha: 1, duration: 0.56 }, 1.95)
+      .set(controls, { pointerEvents: "auto" }, 2.51);
   }
 
   window.addEventListener("tichu:prep-step", (event) => {
@@ -1666,42 +1591,20 @@
   if (reducedMotion || !window.gsap) {
     section.classList.add("is-static");
   } else {
-    const title = section.querySelector(".large-tichu__title");
-    const question = section.querySelector(".large-tichu__question");
-    const deadline = section.querySelector(".large-tichu__deadline");
+    const stackItems = Array.from(section.querySelectorAll(".large-tichu__stack-item"));
     const controls = section.querySelector(".large-tichu__controls");
-    const entryY = () => Math.min(window.innerHeight * 0.18, 145);
-    const controlsY = () => (window.innerHeight <= 720 ? 115 : 105);
-
-    gsap.set([title, question], {
-      xPercent: -50,
-      yPercent: -50,
-      y: entryY,
-      autoAlpha: 0
-    });
-    gsap.set(deadline, {
-      xPercent: -50,
-      yPercent: -50,
-      y: 26,
-      autoAlpha: 0
-    });
     gsap.set(controls, {
-      xPercent: -50,
-      yPercent: -50,
-      y: 184,
-      autoAlpha: 0,
       pointerEvents: "none"
     });
+    gsap.set(stackItems, { y: 18, autoAlpha: 0 });
 
     introTimeline = gsap
       .timeline({ paused: true, defaults: { ease: "power2.inOut" } })
-      .to(title, { y: 0, autoAlpha: 1, duration: 0.78, ease: "power2.inOut" }, 0)
-      .to(title, { y: -180, scale: 0.68, duration: 0.76 }, 0.92)
-      .to(question, { y: -80, autoAlpha: 1, duration: 0.62, ease: "power2.inOut" }, 1.66)
-      .to(deadline, { y: 2, autoAlpha: 1, duration: 0.62, ease: "power2.inOut" }, 2.24)
-      .to(controls, { y: controlsY, autoAlpha: 1, duration: 0.62, ease: "power2.inOut" }, 2.24)
-      .set(controls, { pointerEvents: "auto" }, 2.86)
-      .to({}, { duration: 0.2 });
+      .to(stackItems[0], { y: 0, autoAlpha: 1, duration: 0.56 }, 0)
+      .to(stackItems[1], { y: 0, autoAlpha: 1, duration: 0.56 }, 0.65)
+      .to(stackItems[2], { y: 0, autoAlpha: 1, duration: 0.56 }, 1.3)
+      .to(stackItems[3], { y: 0, autoAlpha: 1, duration: 0.56 }, 1.95)
+      .set(controls, { pointerEvents: "auto" }, 2.51);
   }
 
   window.addEventListener("tichu:prep-step", (event) => {
