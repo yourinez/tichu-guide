@@ -123,6 +123,8 @@
       setStageBarVisible(true, link.hash);
       if (link.hash === "#game-setup") {
         window.requestAnimationFrame(() => window.tichuPrepFlow?.jumpToPage(0));
+      } else if (link.hash === "#game-play") {
+        window.requestAnimationFrame(() => window.tichuPrepFlow?.jumpToGame());
       }
     });
   });
@@ -199,19 +201,18 @@
     { key: "large-tichu", selector: "#prep-large-tichu" },
     { key: "receive-six", selector: "#prep-receive-six" },
     { key: "exchange", selector: "#prep-exchange" },
-    { key: "small-tichu", selector: "#prep-small-tichu" },
-    { key: "game", selector: "#game-play" }
+    { key: "small-tichu", selector: "#prep-small-tichu" }
   ]);
   const pages = PREP_STEPS.map((page) => ({
     ...page,
     element: document.querySelector(page.selector)
   }));
-  const gameStage = pages.at(-1)?.element;
+  const gameStage = document.querySelector("#game-play");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   if (
     !stepper ||
-    items.length !== pages.length - 1 ||
+    items.length !== pages.length ||
     items.some((item, index) => item.dataset.prepTarget !== PREP_STEPS[index].selector) ||
     pages.some((page) => !page.element) ||
     !gameStage
@@ -229,7 +230,9 @@
   let originalScrollBehavior = "";
   let wheelDelta = 0;
   let wheelGestureTimer = 0;
+  let wheelGestureConsumed = false;
   let touchStartY = null;
+  let touchGestureConsumed = false;
   let syncFrame = 0;
 
   const renderStep = () => {
@@ -246,7 +249,7 @@
   };
 
   const announcePageArrival = (index) => {
-    if (![1, 2, 4].includes(index)) {
+    if (![1, 2, 4, 5].includes(index)) {
       return;
     }
 
@@ -260,7 +263,7 @@
   const syncVisibility = () => {
     const visible =
       currentIndex !== null &&
-      currentIndex < pages.length - 1 &&
+      currentIndex < pages.length &&
       document.body.classList.contains("stage-tabs-visible") &&
       document.body.dataset.activeStage === "#game-setup";
     stepper.setAttribute("aria-hidden", String(!visible));
@@ -271,21 +274,6 @@
     gameStage.getBoundingClientRect().top > window.innerHeight * 0.55;
 
   const pagePosition = (index) => {
-    if (index === pages.length - 1) {
-      const gameStartTrigger = window.ScrollTrigger?.getAll().find(
-        (trigger) => trigger.pin && trigger.trigger === gameStage
-      );
-      if (gameStartTrigger) {
-        return Math.max(
-          0,
-          Math.min(
-            gameStartTrigger.start,
-            document.documentElement.scrollHeight - window.innerHeight
-          )
-        );
-      }
-    }
-
     let top = 0;
     let element = pages[index].element.closest(".pin-spacer") || pages[index].element;
     while (element && element !== document.body && element !== document.documentElement) {
@@ -293,6 +281,24 @@
       element = element.offsetParent;
     }
     return Math.max(0, Math.min(top, document.documentElement.scrollHeight - window.innerHeight));
+  };
+
+  const gamePosition = () => {
+    const gameStartTrigger = window.ScrollTrigger?.getAll().find(
+      (trigger) => trigger.pin && trigger.trigger === gameStage
+    );
+    if (gameStartTrigger) {
+      return Math.max(
+        0,
+        Math.min(gameStartTrigger.start, document.documentElement.scrollHeight - window.innerHeight)
+      );
+    }
+
+    const rect = gameStage.getBoundingClientRect();
+    return Math.max(
+      0,
+      Math.min(rect.top + window.scrollY, document.documentElement.scrollHeight - window.innerHeight)
+    );
   };
 
   const unlockGateFor = (index) => {
@@ -329,7 +335,7 @@
 
     unlockGateFor(currentIndex);
     isTransitioning = true;
-    document.body.dataset.activeStage = index === pages.length - 1 ? "#game-play" : "#game-setup";
+    document.body.dataset.activeStage = "#game-setup";
     window.tichuStageNav?.setActive(document.body.dataset.activeStage);
     syncVisibility();
 
@@ -399,6 +405,56 @@
     return true;
   };
 
+  const goToGame = ({ allowFromAnywhere = false, instant = false } = {}) => {
+    if (
+      isTransitioning ||
+      (!allowFromAnywhere && currentIndex !== PREP_STEPS.length - 1)
+    ) {
+      return false;
+    }
+
+    unlockGateFor(currentIndex);
+    isTransitioning = true;
+    document.body.dataset.activeStage = "#game-play";
+    window.tichuStageNav?.setActive("#game-play");
+    syncVisibility();
+
+    const finalize = () => {
+      document.scrollingElement.scrollTop = gamePosition();
+      currentIndex = null;
+      renderStep();
+      syncVisibility();
+      scrollTween = null;
+      isTransitioning = false;
+      document.documentElement.style.scrollBehavior = originalScrollBehavior;
+      announcePageArrival(5);
+      window.ScrollTrigger?.update();
+    };
+
+    originalScrollBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = "auto";
+    const targetY = gamePosition();
+
+    if (!instant && !reducedMotion && window.gsap) {
+      const scrollState = { y: window.scrollY };
+      scrollTween = window.gsap.to(scrollState, {
+        y: targetY,
+        duration: 0.62,
+        ease: "power3.inOut",
+        overwrite: true,
+        onUpdate: () => {
+          document.scrollingElement.scrollTop = scrollState.y;
+        },
+        onComplete: finalize
+      });
+    } else {
+      document.scrollingElement.scrollTop = targetY;
+      finalize();
+    }
+
+    return true;
+  };
+
   window.addEventListener(
     "resize",
     () => {
@@ -420,10 +476,20 @@
   });
 
   const next = () => {
+    if (currentIndex === PREP_STEPS.length - 1) {
+      return goToGame();
+    }
     return goToPage((currentIndex ?? -1) + 1);
   };
 
   const previous = () => {
+    if (currentIndex === 0 && !isTransitioning) {
+      currentIndex = null;
+      renderStep();
+      syncVisibility();
+      window.tichuStageNav?.goTo?.("#card-guide");
+      return true;
+    }
     return currentIndex !== null && goToPage(currentIndex - 1);
   };
 
@@ -474,9 +540,10 @@
     window.clearTimeout(wheelGestureTimer);
     wheelGestureTimer = window.setTimeout(() => {
       wheelDelta = 0;
-    }, 220);
+      wheelGestureConsumed = false;
+    }, 280);
 
-    if (isTransitioning) {
+    if (isTransitioning || wheelGestureConsumed) {
       return;
     }
 
@@ -487,6 +554,7 @@
 
     const direction = Math.sign(wheelDelta);
     wheelDelta = 0;
+    wheelGestureConsumed = true;
     if (direction > 0) {
       next();
     } else {
@@ -495,14 +563,16 @@
   };
 
   const onTouchStart = (event) => {
-    touchStartY = shouldHandleInput() ? event.touches[0]?.clientY ?? null : null;
+    const canStart = shouldHandleInput() && !isTransitioning;
+    touchStartY = canStart ? event.touches[0]?.clientY ?? null : null;
+    touchGestureConsumed = false;
   };
 
   const onTouchMove = (event) => {
     if (!shouldHandleInput() || touchStartY === null) {
       return;
     }
-    if (isTransitioning) {
+    if (isTransitioning || touchGestureConsumed) {
       consumeInput(event);
       return;
     }
@@ -514,12 +584,18 @@
 
     const direction = Math.sign(touchStartY - currentY);
     touchStartY = null;
+    touchGestureConsumed = true;
     consumeInput(event);
     if (direction > 0) {
       next();
     } else {
       previous();
     }
+  };
+
+  const onTouchEnd = () => {
+    touchStartY = null;
+    touchGestureConsumed = false;
   };
 
   const onKeyDown = (event) => {
@@ -554,6 +630,8 @@
   window.addEventListener("wheel", onWheel, { passive: false, capture: true });
   window.addEventListener("touchstart", onTouchStart, { passive: true, capture: true });
   window.addEventListener("touchmove", onTouchMove, { passive: false, capture: true });
+  window.addEventListener("touchend", onTouchEnd, { passive: true, capture: true });
+  window.addEventListener("touchcancel", onTouchEnd, { passive: true, capture: true });
   window.addEventListener("keydown", onKeyDown, { capture: true });
   window.addEventListener("scroll", requestSync, { passive: true });
   window.addEventListener("resize", requestSync, { passive: true });
@@ -563,10 +641,19 @@
     steps: PREP_STEPS,
     goToPage,
     jumpToPage: (index) => goToPage(index, { allowNonAdjacent: true, instant: true }),
+    jumpToGame: () => goToGame({ allowFromAnywhere: true, instant: true }),
     next,
     previous,
+    releaseGameStart: () => {
+      scrollTween?.kill();
+      scrollTween = null;
+      isTransitioning = false;
+      currentIndex = null;
+      renderStep();
+      syncVisibility();
+    },
     current: () => currentIndex,
-    isActive: () => currentIndex !== null && currentIndex < pages.length - 1 && isPrepInView()
+    isActive: () => currentIndex !== null && currentIndex < pages.length && isPrepInView()
   };
 
   renderStep();
@@ -976,7 +1063,7 @@
     } else if (target === "#game-setup") {
       window.tichuPrepFlow?.jumpToPage(0);
     } else if (target === "#game-play") {
-      window.tichuPrepFlow?.jumpToPage(5);
+      window.tichuPrepFlow?.jumpToGame();
     } else if (target === "#score-victory") {
       const section = document.querySelector(target);
       if (section) {
@@ -2117,141 +2204,376 @@
 
   const cardSequence = document.querySelector(".play-card-sequence");
   const gameStart = document.querySelector(".game-start");
+  const comboGuide = document.querySelector(".combo-guide");
+  const comboGuideJump = document.querySelector("[data-scroll-to-combo]");
+  const comboGuideClose = comboGuide?.querySelector(".combo-guide__close");
+  const gameplayCarousel = document.querySelector(".gameplay-carousel");
+  const main = document.querySelector("main");
 
-  if (
-    cardSequence &&
-    gameStart &&
-    !window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
-    window.gsap &&
-    window.ScrollTrigger
-  ) {
-    gsap.registerPlugin(ScrollTrigger);
+  const playButton = gameStart?.querySelector(".game-start__play");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let comboReturnState = null;
+  let comboInertBackground = [];
 
-    const quickReferenceBar = document.querySelector(".quick-reference-bar");
-    const backdrop = gameStart.querySelector(".game-start__backdrop");
-    const bird = gameStart.querySelector(".game-start__bird");
-    const holder = gameStart.querySelector(".game-start__holder");
-    const launch = gameStart.querySelector(".game-start__launch");
-    const details = gameStart.querySelector(".game-start__details");
-    const direction = gameStart.querySelector(".game-start__direction");
-    const [arrowLine, arrowHead] = direction.querySelectorAll("path");
+  if (cardSequence && gameStart && playButton) {
+    const setSpecialCardCue = (visible) => {
+      document.body.classList.toggle("game-start-active", visible);
+    };
+    const introElements = [
+      gameStart.querySelector(".game-start__bird"),
+      gameStart.querySelector(".game-start__holder"),
+      gameStart.querySelector(".game-start__launch"),
+      playButton
+    ].filter(Boolean);
 
-    [arrowLine, arrowHead].forEach((path) => {
-      const length = path.getTotalLength();
-      path.style.strokeDasharray = `${length}px`;
-      path.style.strokeDashoffset = `${length}px`;
-    });
+    const revealStart = () => {
+      if (reducedMotion || !window.gsap) {
+        window.gsap?.set(introElements, { clearProps: "all" });
+        return;
+      }
 
-    gsap.set(backdrop, { yPercent: 100 });
-    gsap.set([bird, holder, launch, details], { y: 34, autoAlpha: 0 });
-    const updateReferenceBarHeight = () => {
-      gameStart.style.setProperty(
-        "--quick-reference-bar-height",
-        `${quickReferenceBar?.offsetHeight ?? 0}px`
+      window.gsap.killTweensOf(introElements);
+      window.gsap.fromTo(
+        introElements,
+        { y: 24, autoAlpha: 0 },
+        {
+          y: 0,
+          autoAlpha: 1,
+          duration: 0.55,
+          stagger: 0.09,
+          ease: "power2.out",
+          overwrite: true
+        }
       );
     };
 
-    updateReferenceBarHeight();
-    ScrollTrigger.addEventListener("refreshInit", updateReferenceBarHeight);
+    if (window.ScrollTrigger) {
+      window.gsap?.registerPlugin(window.ScrollTrigger);
+      window.ScrollTrigger.create({
+        trigger: gameStart,
+        start: "top 68%",
+        end: "bottom 32%",
+        onEnter: () => {
+          setSpecialCardCue(true);
+          revealStart();
+        },
+        onEnterBack: () => {
+          setSpecialCardCue(true);
+          revealStart();
+        },
+        onLeave: () => setSpecialCardCue(false),
+        onLeaveBack: () => setSpecialCardCue(false)
+      });
+    } else {
+      setSpecialCardCue(true);
+      revealStart();
+    }
 
-    gsap
-      .timeline({
-        defaults: { ease: "power2.inOut" },
-        scrollTrigger: {
-          trigger: gameStart,
-          start: "top top",
-          end: "+=300%",
-          pin: true,
-          pinSpacing: true,
-          scrub: 0.7,
-          anticipatePin: 1,
-          invalidateOnRefresh: true
+    window.addEventListener("tichu:prep-step", (event) => {
+      if (event.detail?.index === 5) {
+        setSpecialCardCue(true);
+        revealStart();
+      }
+    });
+
+    playButton.addEventListener("click", () => {
+      setSpecialCardCue(false);
+      window.tichuPrepFlow?.releaseGameStart();
+      const targetY = cardSequence.getBoundingClientRect().top + window.scrollY;
+
+      if (reducedMotion || !window.gsap) {
+        window.scrollTo({ top: targetY, left: 0, behavior: "auto" });
+        return;
+      }
+
+      const content = gameStart.querySelector(".game-start__content");
+      const scrollState = { y: window.scrollY };
+      window.gsap.to(content, {
+        y: -24,
+        autoAlpha: 0,
+        duration: 0.28,
+        ease: "power2.in"
+      });
+      window.gsap.to(scrollState, {
+        y: targetY,
+        duration: 0.68,
+        delay: 0.12,
+        ease: "power3.inOut",
+        onUpdate: () => window.scrollTo(0, scrollState.y),
+        onComplete: () => {
+          window.scrollTo(0, targetY);
+          window.gsap.set(content, { clearProps: "transform,opacity,visibility" });
+          window.ScrollTrigger?.update();
         }
-      })
-      .to(backdrop, { yPercent: 0, duration: 0.9 }, 0)
-      .to(bird, { y: 0, autoAlpha: 1, duration: 0.5, ease: "power2.out" }, 0.95)
-      .to(holder, { y: 0, autoAlpha: 1, duration: 0.46, ease: "power2.out" }, 1.48)
-      .to(launch, { y: 0, autoAlpha: 1, duration: 0.5, ease: "power2.out" }, 1.98)
-      .to(details, { y: 0, autoAlpha: 1, duration: 0.55, ease: "power2.out" }, 2.52)
-      .to(arrowLine, { strokeDashoffset: 0, duration: 0.76, ease: "power1.inOut" }, 2.6)
-      .to(arrowHead, { strokeDashoffset: 0, duration: 0.18, ease: "power1.out" }, 3.25)
-      .to(
-        gameStart.querySelector(".game-start__content"),
-        {
-          y: () => -Math.max(window.innerHeight, 560) * 0.16,
-          opacity: 0,
-          duration: 0.48
-        },
-        3.82
-      )
-      .to(
-        backdrop,
-        {
-          opacity: 0,
-          duration: 0.42
-        },
-        3.9
-      )
-      .fromTo(
-        cardSequence.querySelector(".play-card-sequence__caption"),
-        { y: 44, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.42, ease: "power2.out" },
-        3.9
-      )
-      .fromTo(
-        cardSequence.querySelector(".play-card-sequence__pile"),
-        { y: 52, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.42, ease: "power2.out" },
-        4.02
-      );
+      });
+    });
   }
 
   if (cardSequence) {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      cardSequence.classList.add("is-visible");
-    } else if (window.gsap && window.ScrollTrigger) {
-      gsap.registerPlugin(ScrollTrigger);
+    const pairs = Array.from(cardSequence.querySelectorAll(".play-card-sequence__pair"));
+    const replayButton = cardSequence.querySelector(".play-card-sequence__replay");
+    let coverTimeline = null;
+
+    const entryPositions = {
+      bottom: { x: 0, y: 168, rotation: -2 },
+      right: { x: 170, y: 0, rotation: 3 },
+      top: { x: 0, y: -168, rotation: -2 },
+      left: { x: -170, y: 0, rotation: -3 }
+    };
+
+    const getFinalState = (pair) => ({
+      x: Number(pair.dataset.finalX || 0),
+      y: Number(pair.dataset.finalY || 0),
+      rotation: Number(pair.dataset.finalRotation || 0)
+    });
+
+    if (reducedMotion || !window.gsap) {
+      pairs.forEach((pair) => {
+        pair.style.opacity = "1";
+      });
+    } else {
+      const resetSequence = () => {
+        coverTimeline?.kill();
+        pairs.forEach((pair) => {
+          const entry = entryPositions[pair.dataset.entry] || entryPositions.bottom;
+          window.gsap.set(pair, {
+            xPercent: -50,
+            yPercent: -50,
+            x: entry.x,
+            y: entry.y,
+            rotation: entry.rotation,
+            scale: 0.94,
+            autoAlpha: 0
+          });
+        });
+
+      };
 
       const playSequence = () => {
-        cardSequence.classList.remove("is-visible");
-        void cardSequence.offsetWidth;
-        cardSequence.classList.add("is-visible");
+        resetSequence();
+        coverTimeline = window.gsap.timeline();
+
+        pairs.forEach((pair, index) => {
+          const finalState = getFinalState(pair);
+          const startAt = 0.25 + index * 1.2;
+
+          coverTimeline.to(
+            pair,
+            {
+              ...finalState,
+              scale: 1,
+              autoAlpha: 1,
+              duration: 1.02,
+              ease: "power2.inOut"
+            },
+            startAt
+          );
+        });
       };
 
-      const resetSequence = () => {
-        cardSequence.classList.remove("is-visible");
-      };
+      if (window.ScrollTrigger) {
+        window.gsap.registerPlugin(window.ScrollTrigger);
+        window.ScrollTrigger.create({
+          trigger: cardSequence,
+          start: "top 68%",
+          end: "bottom 18%",
+          onEnter: playSequence,
+          onEnterBack: playSequence,
+          onLeaveBack: resetSequence
+        });
+      } else if ("IntersectionObserver" in window) {
+        const sequenceObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) playSequence();
+              else resetSequence();
+            });
+          },
+          { threshold: 0.25 }
+        );
+        sequenceObserver.observe(cardSequence);
+      } else {
+        playSequence();
+      }
 
-      ScrollTrigger.create({
-        trigger: cardSequence,
-        start: "top 70%",
-        end: "bottom 20%",
-        onEnter: playSequence,
-        onEnterBack: playSequence,
-        onLeave: resetSequence,
-        onLeaveBack: resetSequence
-      });
-    } else if ("IntersectionObserver" in window) {
-      const sequenceObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              cardSequence.classList.remove("is-visible");
-              void cardSequence.offsetWidth;
-              cardSequence.classList.add("is-visible");
-            } else {
-              cardSequence.classList.remove("is-visible");
-            }
-          });
-        },
-        { threshold: 0.2 }
-      );
+      resetSequence();
 
-      sequenceObserver.observe(cardSequence);
-    } else {
-      cardSequence.classList.add("is-visible");
+      replayButton?.addEventListener("click", playSequence);
+      cardSequence.addEventListener("cover:replay", playSequence);
     }
   }
+
+  if (comboGuide && comboGuideJump) {
+    comboGuideJump.addEventListener("click", () => {
+      comboReturnState = {
+        slideIndex: Number(gameplayCarousel?.dataset.activeSlide || 0)
+      };
+      comboGuide.classList.add("is-opened-from-game");
+      comboGuide.hidden = false;
+      comboGuideClose?.removeAttribute("hidden");
+      comboInertBackground = Array.from(main?.children || [])
+        .filter((element) => element !== comboGuide)
+        .map((element) => ({ element, wasInert: element.inert }));
+      comboInertBackground.forEach(({ element }) => {
+        element.inert = true;
+      });
+      document.documentElement.classList.add("combo-guide-open");
+      document.body.classList.add("combo-guide-open");
+      comboGuideClose?.focus({ preventScroll: true });
+    });
+
+    const closeComboGuide = () => {
+      if (!comboGuide.classList.contains("is-opened-from-game")) {
+        return;
+      }
+
+      const returnState = comboReturnState || { slideIndex: 0 };
+
+      gameplayCarousel?.dispatchEvent(
+        new CustomEvent("gameplay:show-slide", {
+          detail: { index: returnState.slideIndex, replayCover: false }
+        })
+      );
+      comboGuide.classList.remove("is-opened-from-game");
+      comboGuideClose.setAttribute("hidden", "");
+      comboGuide.hidden = true;
+      comboInertBackground.forEach(({ element, wasInert }) => {
+        element.inert = wasInert;
+      });
+      comboInertBackground = [];
+      document.documentElement.classList.remove("combo-guide-open");
+      document.body.classList.remove("combo-guide-open");
+      comboReturnState = null;
+      comboGuideJump.focus({ preventScroll: true });
+    };
+
+    comboGuideClose?.addEventListener("click", closeComboGuide);
+    comboGuide?.addEventListener("click", (event) => {
+      if (event.target.closest("[data-combo-guide-close]")) {
+        closeComboGuide();
+      }
+    });
+    document.addEventListener("keydown", (event) => {
+      if (!comboGuide.classList.contains("is-opened-from-game")) {
+        return;
+      }
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeComboGuide();
+        return;
+      }
+      if (event.key === "Tab") {
+        const focusable = Array.from(
+          comboGuide.querySelectorAll(
+            'button:not([disabled]):not([hidden]), [tabindex]:not([tabindex="-1"])'
+          )
+        ).filter((element) => !element.closest("[hidden]"));
+        if (!focusable.length) {
+          event.preventDefault();
+          comboGuide.focus();
+          return;
+        }
+
+        const first = focusable[0];
+        const last = focusable.at(-1);
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    });
+  }
+})();
+
+(() => {
+  "use strict";
+
+  const carousel = document.querySelector(".gameplay-carousel");
+  const viewport = carousel?.querySelector(".gameplay-carousel__viewport");
+  const track = carousel?.querySelector(".gameplay-carousel__track");
+  const slides = Array.from(carousel?.querySelectorAll(".gameplay-carousel__slide") || []);
+  const nextButton = carousel?.querySelector(".gameplay-carousel__nav--next");
+  const coverSlide = carousel?.querySelector(".play-card-sequence");
+  const trickEnd = document.querySelector(".trick-end");
+
+  if (!carousel || !viewport || !track || slides.length !== 1 || !nextButton || !trickEnd) {
+    return;
+  }
+
+  let currentIndex = 0;
+  let swipeStart = null;
+
+  const showSlide = (nextIndex, replayCover = true) => {
+    const lastIndex = slides.length - 1;
+    currentIndex = Math.max(0, Math.min(lastIndex, nextIndex));
+    carousel.dataset.activeSlide = String(currentIndex);
+    track.style.transform = `translate3d(-${currentIndex * 100}%, 0, 0)`;
+
+    slides.forEach((slide, index) => {
+      const isCurrent = index === currentIndex;
+      slide.setAttribute("aria-hidden", String(!isCurrent));
+      slide.inert = !isCurrent;
+    });
+
+    if (currentIndex === 0 && replayCover) {
+      window.setTimeout(() => coverSlide?.dispatchEvent(new CustomEvent("cover:replay")), 360);
+    }
+  };
+
+  const goToTrickEnd = () => {
+    trickEnd.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+      block: "start"
+    });
+    window.setTimeout(() => window.ScrollTrigger?.update(), 350);
+  };
+
+  nextButton.addEventListener("click", goToTrickEnd);
+
+  viewport.addEventListener("pointerdown", (event) => {
+    if (!event.isPrimary || (event.pointerType === "mouse" && event.button !== 0)) {
+      return;
+    }
+    swipeStart = { x: event.clientX, y: event.clientY };
+  });
+
+  viewport.addEventListener("pointerup", (event) => {
+    if (!swipeStart || !event.isPrimary) {
+      swipeStart = null;
+      return;
+    }
+
+    const deltaX = event.clientX - swipeStart.x;
+    const deltaY = event.clientY - swipeStart.y;
+    swipeStart = null;
+
+    if (Math.abs(deltaX) >= 42 && Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX < 0) {
+        goToTrickEnd();
+      }
+    }
+  });
+
+  viewport.addEventListener("pointercancel", () => {
+    swipeStart = null;
+  });
+
+  viewport.addEventListener("keydown", (event) => {
+    if (event.key !== "ArrowRight") {
+      return;
+    }
+    event.preventDefault();
+    goToTrickEnd();
+  });
+
+  carousel.addEventListener("gameplay:show-slide", (event) => {
+    showSlide(Number(event.detail?.index || 0), event.detail?.replayCover !== false);
+  });
+
+  showSlide(0, false);
 })();
 
 (() => {
@@ -2621,6 +2943,7 @@
   let returnFocus = null;
   let lockedScrollY = 0;
   let closeTimer = null;
+  let inertBackground = [];
 
   const modalFor = (name) =>
     Array.from(document.querySelectorAll("[data-modal]")).find(
@@ -2640,7 +2963,12 @@
     document.documentElement.classList.add("modal-open");
     document.body.classList.add("modal-open");
     if (main) {
-      main.inert = true;
+      inertBackground = Array.from(main.children)
+        .filter((element) => !element.matches(".quick-reference-bar"))
+        .map((element) => ({ element, wasInert: element.inert }));
+      inertBackground.forEach(({ element }) => {
+        element.inert = true;
+      });
     }
   };
 
@@ -2648,9 +2976,10 @@
     const restoreScrollY = lockedScrollY;
     document.documentElement.classList.remove("modal-open");
     document.body.classList.remove("modal-open");
-    if (main) {
-      main.inert = false;
-    }
+    inertBackground.forEach(({ element, wasInert }) => {
+      element.inert = wasInert;
+    });
+    inertBackground = [];
 
     if (Math.abs(window.scrollY - restoreScrollY) > 1) {
       window.scrollTo({ top: restoreScrollY, left: 0, behavior: "auto" });

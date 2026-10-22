@@ -214,46 +214,51 @@
 
       <section class="deal-section" id="game-setup" aria-labelledby="deal-title">
         <div class="deal-section__inner">
-          <h2 id="deal-title">먼저 카드를 나눠요</h2>
+          <div class="deal-content">
+            <h2 id="deal-title">먼저 카드를 나눠요</h2>
 
-          <div class="deal-table" aria-label="네 사람에게 카드를 분배하는 자리">
-            <div class="deal-seat deal-seat--top" data-seat="top">
-              <span class="deal-seat__label">파트너</span>
-              <div class="deal-seat__pile">
-                <img class="deal-seat__fan" src="8장.png" alt="파트너가 받은 8장" />
+            <div class="deal-table" aria-label="네 사람에게 카드를 분배하는 자리">
+              <div class="deal-seat deal-seat--top" data-seat="top">
+                <span class="deal-seat__label">파트너</span>
+                <div class="deal-seat__pile">
+                  <img class="deal-seat__fan" src="8장.png" alt="파트너가 받은 8장" />
+                </div>
               </div>
-            </div>
 
-            <div class="deal-seat deal-seat--right" data-seat="right">
-              <span class="deal-seat__label">상대</span>
-              <div class="deal-seat__pile">
-                <img class="deal-seat__fan" src="8장.png" alt="오른쪽 상대가 받은 8장" />
+              <div class="deal-seat deal-seat--right" data-seat="right">
+                <span class="deal-seat__label">상대</span>
+                <div class="deal-seat__pile">
+                  <img class="deal-seat__fan" src="8장.png" alt="오른쪽 상대가 받은 8장" />
+                </div>
               </div>
-            </div>
 
-            <div class="deal-seat deal-seat--bottom" data-seat="bottom">
-              <div class="deal-seat__pile">
-                <img class="deal-seat__fan" src="8장.png" alt="내가 받은 8장" />
+              <div class="deal-seat deal-seat--bottom" data-seat="bottom">
+                <div class="deal-seat__pile">
+                  <img class="deal-seat__fan" src="8장.png" alt="내가 받은 8장" />
+                </div>
+                <span class="deal-seat__label">나</span>
+                <p class="hand-privacy-note" role="note">
+                  ⚠️ 카드는 나만 볼 수 있어요.<br />파트너에게도 보여주면 안 돼요!
+                </p>
               </div>
-              <span class="deal-seat__label">나</span>
-            </div>
 
-            <div class="deal-seat deal-seat--left" data-seat="left">
-              <span class="deal-seat__label">상대</span>
-              <div class="deal-seat__pile">
-                <img class="deal-seat__fan" src="8장.png" alt="왼쪽 상대가 받은 8장" />
+              <div class="deal-seat deal-seat--left" data-seat="left">
+                <span class="deal-seat__label">상대</span>
+                <div class="deal-seat__pile">
+                  <img class="deal-seat__fan" src="8장.png" alt="왼쪽 상대가 받은 8장" />
+                </div>
               </div>
-            </div>
 
-            <div class="deal-deck" aria-hidden="true">
-              <img src="뒷면.png" alt="" />
+              <div class="deal-deck" aria-hidden="true">
+                <img src="뒷면.png" alt="" />
+              </div>
+              <div class="deal-flight-layer" aria-hidden="true"></div>
+              <button class="deal-button" type="button">나누기</button>
+              <p class="deal-status" aria-live="polite" aria-hidden="true">8장씩 받았어요</p>
+              <button class="deal-replay" type="button" aria-label="카드 분배 다시 재생" hidden>
+                <span aria-hidden="true">↻</span>
+              </button>
             </div>
-            <div class="deal-flight-layer" aria-hidden="true"></div>
-            <button class="deal-button" type="button">나누기</button>
-            <p class="deal-status" aria-live="polite" aria-hidden="true">8장씩 받았어요</p>
-            <button class="deal-replay" type="button" aria-label="카드 분배 다시 재생" hidden>
-              <span aria-hidden="true">↻</span>
-            </button>
           </div>
           <button class="deal-next" type="button" aria-label="라지 티츄 단계로 이동">
             <span aria-hidden="true">↓</span>
@@ -338,10 +343,14 @@
                 <img src="뒷면.png" alt="" />
               </div>
             </div>
+            <p class="hand-privacy-note exchange-receive__privacy" role="note">
+              ⚠️ 카드는 나만 볼 수 있어요.<br />파트너에게도 보여주면 안 돼요!
+            </p>
           </div>
 
           <div class="exchange-main" id="prep-exchange">
             <h3>이제 카드 3장을 나눠요</h3>
+            <p class="exchange-main__rule">왼쪽·파트너·오른쪽에게 각각 1장씩</p>
 
             <div class="exchange-table" aria-label="내 카드를 세 방향으로 교환하는 자리">
               <span class="exchange-seat exchange-seat--top">파트너</span>
@@ -359,7 +368,9 @@
               </div>
 
               <button class="exchange-button" type="button">카드 교환하기</button>
-              <p class="exchange-status" aria-live="polite" aria-hidden="true">서로 3장씩 주고받았어요</p>
+              <p class="exchange-status" aria-live="polite" aria-hidden="true">
+                서로 3장씩<br />동시에<br />주고받아요
+              </p>
               <button
                 class="exchange-replay"
                 type="button"
@@ -448,75 +459,94 @@
           <img class="game-start__bird" src="참새.png" alt="참새 카드" />
           <h2 id="game-start-title">
             <span class="game-start__holder">참새 보유자</span>
-            <strong class="game-start__launch">GAME START!</strong>
+            <strong class="game-start__launch">게임 시작!</strong>
           </h2>
-          <div class="game-start__details">
-            <svg
-              class="game-start__direction"
-              viewBox="0 0 440 640"
-              preserveAspectRatio="none"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path
-                class="game-start__arrow-line"
-                d="M 344 268 C 382 260 400 228 400 184 C 400 116 330 83 220 82 C 110 81 40 115 40 184 C 40 228 58 259 96 268"
-              />
-              <path
-                class="game-start__arrow-head"
-                d="M 72 252 L 96 268 L 71 281"
-              />
-            </svg>
-            <p>참새 카드 제시한 사람이 첫 카드를 내며 시작합니다 (아무 카드 &amp; 몇 장이든 OK)</p>
-            <p class="game-start__direction-label">시계 반대방향으로 진행해요</p>
-            <button
-              class="inline-modal-button"
-              type="button"
-              data-open="special"
-              aria-haspopup="dialog"
-              aria-controls="special-modal"
-              aria-expanded="false"
-            >
-              특수카드가 뭐예요?
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section class="play-card-sequence" aria-labelledby="play-card-sequence-title">
-        <h2 class="play-card-sequence__caption" id="play-card-sequence-title">
-          더 높은 카드로 덮으며 진행해요
-        </h2>
-        <div class="play-card-sequence__pile" aria-hidden="true">
-          <img class="play-card-sequence__card" src="별7.png" alt="" />
-          <img class="play-card-sequence__card" src="별9.png" alt="" />
-          <img class="play-card-sequence__card" src="별10.png" alt="" />
-          <img class="play-card-sequence__card" src="집J.png" alt="" />
-          <img class="play-card-sequence__card" src="집Q.png" alt="" />
-          <img class="play-card-sequence__card" src="별K.png" alt="" />
-          <img class="play-card-sequence__card" src="별A.png" alt="" />
-        </div>
-      </section>
-
-      <section class="combo-bridge" aria-label="카드 조합 소개">
-        <div class="combo-bridge__content">
-          <button
-            class="combo-bridge__button"
-            type="button"
-            data-open="combo"
-            aria-haspopup="dialog"
-            aria-controls="combo-modal"
-            aria-expanded="false"
-          >
-            <span>카드는 묶어서</span>
-            <strong>낼 수 있어요</strong>
+          <button class="game-start__play" type="button" aria-label="게임 진행 설명 시작">
+            <span aria-hidden="true">▶</span>
           </button>
         </div>
       </section>
 
-      <section class="combo-guide" aria-labelledby="combo-guide-title">
+      <section class="gameplay-carousel" aria-label="게임 진행 핵심 안내">
+        <div class="gameplay-carousel__viewport" tabindex="0" aria-label="카드 덮기 안내. 다음 화살표나 왼쪽 스와이프로 트릭 종료 화면으로 이동합니다">
+          <div class="gameplay-carousel__track">
+            <section class="play-card-sequence gameplay-carousel__slide" aria-labelledby="play-card-sequence-title">
+              <h2 class="play-card-sequence__caption" id="play-card-sequence-title">
+                <strong>더 높은 카드로</strong> 판 위의 카드 위에<br />카드를 덮으세요!
+              </h2>
+              <div class="play-card-sequence__board-wrap">
+                <div class="play-card-sequence__board" aria-label="아래, 오른쪽, 위, 왼쪽에서 나온 3, 6, 9, K 페어가 차례로 중앙에 쌓입니다">
+                  <p class="play-card-sequence__direction">시계반대방향</p>
+                  <div class="play-card-sequence__pair is-base" data-cover-value="3" data-entry="bottom" data-final-x="-7" data-final-y="7" data-final-rotation="-2">
+                    <img src="별3.png" alt="별 3" />
+                    <img src="옥3.png" alt="옥 3" />
+                  </div>
+                  <div class="play-card-sequence__pair" data-cover-value="6" data-entry="right" data-final-x="7" data-final-y="3" data-final-rotation="1.5">
+                    <img src="옥6.png" alt="옥 6" />
+                    <img src="집6.png" alt="집 6" />
+                  </div>
+                  <div class="play-card-sequence__pair" data-cover-value="9" data-entry="top" data-final-x="-5" data-final-y="-3" data-final-rotation="-1">
+                    <img src="별9.png" alt="별 9" />
+                    <img src="검9.png" alt="검 9" />
+                  </div>
+                  <div class="play-card-sequence__pair" data-cover-value="K" data-entry="left" data-final-x="5" data-final-y="-7" data-final-rotation="2">
+                    <img src="별K.png" alt="별 K" />
+                    <img src="옥K.png" alt="옥 K" />
+                  </div>
+                  <button class="play-card-sequence__replay" type="button" aria-label="카드 덮기 모션 다시 재생">
+                    <span aria-hidden="true">↻</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="play-card-sequence__rules">
+                <p>
+                  <strong>첫 사람(참새 보유자)이 낸 ‘장 수’가 그 판의 기준!</strong>
+                  <span>나머지 사람은 같은 장수로만<br />앞의 카드를 덮을 수 있어요</span>
+                </p>
+                <div class="play-card-sequence__actions">
+                  <button class="combo-guide-jump" type="button" data-scroll-to-combo>
+                    그래서 뭘 낼 수 있나요?
+                  </button>
+                  <button
+                    class="combo-guide-jump pass-guide-trigger"
+                    type="button"
+                    data-open="pass-tip"
+                    aria-haspopup="dialog"
+                    aria-controls="pass-tip-modal"
+                    aria-expanded="false"
+                  >
+                    낼 게 없다면? 패스!
+                  </button>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+      <button class="gameplay-carousel__nav gameplay-carousel__nav--next" type="button" aria-label="트릭 종료 화면으로 이동">
+        <span aria-hidden="true"></span>
+      </button>
+      </section>
+
+      <section
+        class="combo-guide"
+        id="combo-guide"
+        aria-labelledby="combo-guide-title"
+        role="dialog"
+        aria-modal="true"
+        tabindex="-1"
+        hidden
+      >
+        <div class="combo-guide__backdrop" data-combo-guide-close aria-hidden="true"></div>
+        <button class="combo-guide__close" type="button" aria-label="카드 조합 안내를 닫고 게임 진행 화면으로 돌아가기" hidden>
+          <span aria-hidden="true">×</span>
+        </button>
         <div class="combo-guide__inner">
           <h2 id="combo-guide-title">앞에 몇 장 깔렸나요?</h2>
+          <p class="combo-guide__lead">
+            참새보유자 &amp; 트릭 시작자가 낸 첫 카드의<br />같은 장수로만 판 위의 카드를 덮을 수 있어요
+          </p>
 
           <div class="combo-tabs" role="tablist" aria-label="카드 장수 선택">
             <button class="combo-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="combo-panel-1" data-combo="1">
@@ -691,6 +721,40 @@
             <p>마지막에 낸 사람이 전부 가져가요 <strong>'트릭을 딴다'</strong></p>
             <p>가져간 카드는 플레이어 앞에 뒷면으로 쌓아둡니다.</p>
           </div>
+        </div>
+      </section>
+
+      <section class="gameplay-card-zones" aria-labelledby="gameplay-card-zones-title">
+        <div class="gameplay-card-zones__inner">
+          <h2 id="gameplay-card-zones-title">딴 카드와 내 카드는<br />완전히 달라요</h2>
+
+          <div class="gameplay-card-zones__compare">
+            <article class="gameplay-card-zone gameplay-card-zone--won">
+              <h3>딴 트릭</h3>
+              <div class="gameplay-card-zone__backs" aria-label="뒷면으로 쌓아둔 딴 카드">
+                <img src="뒷면.png" alt="" />
+                <img src="뒷면.png" alt="" />
+                <img src="뒷면.png" alt="딴 트릭 카드 더미" />
+              </div>
+              <strong>점수용</strong>
+              <p>뒤집어 쌓아둠<br />다시 못 냄</p>
+            </article>
+
+            <span class="gameplay-card-zones__divider" aria-hidden="true"></span>
+
+            <article class="gameplay-card-zone gameplay-card-zone--hand">
+              <h3>내 손패</h3>
+              <div class="gameplay-card-zone__faces" aria-label="플레이에 사용하는 내 손패">
+                <img src="별7.png" alt="별 7" />
+                <img src="옥9.png" alt="옥 9" />
+                <img src="집J.png" alt="집 J" />
+              </div>
+              <strong>플레이용</strong>
+              <p>내가 직접<br />내는 카드</p>
+            </article>
+          </div>
+
+          <p class="gameplay-card-zones__note">딴 트릭은 점수 더미, 손패는 플레이 카드예요.</p>
         </div>
       </section>
 
@@ -1302,6 +1366,27 @@
               <li>혼자 남는 외톨이 카드</li>
             </ul>
           </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="app-modal" id="pass-tip-modal" data-modal="pass-tip" hidden>
+      <div class="app-modal__backdrop" data-close-modal aria-hidden="true"></div>
+      <div
+        class="app-modal__dialog tichu-tip-modal__dialog pass-tip-modal__dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="pass-tip-title"
+        tabindex="-1"
+      >
+        <button class="app-modal__close" type="button" data-close-modal aria-label="패스 설명 닫기">×</button>
+        <section class="tichu-tip pass-tip" aria-labelledby="pass-tip-title">
+          <h2 id="pass-tip-title">낼 게 없다면? 패스!</h2>
+          <p>
+            낼 조합이 없으면 <strong>패스!</strong><br />
+            패스해도 끝이 아니라, 다음 차례에 다시 낼 수 있어요.<br />
+            <strong>3명이 연속 패스하면 트릭 종료.</strong>
+          </p>
         </section>
       </div>
     </div>
