@@ -33,15 +33,65 @@
   "use strict";
 
   const menuLinks = document.querySelectorAll(".chapter-menu__links a");
-  const chapterMenu = document.querySelector(".chapter-menu");
   const stageBar = document.querySelector(".stage-tab-bar");
   const stageTabs = Array.from(document.querySelectorAll("[data-stage-target]"));
-  const introSection = document.querySelector("#game-intro");
-  const cardGuide = document.querySelector("#card-guide");
+  const stageGroups = new Map([
+    ["#game-intro", [document.querySelector(".hero")]],
+    ["#card-guide", [document.querySelector(".hero")]],
+    [
+      "#game-setup",
+      [
+        document.querySelector("#game-setup"),
+        document.querySelector("#prep-large-tichu"),
+        document.querySelector("#prep-receive-six")?.closest(".exchange-section"),
+        document.querySelector("#prep-small-tichu")
+      ]
+    ],
+    ["#game-play", [document.querySelector(".gameplay-carousel")]],
+    [
+      "#score-victory",
+      [document.querySelector("#score-victory"), document.querySelector(".round-finale")]
+    ]
+  ]);
+  const stageContainers = Array.from(
+    new Set(Array.from(stageGroups.values()).flat().filter(Boolean))
+  );
+  const introView = document.querySelector(".hero__team-layout");
+  const cardView = document.querySelector("#card-guide");
   let requestedStageTarget = null;
+
+  const syncStageIsolation = (target = null) => {
+    const activeContainers = new Set(stageGroups.get(target) || []);
+    const isolated = activeContainers.size > 0;
+
+    document.body.classList.toggle("stage-isolated", isolated);
+    stageContainers.forEach((container) => {
+      const inactive = isolated && !activeContainers.has(container);
+      container.classList.toggle("is-stage-inactive", inactive);
+      container.inert = inactive;
+      if (inactive) {
+        container.setAttribute("aria-hidden", "true");
+      } else {
+        container.removeAttribute("aria-hidden");
+      }
+    });
+
+    [
+      [introView, target !== "#game-intro"],
+      [cardView, target !== "#card-guide"]
+    ].forEach(([view, inactiveForTarget]) => {
+      if (!view) return;
+      const inactive = isolated && inactiveForTarget;
+      view.classList.toggle("is-stage-subview-inactive", inactive);
+      view.inert = inactive;
+      if (inactive) view.setAttribute("aria-hidden", "true");
+      else view.removeAttribute("aria-hidden");
+    });
+  };
 
   const setActiveStage = (target) => {
     document.body.dataset.activeStage = target;
+    syncStageIsolation(target);
     stageTabs.forEach((tab) => {
       const isActive = tab.dataset.stageTarget === target;
       tab.classList.toggle("is-active", isActive);
@@ -53,18 +103,10 @@
     });
   };
 
-  const isChapterMenuScreen = () => {
-    if (!chapterMenu) {
-      return false;
-    }
-
-    const menuRect = chapterMenu.getBoundingClientRect();
-    const viewportCenter = window.innerHeight * 0.5;
-    return menuRect.top <= viewportCenter && menuRect.bottom >= viewportCenter;
-  };
-
   const applyStageBarState = () => {
-    const visible = Boolean(requestedStageTarget) && !isChapterMenuScreen();
+    // 상세 단계에 들어간 뒤에는 스크롤 위치로 상태를 추측하지 않는다.
+    // 목차 복귀는 hide()/menu lock처럼 명시적인 동작에서만 처리한다.
+    const visible = Boolean(requestedStageTarget);
     if (!visible && stageBar?.contains(document.activeElement)) {
       document.activeElement.blur();
     }
@@ -76,6 +118,8 @@
     });
     if (visible && requestedStageTarget) {
       setActiveStage(requestedStageTarget);
+    } else {
+      syncStageIsolation();
     }
   };
 
@@ -120,18 +164,23 @@
     setStageBarVisible(false);
   }
   menuLinks.forEach((link) => {
-    link.addEventListener("click", () => {
+    link.addEventListener("click", (event) => {
+      if (!link.hasAttribute("data-hero-time")) {
+        event.preventDefault();
+        window.history.replaceState(null, "", link.hash);
+        window.tichuStageNav?.goTo?.(link.hash);
+        if (link.hash === "#game-setup") {
+          window.requestAnimationFrame(() => {
+            window.ScrollTrigger?.refresh();
+            window.requestAnimationFrame(() => window.tichuPrepFlow?.jumpToPage(0));
+          });
+        }
+        return;
+      }
+
       clearDetailScrollLock();
       setMenuScrollLock(false);
       setStageBarVisible(true, link.hash);
-      if (link.hash === "#game-setup") {
-        window.requestAnimationFrame(() => window.tichuPrepFlow?.jumpToPage(0));
-      } else if (link.hash === "#game-play") {
-        window.requestAnimationFrame(() => {
-          window.tichuPrepFlow?.jumpToGame();
-          window.tichuGameSlides?.goToSlide(0);
-        });
-      }
     });
   });
 
@@ -144,46 +193,42 @@
 
   const updateStageFromScroll = () => {
     applyStageBarState();
-
-    if (!stageBar?.classList.contains("is-visible")) {
-      return;
-    }
-
-    const viewportMarker = window.innerHeight * 0.46;
-    const introRect = introSection?.getBoundingClientRect();
-    const introGroupIsActive =
-      introRect && introRect.top <= viewportMarker && introRect.bottom > viewportMarker;
-    const cardOpacity = cardGuide ? Number.parseFloat(window.getComputedStyle(cardGuide).opacity) : 0;
-    let current = introGroupIsActive
-      ? cardOpacity > 0.05
-        ? "#card-guide"
-        : "#game-intro"
-      : null;
-    const regularStages = ["#game-setup", "#game-play", "#score-victory"];
-
-    regularStages.forEach((selector) => {
-      const section = document.querySelector(selector);
-      if (section && section.getBoundingClientRect().top <= viewportMarker) {
-        current = selector;
-      }
-    });
-
-    if (current) {
-      setActiveStage(current);
-    }
   };
 
   window.tichuStageNav.update = updateStageFromScroll;
   window.addEventListener("scroll", updateStageFromScroll, { passive: true });
   window.addEventListener("resize", updateStageFromScroll, { passive: true });
 
-  if (chapterMenu && "IntersectionObserver" in window) {
-    const menuObserver = new IntersectionObserver(
-      () => applyStageBarState(),
-      { threshold: [0, 0.5, 1] }
-    );
-    menuObserver.observe(chapterMenu);
-  }
+  let correctingScoreBoundary = false;
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (requestedStageTarget !== "#score-victory" || correctingScoreBoundary) {
+        return;
+      }
+      const scoreSections = stageGroups.get("#score-victory") || [];
+      const first = scoreSections[0];
+      const last = scoreSections.at(-1);
+      if (!first || !last) {
+        return;
+      }
+      const min = first.getBoundingClientRect().top + window.scrollY;
+      const max = Math.max(
+        min,
+        last.getBoundingClientRect().bottom + window.scrollY - window.innerHeight
+      );
+      const target = Math.max(min, Math.min(max, window.scrollY));
+      if (Math.abs(target - window.scrollY) <= 1) {
+        return;
+      }
+      correctingScoreBoundary = true;
+      document.scrollingElement.scrollTop = target;
+      window.requestAnimationFrame(() => {
+        correctingScoreBoundary = false;
+      });
+    },
+    { passive: true }
+  );
 
   if (hasDetailHash) {
     window.addEventListener(
@@ -197,7 +242,7 @@
   }
 })();
 
-(() => {
+const legacyPrepFlow = () => {
   "use strict";
 
   const stepper = document.querySelector(".prep-stepper");
@@ -665,6 +710,410 @@
   renderStep();
   syncVisibility();
   requestSync();
+};
+
+(() => {
+  "use strict";
+
+  const stepper = document.querySelector(".prep-stepper");
+  const stepItems = Array.from(document.querySelectorAll("[data-prep-step]"));
+  const PREP_STEPS = Object.freeze([
+    { key: "deal", selector: "#game-setup" },
+    { key: "large-tichu", selector: "#prep-large-tichu" },
+    { key: "receive-six", selector: "#prep-receive-six" },
+    { key: "exchange", selector: "#prep-exchange" },
+    { key: "small-tichu", selector: "#prep-small-tichu" }
+  ]);
+  const steps = PREP_STEPS.map((step) => ({
+    ...step,
+    element: document.querySelector(step.selector)
+  }));
+  const gameStage = document.querySelector("#game-play");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (
+    !stepper ||
+    !gameStage ||
+    stepItems.length !== steps.length ||
+    steps.some((step) => !step.element)
+  ) {
+    return;
+  }
+
+  let currentIndex = 0;
+  let prepActive = false;
+  let transitionLocked = false;
+  let scrollTween = null;
+  let wheelTotal = 0;
+  let wheelGestureConsumed = false;
+  let wheelGestureTimer = 0;
+  let touchStartY = null;
+  let touchGestureConsumed = false;
+  let originalScrollBehavior = "";
+  let correctingScroll = false;
+
+  const clampStep = (index) => Math.max(0, Math.min(steps.length - 1, index));
+
+  const documentPosition = (element) => {
+    const anchor = element.closest(".pin-spacer") || element;
+    const top = anchor.getBoundingClientRect().top + window.scrollY;
+    return Math.max(0, Math.min(top, document.documentElement.scrollHeight - window.innerHeight));
+  };
+
+  const gamePosition = () => {
+    const pinTrigger = window.ScrollTrigger?.getAll().find(
+      (trigger) => trigger.pin && trigger.trigger === gameStage
+    );
+    return pinTrigger
+      ? Math.max(0, Math.min(pinTrigger.start, document.documentElement.scrollHeight - window.innerHeight))
+      : documentPosition(gameStage);
+  };
+
+  const render = () => {
+    stepItems.forEach((item, index) => {
+      const isCurrent = prepActive && index === currentIndex;
+      item.classList.toggle("is-current", isCurrent);
+      item.classList.toggle("is-complete", prepActive && index < currentIndex);
+      if (isCurrent) item.setAttribute("aria-current", "step");
+      else item.removeAttribute("aria-current");
+    });
+
+    const visible =
+      prepActive &&
+      document.body.classList.contains("stage-tabs-visible") &&
+      document.body.dataset.activeStage === "#game-setup";
+    stepper.setAttribute("aria-hidden", String(!visible));
+  };
+
+  const unlockGate = (element) => {
+    window.tichuProgressGates?.forEach((gate) => {
+      if (
+        gate.section === element ||
+        gate.section?.contains(element) ||
+        element?.contains(gate.section)
+      ) {
+        gate.unlock();
+      }
+    });
+  };
+
+  const announceStepLeave = (fromIndex, toIndex) => {
+    if (!Number.isInteger(fromIndex) || fromIndex === toIndex) {
+      return;
+    }
+    window.dispatchEvent(
+      new CustomEvent("tichu:prep-step-leave", {
+        detail: {
+          index: fromIndex,
+          nextIndex: toIndex,
+          direction: Math.sign(toIndex - fromIndex)
+        }
+      })
+    );
+  };
+
+  const replayStepMotion = (index, previousIndex = null) => {
+    window.dispatchEvent(
+      new CustomEvent("tichu:prep-step", {
+        detail: {
+          index,
+          previousIndex,
+          direction: Number.isInteger(previousIndex) ? Math.sign(index - previousIndex) : 0
+        }
+      })
+    );
+  };
+
+  const finishTransition = (index, previousIndex, target) => {
+    document.scrollingElement.scrollTop = target();
+    scrollTween = null;
+    transitionLocked = false;
+    document.documentElement.style.scrollBehavior = originalScrollBehavior;
+    render();
+    replayStepMotion(index, previousIndex);
+    window.ScrollTrigger?.update();
+  };
+
+  const goToStep = (requestedIndex, { force = false, instant = false } = {}) => {
+    if (!Number.isInteger(requestedIndex) || transitionLocked) {
+      return false;
+    }
+
+    const nextIndex = clampStep(requestedIndex);
+    const previousIndex = prepActive ? currentIndex : null;
+    if (!force && prepActive && Math.abs(nextIndex - currentIndex) !== 1) {
+      return false;
+    }
+    if (!force && prepActive && nextIndex === currentIndex) {
+      return false;
+    }
+
+    announceStepLeave(previousIndex, nextIndex);
+    unlockGate(steps[previousIndex ?? currentIndex]?.element);
+    prepActive = true;
+    currentIndex = nextIndex;
+    transitionLocked = true;
+    document.body.dataset.activeStage = "#game-setup";
+    window.tichuStageNav?.show("#game-setup");
+    window.tichuStageNav?.setActive("#game-setup");
+    render();
+
+    originalScrollBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = "auto";
+    const target = () => documentPosition(steps[nextIndex].element);
+
+    scrollTween?.kill();
+    if (!instant && !reducedMotion && window.gsap) {
+      const scrollState = { y: window.scrollY };
+      scrollTween = window.gsap.to(scrollState, {
+        y: target(),
+        duration: 0.68,
+        ease: "power3.inOut",
+        overwrite: true,
+        onUpdate: () => {
+          document.scrollingElement.scrollTop = scrollState.y;
+        },
+        onComplete: () => finishTransition(nextIndex, previousIndex, target)
+      });
+    } else {
+      document.scrollingElement.scrollTop = target();
+      finishTransition(nextIndex, previousIndex, target);
+    }
+    return true;
+  };
+
+  const goToGame = ({ force = false, instant = false } = {}) => {
+    if (transitionLocked || (!force && (!prepActive || currentIndex !== steps.length - 1))) {
+      return false;
+    }
+
+    const previousIndex = currentIndex;
+    announceStepLeave(previousIndex, steps.length);
+    unlockGate(steps[previousIndex]?.element);
+    transitionLocked = true;
+    document.body.dataset.activeStage = "#game-play";
+    window.tichuStageNav?.setActive("#game-play");
+    render();
+
+    originalScrollBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = "auto";
+    const target = () => gamePosition();
+    const finalize = () => {
+      document.scrollingElement.scrollTop = target();
+      prepActive = false;
+      transitionLocked = false;
+      scrollTween = null;
+      document.documentElement.style.scrollBehavior = originalScrollBehavior;
+      render();
+      replayStepMotion(5, previousIndex);
+      window.ScrollTrigger?.update();
+    };
+
+    if (!instant && !reducedMotion && window.gsap) {
+      const scrollState = { y: window.scrollY };
+      scrollTween = window.gsap.to(scrollState, {
+        y: target(),
+        duration: 0.68,
+        ease: "power3.inOut",
+        overwrite: true,
+        onUpdate: () => {
+          document.scrollingElement.scrollTop = scrollState.y;
+        },
+        onComplete: finalize
+      });
+    } else {
+      document.scrollingElement.scrollTop = target();
+      finalize();
+    }
+    return true;
+  };
+
+  const moveBy = (delta) => {
+    if (!prepActive || transitionLocked || Math.abs(delta) !== 1) {
+      return false;
+    }
+
+    const requestedIndex = currentIndex + delta;
+    if (requestedIndex >= 0 && requestedIndex < steps.length) {
+      return goToStep(requestedIndex);
+    }
+    // 준비 단계의 양 끝에서는 입력만 소비한다. 다른 큰 단계로의 이동은
+    // 상단 단계 바나 목차에서만 명시적으로 수행한다.
+    if (requestedIndex === steps.length || requestedIndex === -1) return false;
+    return false;
+  };
+
+  const next = () => moveBy(1);
+  const previous = () => moveBy(-1);
+
+  const shouldHandleInput = () =>
+    prepActive &&
+    document.body.dataset.activeStage === "#game-setup" &&
+    document.body.classList.contains("stage-tabs-visible") &&
+    !document.documentElement.classList.contains("modal-open");
+
+  const consume = (event) => {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  };
+
+  const resetWheelGestureSoon = () => {
+    window.clearTimeout(wheelGestureTimer);
+    wheelGestureTimer = window.setTimeout(() => {
+      wheelTotal = 0;
+      wheelGestureConsumed = false;
+    }, 320);
+  };
+
+  window.addEventListener(
+    "wheel",
+    (event) => {
+      if (!shouldHandleInput()) {
+        wheelTotal = 0;
+        return;
+      }
+
+      consume(event);
+      resetWheelGestureSoon();
+      if (transitionLocked || wheelGestureConsumed) {
+        return;
+      }
+
+      wheelTotal += event.deltaY;
+      if (Math.abs(wheelTotal) < 24) {
+        return;
+      }
+
+      const direction = Math.sign(wheelTotal);
+      wheelTotal = 0;
+      wheelGestureConsumed = true;
+      if (direction > 0) next();
+      else previous();
+    },
+    { passive: false, capture: true }
+  );
+
+  window.addEventListener(
+    "touchstart",
+    (event) => {
+      touchStartY = shouldHandleInput() && !transitionLocked
+        ? event.touches[0]?.clientY ?? null
+        : null;
+      touchGestureConsumed = false;
+    },
+    { passive: true, capture: true }
+  );
+
+  window.addEventListener(
+    "touchmove",
+    (event) => {
+      if (!shouldHandleInput() || touchStartY === null) {
+        return;
+      }
+      consume(event);
+      if (transitionLocked || touchGestureConsumed) {
+        return;
+      }
+
+      const currentY = event.touches[0]?.clientY;
+      if (currentY === undefined || Math.abs(touchStartY - currentY) < 46) {
+        return;
+      }
+
+      const direction = Math.sign(touchStartY - currentY);
+      touchGestureConsumed = true;
+      touchStartY = null;
+      if (direction > 0) next();
+      else previous();
+    },
+    { passive: false, capture: true }
+  );
+
+  const clearTouchGesture = () => {
+    touchStartY = null;
+    window.setTimeout(() => {
+      touchGestureConsumed = false;
+    }, 220);
+  };
+  window.addEventListener("touchend", clearTouchGesture, { passive: true, capture: true });
+  window.addEventListener("touchcancel", clearTouchGesture, { passive: true, capture: true });
+
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (!shouldHandleInput() || transitionLocked || correctingScroll) {
+        return;
+      }
+      const target = documentPosition(steps[currentIndex].element);
+      if (Math.abs(window.scrollY - target) <= 1) {
+        return;
+      }
+      correctingScroll = true;
+      document.scrollingElement.scrollTop = target;
+      window.requestAnimationFrame(() => {
+        correctingScroll = false;
+      });
+    },
+    { passive: true }
+  );
+
+  window.addEventListener(
+    "keydown",
+    (event) => {
+      if (
+        !shouldHandleInput() ||
+        transitionLocked ||
+        event.repeat ||
+        (event.target instanceof Element && event.target.closest("button, a, input, select, textarea"))
+      ) {
+        return;
+      }
+      if (["ArrowDown", "PageDown"].includes(event.key) || (event.key === " " && !event.shiftKey)) {
+        consume(event);
+        next();
+      } else if (["ArrowUp", "PageUp"].includes(event.key) || (event.key === " " && event.shiftKey)) {
+        consume(event);
+        previous();
+      }
+    },
+    { capture: true }
+  );
+
+  stepItems.forEach((item, index) => {
+    const button = item.querySelector("button");
+    button?.addEventListener("click", () => {
+      if (!prepActive || transitionLocked || index === currentIndex) {
+        return;
+      }
+      goToStep(currentIndex + Math.sign(index - currentIndex));
+    });
+  });
+
+  const observer = new MutationObserver(render);
+  observer.observe(document.body, {
+    attributes: true,
+    attributeFilter: ["class", "data-active-stage"]
+  });
+
+  window.tichuPrepFlow = {
+    steps: PREP_STEPS,
+    goToStep,
+    jumpToPage: (index) => goToStep(index, { force: true, instant: true }),
+    jumpToGame: () => goToGame({ force: true, instant: true }),
+    next,
+    previous,
+    releaseGameStart: () => {
+      scrollTween?.kill();
+      scrollTween = null;
+      transitionLocked = false;
+      prepActive = false;
+      render();
+    },
+    current: () => currentIndex,
+    isActive: () => prepActive
+  };
+
+  render();
 })();
 
 (() => {
@@ -680,8 +1129,13 @@
   const introMenuLink = document.querySelector('.chapter-menu__links a[href="#game-intro"]');
   let introSlideIndex = 0;
   let swipeStart = null;
+  let lockedDetailScrollY = 0;
+  let correctingDetailScroll = false;
 
   const setDetailScrollLock = (locked) => {
+    if (locked) {
+      lockedDetailScrollY = window.scrollY;
+    }
     document.documentElement.classList.toggle("detail-view-open", locked);
     document.body.classList.toggle("detail-view-open", locked);
   };
@@ -798,6 +1252,7 @@
   const copy = document.querySelector(".hero__copy");
   const cards = document.querySelector(".cards");
   const cardsCount = document.querySelector(".cards__count");
+  const cardScrollCue = document.querySelector(".cards__scroll-cue");
   const playingCard = document.querySelector(".playing-card");
   const suitIntro = document.querySelector(".suit-intro");
   const cardSuits = gsap.utils.toArray(".cards__suit-box");
@@ -876,6 +1331,15 @@
         opacity: 0,
         duration: 0.46,
         ease: "power2.inOut"
+      },
+      2.55
+    )
+    .to(
+      cardScrollCue,
+      {
+        autoAlpha: 0,
+        duration: 0.28,
+        ease: "power1.out"
       },
       2.55
     )
@@ -1062,10 +1526,12 @@
     window.tichuStageNav.setActive(target);
 
     if (target === "#game-intro") {
+      cardPageIndex = -1;
       showIntroSlide(0);
       jumpToHeroTime(0.72);
       setDetailScrollLock(true);
     } else if (target === "#card-guide") {
+      cardPageIndex = 0;
       setDetailScrollLock(false);
       jumpToHeroTime(CARD_PAGE_TIMES[0]);
     } else if (target === "#game-setup") {
@@ -1113,7 +1579,7 @@
     const scrollState = { y: window.scrollY };
     gsap.to(scrollState, {
       y: cardPagePosition(index),
-      duration: 2,
+      duration: 0.95,
       ease: "power2.inOut",
       overwrite: true,
       onUpdate: () => {
@@ -1133,8 +1599,6 @@
   const advanceCardPage = (direction) => {
     const currentIndex = cardPageIndex < 0 ? getCardPageAtScroll() : cardPageIndex;
     if (direction > 0 && currentIndex === CARD_PAGE_TIMES.length - 1) {
-      cardPageIndex = -1;
-      window.tichuPrepFlow?.goToPage(0);
       return;
     }
 
@@ -1145,9 +1609,8 @@
   };
 
   const isCardPageFlowActive = () => {
-    const trigger = timeline.scrollTrigger;
     return Boolean(
-      trigger?.isActive &&
+      document.body.dataset.activeStage === "#card-guide" &&
       document.body.classList.contains("stage-tabs-visible") &&
       !document.documentElement.classList.contains("modal-open")
     );
@@ -1158,7 +1621,7 @@
     window.clearTimeout(cardWheelResetTimer);
     cardWheelResetTimer = window.setTimeout(() => {
       cardWheelConsumed = false;
-    }, 420);
+    }, 280);
   };
 
   window.addEventListener(
@@ -1176,19 +1639,13 @@
             ? window.innerHeight
             : 1);
       const currentIndex = cardPageIndex < 0 ? getCardPageAtScroll() : cardPageIndex;
-      const firstCardPosition = cardPagePosition(0);
-      const enteringFirstCard =
-        currentIndex < 0 &&
-        deltaY > 0 &&
-        window.scrollY < firstCardPosition &&
-        window.scrollY + deltaY >= firstCardPosition;
-      if (currentIndex < 0 && !enteringFirstCard) {
-        return;
-      }
+      const enteringFirstCard = currentIndex < 0;
 
       const gestureAlreadyConsumed = cardWheelConsumed;
       if (currentIndex === 0 && deltaY < 0) {
-        cardPageIndex = -1;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        consumeCardWheelGesture();
         return;
       }
 
@@ -1209,9 +1666,55 @@
   );
 
   window.addEventListener(
+    "touchmove",
+    (event) => {
+      if (document.body.classList.contains("detail-view-open")) {
+        event.preventDefault();
+      }
+    },
+    { passive: false, capture: true }
+  );
+
+  window.addEventListener(
     "scroll",
     () => {
-      if (cardTransitioning || !timeline.scrollTrigger?.isActive) {
+      if (
+        !document.body.classList.contains("detail-view-open") ||
+        correctingDetailScroll ||
+        Math.abs(window.scrollY - lockedDetailScrollY) <= 1
+      ) {
+        return;
+      }
+
+      correctingDetailScroll = true;
+      window.scrollTo({ top: lockedDetailScrollY, left: 0, behavior: "auto" });
+      window.requestAnimationFrame(() => {
+        correctingDetailScroll = false;
+      });
+    },
+    { passive: true }
+  );
+
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (cardTransitioning) {
+        return;
+      }
+
+      if (document.body.dataset.activeStage === "#card-guide") {
+        const min = cardPagePosition(0);
+        const max = cardPagePosition(CARD_PAGE_TIMES.length - 1);
+        const clamped = Math.max(min, Math.min(max, window.scrollY));
+        if (Math.abs(clamped - window.scrollY) > 1) {
+          document.scrollingElement.scrollTop = clamped;
+          cardPageIndex = clamped === min ? 0 : CARD_PAGE_TIMES.length - 1;
+          window.ScrollTrigger?.update();
+          return;
+        }
+      }
+
+      if (!timeline.scrollTrigger?.isActive) {
         return;
       }
 
@@ -1241,16 +1744,12 @@
 
       const direction = Math.sign(cardTouchStartY - currentY);
       const currentIndex = cardPageIndex < 0 ? getCardPageAtScroll() : cardPageIndex;
-      const enteringFirstCard =
-        currentIndex < 0 &&
-        direction > 0 &&
-        window.scrollY + Math.abs(cardTouchStartY - currentY) >= cardPagePosition(0);
-      if (currentIndex < 0 && !enteringFirstCard) {
-        return;
-      }
+      const enteringFirstCard = currentIndex < 0;
 
       if (currentIndex === 0 && direction < 0) {
-        cardPageIndex = -1;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        cardTouchStartY = null;
         return;
       }
 
@@ -1303,7 +1802,7 @@
       }
 
       if (currentIndex === 0 && direction < 0) {
-        cardPageIndex = -1;
+        event.preventDefault();
         return;
       }
 
@@ -1335,7 +1834,7 @@
       event.preventDefault();
       if (link.hash === "#game-intro") {
         showIntroSlide(0);
-        scrollToHeroTime(targetTime, "auto");
+        jumpToHeroTime(targetTime);
         setDetailScrollLock(true);
       } else {
         setDetailScrollLock(false);
@@ -1596,6 +2095,7 @@
     status.setAttribute("aria-hidden", "true");
     button.hidden = !showStartButton;
     replayButton.hidden = true;
+    gsap.set([button, replayButton, deck, status], { transform: "none" });
     gsap.set(button, { opacity: 1, scale: 1, xPercent: -50, yPercent: -50 });
     gsap.set(replayButton, { opacity: 0, scale: 0.82, xPercent: -50 });
     gsap.set(deck, { opacity: 0, scale: 0.92, xPercent: -50, yPercent: -50 });
@@ -1701,6 +2201,23 @@
 
   button.addEventListener("click", () => playDeal(false));
   replayButton.addEventListener("click", () => playDeal(true));
+
+  window.addEventListener("tichu:prep-step-leave", (event) => {
+    if (event.detail?.index === 0) {
+      dealTimeline?.pause();
+    }
+  });
+
+  window.addEventListener("tichu:prep-step", (event) => {
+    if (event.detail?.index !== 0) {
+      return;
+    }
+    if (section.classList.contains("is-complete")) {
+      showStaticResult();
+    } else {
+      resetDeal(true);
+    }
+  });
 })();
 
 (() => {
@@ -1746,6 +2263,12 @@
   window.addEventListener("tichu:prep-step", (event) => {
     if (event.detail?.index === 1) {
       introTimeline?.restart();
+    }
+  });
+
+  window.addEventListener("tichu:prep-step-leave", (event) => {
+    if (event.detail?.index === 1) {
+      introTimeline?.pause();
     }
   });
 
@@ -1823,6 +2346,7 @@
   }
 
   count.textContent = "8장";
+  gsap.set(receiveCards, { transform: "none" });
   gsap.set(receiveCards, {
     xPercent: -50,
     x: (index) => (index - (receiveCards.length - 1) / 2) * 11,
@@ -1832,6 +2356,7 @@
     transformOrigin: "50% 92%",
     autoAlpha: 0
   });
+  gsap.set(outgoingCards, { transform: "none" });
   gsap.set(outgoingCards, {
     top: "82%",
     left: "50%",
@@ -1878,6 +2403,12 @@
     }
   });
 
+  window.addEventListener("tichu:prep-step-leave", (event) => {
+    if (event.detail?.index === 2) {
+      receiveTimeline?.pause();
+    }
+  });
+
   const targets = {
     left: { top: "50%", left: "14%", rotation: -90, opacity: 0.72 },
     top: { top: "20%", left: "50%", rotation: 0, opacity: 1 },
@@ -1892,6 +2423,7 @@
 
   incomingCards.forEach((card) => {
     const source = targets[card.dataset.exchangeSource];
+    gsap.set(card, { transform: "none" });
     gsap.set(card, {
       top: source.top,
       left: source.left,
@@ -1909,8 +2441,10 @@
     button.hidden = false;
     button.disabled = false;
     replayButton.hidden = true;
+    gsap.set([button, replayButton, status], { transform: "none" });
     gsap.set(button, { opacity: 1, scale: 1, xPercent: -50, yPercent: -50 });
     gsap.set(replayButton, { opacity: 0, scale: 0.82, xPercent: -50, yPercent: 0 });
+    gsap.set(outgoingCards, { transform: "none" });
     gsap.set(outgoingCards, {
       top: "82%",
       left: "50%",
@@ -1921,6 +2455,7 @@
     });
     incomingCards.forEach((card) => {
       const source = targets[card.dataset.exchangeSource];
+      gsap.set(card, { transform: "none" });
       gsap.set(card, {
         top: source.top,
         left: source.left,
@@ -2013,6 +2548,23 @@
 
   button.addEventListener("click", playExchange);
   replayButton.addEventListener("click", playExchange);
+
+  window.addEventListener("tichu:prep-step-leave", (event) => {
+    if (event.detail?.index === 3) {
+      exchangeTimeline?.pause();
+    }
+  });
+
+  window.addEventListener("tichu:prep-step", (event) => {
+    if (event.detail?.index !== 3) {
+      return;
+    }
+    if (section.classList.contains("is-complete")) {
+      showStaticExchange();
+    } else {
+      resetExchange();
+    }
+  });
 })();
 
 (() => {
@@ -2056,6 +2608,12 @@
   window.addEventListener("tichu:prep-step", (event) => {
     if (event.detail?.index === 4) {
       introTimeline?.restart();
+    }
+  });
+
+  window.addEventListener("tichu:prep-step-leave", (event) => {
+    if (event.detail?.index === 4) {
+      introTimeline?.pause();
     }
   });
 
@@ -3139,4 +3697,103 @@
   window.addEventListener("scroll", update, { passive: true });
   window.addEventListener("resize", update);
   update();
+})();
+
+(() => {
+  "use strict";
+
+  const scoreStart = document.querySelector("#score-victory");
+  const scoreEnd = document.querySelector(".round-finale");
+
+  if (!scoreStart || !scoreEnd) {
+    return;
+  }
+
+  let touchStartY = null;
+  let correcting = false;
+
+  const isScoreActive = () =>
+    document.body.dataset.activeStage === "#score-victory" &&
+    document.body.classList.contains("stage-tabs-visible") &&
+    !document.documentElement.classList.contains("modal-open");
+
+  const documentTop = (element) => element.getBoundingClientRect().top + window.scrollY;
+  const bounds = () => ({
+    min: documentTop(scoreStart),
+    max: Math.max(
+      documentTop(scoreStart),
+      documentTop(scoreEnd) + scoreEnd.offsetHeight - window.innerHeight
+    )
+  });
+
+  const atBoundary = (direction) => {
+    const { min, max } = bounds();
+    return (direction < 0 && window.scrollY <= min + 1) ||
+      (direction > 0 && window.scrollY >= max - 1);
+  };
+
+  window.addEventListener(
+    "wheel",
+    (event) => {
+      if (!isScoreActive() || !event.deltaY || !atBoundary(Math.sign(event.deltaY))) {
+        return;
+      }
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    },
+    { passive: false, capture: true }
+  );
+
+  window.addEventListener(
+    "touchstart",
+    (event) => {
+      touchStartY = isScoreActive() ? event.touches[0]?.clientY ?? null : null;
+    },
+    { passive: true, capture: true }
+  );
+
+  window.addEventListener(
+    "touchmove",
+    (event) => {
+      if (!isScoreActive() || touchStartY === null) {
+        return;
+      }
+      const currentY = event.touches[0]?.clientY;
+      if (currentY === undefined) {
+        return;
+      }
+      const direction = Math.sign(touchStartY - currentY);
+      if (direction && atBoundary(direction)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+    },
+    { passive: false, capture: true }
+  );
+
+  const clearTouch = () => {
+    touchStartY = null;
+  };
+  window.addEventListener("touchend", clearTouch, { passive: true, capture: true });
+  window.addEventListener("touchcancel", clearTouch, { passive: true, capture: true });
+
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (!isScoreActive() || correcting) {
+        return;
+      }
+      const { min, max } = bounds();
+      const target = Math.max(min, Math.min(max, window.scrollY));
+      if (Math.abs(target - window.scrollY) <= 1) {
+        return;
+      }
+      correcting = true;
+      window.scrollTo({ top: target, left: 0, behavior: "auto" });
+      window.requestAnimationFrame(() => {
+        correcting = false;
+      });
+    },
+    { passive: true }
+  );
 })();

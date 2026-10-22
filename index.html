@@ -103,6 +103,10 @@
                 <button type="button" data-intro-slide="2" aria-label="승리 조건 보기"></button>
               </div>
 
+              <p class="hero__swipe-cue" aria-hidden="true">
+                <span>‹</span> 좌우로 넘겨보세요 <span>›</span>
+              </p>
+
               <button
                 class="hero__scene-nav hero__scene-nav--previous"
                 type="button"
@@ -908,24 +912,34 @@
     <nav class="prep-stepper" aria-label="게임 준비 진행 순서" aria-hidden="true">
       <ol>
         <li class="is-current" data-prep-step="0" data-prep-target="#game-setup" aria-current="step">
-          <span class="prep-stepper__dot" aria-hidden="true">1</span>
-          <span>분배</span>
+          <button type="button" aria-label="분배 단계로 이동">
+            <span class="prep-stepper__dot" aria-hidden="true">1</span>
+            <span>분배</span>
+          </button>
         </li>
         <li data-prep-step="1" data-prep-target="#prep-large-tichu">
-          <span class="prep-stepper__dot" aria-hidden="true">2</span>
-          <span>라지티츄</span>
+          <button type="button" aria-label="라지 티츄 단계로 이동">
+            <span class="prep-stepper__dot" aria-hidden="true">2</span>
+            <span>라지티츄</span>
+          </button>
         </li>
         <li data-prep-step="2" data-prep-target="#prep-receive-six">
-          <span class="prep-stepper__dot" aria-hidden="true">3</span>
-          <span>+6장</span>
+          <button type="button" aria-label="6장 더 분배 단계로 이동">
+            <span class="prep-stepper__dot" aria-hidden="true">3</span>
+            <span>+6장</span>
+          </button>
         </li>
         <li data-prep-step="3" data-prep-target="#prep-exchange">
-          <span class="prep-stepper__dot" aria-hidden="true">4</span>
-          <span>교환</span>
+          <button type="button" aria-label="카드 교환 단계로 이동">
+            <span class="prep-stepper__dot" aria-hidden="true">4</span>
+            <span>교환</span>
+          </button>
         </li>
         <li data-prep-step="4" data-prep-target="#prep-small-tichu">
-          <span class="prep-stepper__dot" aria-hidden="true">5</span>
-          <span>스몰티츄</span>
+          <button type="button" aria-label="스몰 티츄 단계로 이동">
+            <span class="prep-stepper__dot" aria-hidden="true">5</span>
+            <span>스몰티츄</span>
+          </button>
         </li>
       </ol>
     </nav>
@@ -1449,6 +1463,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
-    <script src="main.js" charset="UTF-8"></script>
+    <script src="main.js?v=20261022-stage-isolation-4" charset="UTF-8"></script>
   </body>
 </html>

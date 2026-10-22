@@ -110,6 +110,22 @@ body {
   overflow-x: clip;
 }
 
+/* 큰 단계는 상단 단계 바/목차로만 바뀐다. 비활성 단계는 문서 높이는
+   유지하되 화면과 접근성 트리에서 제외해 경계 스크롤 노출을 막는다. */
+body.stage-isolated {
+  overscroll-behavior-y: none;
+}
+
+.is-stage-inactive {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.is-stage-subview-inactive {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 body.splash-active {
   height: 100dvh;
   overflow: hidden;
@@ -195,6 +211,15 @@ img {
   overflow: hidden;
   place-items: center;
   background: #373132;
+}
+
+html.menu-view-open .chapter-menu,
+body.menu-view-open .chapter-menu {
+  position: sticky;
+  z-index: 1500;
+  top: 0;
+  overscroll-behavior: none;
+  touch-action: none;
 }
 
 .chapter-menu__title {
@@ -369,6 +394,7 @@ body.menu-view-open .stage-tab-bar {
 
 body.stage-tabs-visible[data-active-stage="#game-setup"] .prep-stepper {
   opacity: 1;
+  pointer-events: auto;
   transform: translate(-50%, 0);
   transition-delay: 0s;
   visibility: visible;
@@ -395,6 +421,27 @@ body.stage-tabs-visible[data-active-stage="#game-setup"] .prep-stepper {
   line-height: 1;
   letter-spacing: -0.035em;
   white-space: nowrap;
+}
+
+.prep-stepper li > button {
+  display: grid;
+  min-width: 0;
+  padding: 0 2px;
+  justify-items: center;
+  gap: 3px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+}
+
+.prep-stepper li > button:focus-visible {
+  outline: 2px solid #a91462;
+  outline-offset: 3px;
+  border-radius: 8px;
 }
 
 .prep-stepper li:not(:last-child)::after {
@@ -869,6 +916,31 @@ body[data-active-stage="#game-play"] .floating-tip-button {
   justify-content: center;
   gap: 3px;
   transform: translateX(-50%);
+}
+
+.hero__swipe-cue {
+  position: absolute;
+  z-index: 6;
+  bottom: max(65px, calc(env(safe-area-inset-bottom) + 53px));
+  left: 50%;
+  display: flex;
+  margin: 0;
+  align-items: center;
+  gap: 8px;
+  color: rgb(255 255 255 / 0.7);
+  font-size: 12px;
+  font-weight: 620;
+  letter-spacing: -0.025em;
+  pointer-events: none;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.hero__swipe-cue span {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 0.7;
 }
 
 .hero__slide-dots button {
