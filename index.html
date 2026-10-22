@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" class="menu-view-open">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -23,7 +23,7 @@
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body class="menu-view-open">
     <div class="splash-screen" aria-label="티츄 시작 화면">
       <div class="splash-screen__dragon" role="img" aria-label="용"></div>
       <img class="splash-screen__logo" src="tichu.png" alt="티츄 로고" />
@@ -34,7 +34,7 @@
         <h1 class="chapter-menu__title" id="chapter-menu-title">티츄 시작하기</h1>
         <div class="chapter-menu__links">
           <a href="#game-intro" data-hero-time="0.72">게임 소개</a>
-          <a href="#card-guide" data-hero-time="5.55">카드 알기</a>
+          <a href="#card-guide" data-hero-time="2.2">카드 알기</a>
           <a href="#game-setup">게임 준비</a>
           <a href="#game-play" data-skip-gates>게임 진행</a>
           <a href="#score-victory" data-skip-gates>점수 &amp; 승리</a>
@@ -45,14 +45,6 @@
         <div class="hero__stage">
           <div class="hero__copy" aria-live="off">
             <div class="hero__team-layout">
-              <button
-                class="hero__scene-nav hero__scene-nav--back"
-                type="button"
-                aria-label="목차로 돌아가기"
-              >
-                <span aria-hidden="true"></span>
-              </button>
-
               <div class="hero__intro-viewport">
                 <div class="hero__intro-track">
                   <section class="hero__intro-slide" aria-label="4인 2팀 자리 배치">
@@ -132,20 +124,6 @@
             </div>
           </div>
 
-          <div class="goal" aria-labelledby="goal-title">
-            <p class="goal__time">30 – 60분</p>
-            <h2 class="goal__eyebrow" id="goal-title">승리 조건</h2>
-            <p class="goal__core">손에 쥔 카드,<br /><strong>전부 비우기!</strong></p>
-
-            <div class="goal__ways">
-              <p class="goal__way">가장 먼저 — 소진!</p>
-              <p class="goal__way">
-                파트너와 함께 —
-                <span class="goal__highlight">1000점 도달<span class="goal__stroke" aria-hidden="true"></span></span>!!
-              </p>
-            </div>
-          </div>
-
           <div class="cards" id="card-guide" aria-labelledby="cards-title">
             <h2 class="cards__count" id="cards-title">
               카드는 모두 <span><strong>56</strong>장</span>
@@ -209,7 +187,7 @@
             aria-controls="combo-modal"
             aria-expanded="false"
           >
-            조합
+            카드조합
           </button>
           <button
             class="quick-reference-bar__button quick-reference-bar__button--bomb"
@@ -219,7 +197,7 @@
             aria-controls="bomb-modal"
             aria-expanded="false"
           >
-            💥 폭탄
+            폭탄
           </button>
           <button
             class="quick-reference-bar__button"
@@ -271,61 +249,63 @@
               <img src="뒷면.png" alt="" />
             </div>
             <div class="deal-flight-layer" aria-hidden="true"></div>
-            <button class="deal-button" type="button">카드 분배하기</button>
+            <button class="deal-button" type="button">나누기</button>
             <p class="deal-status" aria-live="polite" aria-hidden="true">8장씩 받았어요</p>
+            <button class="deal-replay" type="button" aria-label="카드 분배 다시 재생" hidden>
+              <span aria-hidden="true">↻</span>
+            </button>
           </div>
+          <button class="deal-next" type="button" aria-label="라지 티츄 단계로 이동">
+            <span aria-hidden="true">↓</span>
+          </button>
           <p class="progress-gate__hint" role="status" aria-live="polite" aria-hidden="true">
             버튼을 눌러 진행하세요
           </p>
         </div>
       </section>
 
-      <section class="large-tichu" aria-labelledby="large-tichu-title">
+      <section class="large-tichu" id="prep-large-tichu" aria-labelledby="large-tichu-title">
         <div class="large-tichu__stage">
           <div class="large-tichu__content">
             <h2 class="large-tichu__stack-item large-tichu__title" id="large-tichu-title">
-              총 14장 중,<br /><strong>8장을 먼저 봤어요</strong>
+              총 14장 중 <strong>8장을 먼저 확인해요</strong>
             </h2>
             <p class="large-tichu__stack-item large-tichu__question">
               <span>1등으로</span>
               <span>손을 비울 자신 있나요?</span>
             </p>
             <div class="large-tichu__stack-item large-tichu__deadline large-tichu__deadline-block">
-              <p class="large-tichu__deadline-copy">
-                지금만 선언할 수 있어요!
-                <span>(나머지 6장 받기 전)</span>
-              </p>
               <p class="tichu__score-line" aria-label="라지 티츄 성공 보너스 200점, 실패 시 마이너스 200점">
-                <span class="large-tichu__score-success">성공 보너스 +200</span>
+                <span class="large-tichu__score-success">성공 +200</span>
                 <span class="tichu__score-divider" aria-hidden="true">|</span>
-                <span class="large-tichu__score-fail">실패 시 −200</span>
+                <span class="large-tichu__score-fail">실패 -200</span>
               </p>
             </div>
 
             <div class="large-tichu__stack-item large-tichu__controls">
-              <button
-                class="large-tichu__tip-trigger"
-                type="button"
-                data-open="tichu-tip"
-                aria-haspopup="dialog"
-                aria-controls="tichu-tip-modal"
-                aria-expanded="false"
-              >
-                티츄, 외쳐도 될까? 🤔
-              </button>
-              <div class="large-tichu__actions" aria-label="라지 티츄 선택">
+              <div class="large-tichu__actions large-tichu__actions--large" aria-label="라지 티츄 선택">
                 <div class="large-tichu__declare-option">
                   <button type="button" data-large-tichu-choice="declare" aria-pressed="false">
-                    <strong>!! 라지 티츄 !!</strong>
+                    <strong>&gt; &quot;라지 티츄&quot; 선언하기 &lt;</strong>
                   </button>
                 </div>
+                <button
+                  class="large-tichu__tip-trigger"
+                  type="button"
+                  data-open="tichu-tip"
+                  aria-haspopup="dialog"
+                  aria-controls="tichu-tip-modal"
+                  aria-expanded="false"
+                >
+                  티츄, 외쳐도 될까?
+                </button>
                 <button
                   class="large-tichu__pass-button"
                   type="button"
                   data-large-tichu-choice="pass"
                   aria-pressed="false"
                 >
-                  <strong>패스</strong>
+                  나중에 스몰티츄 기회가 또 있어요
                 </button>
               </div>
 
@@ -337,7 +317,7 @@
 
       <section class="exchange-section" aria-labelledby="exchange-title">
         <div class="exchange-section__inner">
-          <div class="exchange-receive">
+          <div class="exchange-receive" id="prep-receive-six">
             <h2 id="exchange-title">나머지 6장을 받아,<br /><strong>14장 완성!</strong></h2>
             <div class="exchange-receive__visual" aria-label="손의 카드가 8장에서 14장으로 늘어납니다">
               <span class="exchange-receive__count">14장</span>
@@ -348,11 +328,19 @@
                 <img src="뒷면.png" alt="" />
                 <img src="뒷면.png" alt="" />
                 <img src="뒷면.png" alt="" />
+                <img src="뒷면.png" alt="" />
+                <img src="뒷면.png" alt="" />
+                <img src="뒷면.png" alt="" />
+                <img src="뒷면.png" alt="" />
+                <img src="뒷면.png" alt="" />
+                <img src="뒷면.png" alt="" />
+                <img src="뒷면.png" alt="" />
+                <img src="뒷면.png" alt="" />
               </div>
             </div>
           </div>
 
-          <div class="exchange-main">
+          <div class="exchange-main" id="prep-exchange">
             <h3>이제 카드 3장을 나눠요</h3>
 
             <div class="exchange-table" aria-label="내 카드를 세 방향으로 교환하는 자리">
@@ -372,6 +360,14 @@
 
               <button class="exchange-button" type="button">카드 교환하기</button>
               <p class="exchange-status" aria-live="polite" aria-hidden="true">서로 3장씩 주고받았어요</p>
+              <button
+                class="exchange-replay"
+                type="button"
+                aria-label="카드 교환 애니메이션 다시 재생"
+                hidden
+              >
+                <span aria-hidden="true">↻</span>
+              </button>
             </div>
 
             <div class="exchange-roles" aria-label="카드 교환 방향 안내">
@@ -395,72 +391,52 @@
         </div>
       </section>
 
-      <section class="large-tichu small-tichu" aria-labelledby="small-tichu-title">
+      <section class="large-tichu small-tichu" id="prep-small-tichu" aria-labelledby="small-tichu-title">
         <div class="large-tichu__stage">
           <div class="large-tichu__content">
             <h2 class="large-tichu__stack-item large-tichu__title" id="small-tichu-title">
               카드 14장,<br /><strong>교환까지 끝났어요</strong>
             </h2>
             <p class="large-tichu__stack-item large-tichu__question">
-              <span>그래도 1등</span>
-              <span>자신 있나요?</span>
+              <span>1등으로</span>
+              <span>손을 비울 자신 있나요?</span>
             </p>
-            <div class="large-tichu__stack-item large-tichu__deadline small-tichu__deadline-block">
-              <p class="small-tichu__deadline-copy">첫 카드를 내기 전까지 선언할 수 있어요</p>
+            <div class="large-tichu__stack-item large-tichu__deadline">
               <p class="tichu__score-line" aria-label="스몰 티츄 성공 보너스 100점, 실패 시 마이너스 100점">
-                <span class="large-tichu__score-success">성공 보너스 +100</span>
+                <span class="large-tichu__score-success">성공 +100</span>
                 <span class="tichu__score-divider" aria-hidden="true">|</span>
-                <span class="large-tichu__score-fail">실패 시 −100</span>
+                <span class="large-tichu__score-fail">실패 -100</span>
               </p>
             </div>
 
             <div class="large-tichu__stack-item large-tichu__controls">
-              <p
-                class="small-tichu__eligibility"
-                id="small-tichu-eligibility"
-                aria-live="polite"
-                aria-atomic="true"
-              >
-                라지 티츄를 외치지 않았다면, 지금 스몰 티츄를 외칠 수 있어요!
-              </p>
-              <p class="small-tichu__blocked-sub" hidden>
-                스몰 티츄는 외칠 수 없어요. 라지 티츄로 반드시 1등을 노리세요!&nbsp;🔥
-              </p>
-              <button
-                class="large-tichu__tip-trigger"
-                type="button"
-                data-open="tichu-tip"
-                aria-haspopup="dialog"
-                aria-controls="tichu-tip-modal"
-                aria-expanded="false"
-              >
-                티츄, 외쳐도 될까? 🤔
-              </button>
-              <div class="large-tichu__actions" aria-label="스몰 티츄 선택">
+              <div class="large-tichu__actions large-tichu__actions--large" aria-label="스몰 티츄 선택">
                 <div class="large-tichu__declare-option">
-                  <button
-                    type="button"
-                    data-small-tichu-choice="declare"
-                    aria-pressed="false"
-                    aria-describedby="small-tichu-eligibility"
-                  >
-                    <strong>!! 스몰 티츄 !!</strong>
+                  <button type="button" data-small-tichu-choice="declare" aria-pressed="false">
+                    <strong>&gt; &quot;스몰 티츄&quot; 선언하기 &lt;</strong>
                   </button>
                 </div>
+                <button
+                  class="large-tichu__tip-trigger"
+                  type="button"
+                  data-open="tichu-tip"
+                  aria-haspopup="dialog"
+                  aria-controls="tichu-tip-modal"
+                  aria-expanded="false"
+                >
+                  티츄, 외쳐도 될까?
+                </button>
                 <button
                   class="large-tichu__pass-button"
                   type="button"
                   data-small-tichu-choice="pass"
                   aria-pressed="false"
                 >
-                  <strong>패스</strong>
+                  패스
                 </button>
               </div>
 
               <p class="large-tichu__feedback" aria-live="polite" aria-atomic="true"></p>
-              <p class="small-tichu__difference">
-                라지 티츄(+200)보다 작지만, 교환까지 패를 다 보고 결정할 수 있어요.
-              </p>
             </div>
           </div>
         </div>
@@ -838,6 +814,41 @@
         </div>
       </section>
     </main>
+
+    <nav class="stage-tab-bar" aria-label="단계 이동" aria-hidden="true">
+      <div class="stage-tab-bar__inner">
+        <button type="button" data-stage-target="#game-intro">소개</button>
+        <button type="button" data-stage-target="#card-guide">카드</button>
+        <button type="button" data-stage-target="#game-setup">준비</button>
+        <button type="button" data-stage-target="#game-play">게임</button>
+        <button type="button" data-stage-target="#score-victory">점수</button>
+      </div>
+    </nav>
+
+    <nav class="prep-stepper" aria-label="게임 준비 진행 순서" aria-hidden="true">
+      <ol>
+        <li class="is-current" data-prep-step="0" data-prep-target="#game-setup" aria-current="step">
+          <span class="prep-stepper__dot" aria-hidden="true">1</span>
+          <span>분배</span>
+        </li>
+        <li data-prep-step="1" data-prep-target="#prep-large-tichu">
+          <span class="prep-stepper__dot" aria-hidden="true">2</span>
+          <span>라지티츄</span>
+        </li>
+        <li data-prep-step="2" data-prep-target="#prep-receive-six">
+          <span class="prep-stepper__dot" aria-hidden="true">3</span>
+          <span>+6장</span>
+        </li>
+        <li data-prep-step="3" data-prep-target="#prep-exchange">
+          <span class="prep-stepper__dot" aria-hidden="true">4</span>
+          <span>교환</span>
+        </li>
+        <li data-prep-step="4" data-prep-target="#prep-small-tichu">
+          <span class="prep-stepper__dot" aria-hidden="true">5</span>
+          <span>스몰티츄</span>
+        </li>
+      </ol>
+    </nav>
 
     <button
       class="floating-tip-button"

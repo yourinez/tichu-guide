@@ -26,7 +26,572 @@
       document.body.classList.remove("splash-active");
       window.ScrollTrigger?.refresh();
     }, 680);
-  }, 2000);
+  }, 1500);
+})();
+
+(() => {
+  "use strict";
+
+  const menuLinks = document.querySelectorAll(".chapter-menu__links a");
+  const chapterMenu = document.querySelector(".chapter-menu");
+  const stageBar = document.querySelector(".stage-tab-bar");
+  const stageTabs = Array.from(document.querySelectorAll("[data-stage-target]"));
+  let requestedStageTarget = null;
+
+  const setActiveStage = (target) => {
+    document.body.dataset.activeStage = target;
+    stageTabs.forEach((tab) => {
+      const isActive = tab.dataset.stageTarget === target;
+      tab.classList.toggle("is-active", isActive);
+      if (isActive) {
+        tab.setAttribute("aria-current", "page");
+      } else {
+        tab.removeAttribute("aria-current");
+      }
+    });
+  };
+
+  const isChapterMenuScreen = () => {
+    if (!chapterMenu) {
+      return false;
+    }
+
+    const menuRect = chapterMenu.getBoundingClientRect();
+    const viewportCenter = window.innerHeight * 0.5;
+    return menuRect.top <= viewportCenter && menuRect.bottom >= viewportCenter;
+  };
+
+  const applyStageBarState = () => {
+    const visible = Boolean(requestedStageTarget) && !isChapterMenuScreen();
+    stageBar?.classList.toggle("is-visible", visible);
+    stageBar?.setAttribute("aria-hidden", String(!visible));
+    document.body.classList.toggle("stage-tabs-visible", visible);
+    stageTabs.forEach((tab) => {
+      tab.tabIndex = visible ? 0 : -1;
+    });
+    if (visible && requestedStageTarget) {
+      setActiveStage(requestedStageTarget);
+    }
+  };
+
+  const setStageBarVisible = (visible, target = null) => {
+    requestedStageTarget = visible ? target || requestedStageTarget : null;
+    applyStageBarState();
+  };
+
+  const clearDetailScrollLock = () => {
+    document.documentElement.classList.remove("detail-view-open");
+    document.body.classList.remove("detail-view-open");
+  };
+
+  const setMenuScrollLock = (locked) => {
+    document.documentElement.classList.toggle("menu-view-open", locked);
+    document.body.classList.toggle("menu-view-open", locked);
+  };
+
+  window.tichuMenuView = {
+    lock: () => {
+      setMenuScrollLock(true);
+      setStageBarVisible(false);
+    },
+    unlock: () => setMenuScrollLock(false)
+  };
+
+  window.tichuStageNav = {
+    setActive: setActiveStage,
+    show: (target) => setStageBarVisible(true, target),
+    hide: () => setStageBarVisible(false)
+  };
+
+  const hasDetailHash = Boolean(window.location.hash && window.location.hash !== "#");
+
+  if (hasDetailHash) {
+    setMenuScrollLock(false);
+    setStageBarVisible(false);
+  } else {
+    setMenuScrollLock(false);
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    setMenuScrollLock(true);
+    setStageBarVisible(false);
+  }
+  menuLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      clearDetailScrollLock();
+      setMenuScrollLock(false);
+      setStageBarVisible(true, link.hash);
+      if (link.hash === "#game-setup") {
+        window.requestAnimationFrame(() => window.tichuPrepFlow?.goTo(0));
+      }
+    });
+  });
+
+  stageTabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const target = tab.dataset.stageTarget;
+      const menuLink = Array.from(menuLinks).find((link) => link.hash === target);
+
+      if (!menuLink) {
+        return;
+      }
+
+      if (target === "#game-play" && window.tichuPrepFlow?.isActive()) {
+        window.tichuPrepFlow.next();
+        return;
+      }
+
+      clearDetailScrollLock();
+      setActiveStage(target);
+      menuLink.click();
+    });
+  });
+
+  const updateStageFromScroll = () => {
+    applyStageBarState();
+
+    if (!stageBar?.classList.contains("is-visible")) {
+      return;
+    }
+
+    const regularStages = ["#card-guide", "#game-setup", "#game-play", "#score-victory"];
+    let current = null;
+
+    regularStages.forEach((selector) => {
+      const section = document.querySelector(selector);
+      if (section && section.getBoundingClientRect().top <= window.innerHeight * 0.46) {
+        current = selector;
+      }
+    });
+
+    if (current) {
+      setActiveStage(current);
+    }
+  };
+
+  window.addEventListener("scroll", updateStageFromScroll, { passive: true });
+  window.addEventListener("resize", updateStageFromScroll, { passive: true });
+
+  if (chapterMenu && "IntersectionObserver" in window) {
+    const menuObserver = new IntersectionObserver(
+      () => applyStageBarState(),
+      { threshold: [0, 0.5, 1] }
+    );
+    menuObserver.observe(chapterMenu);
+  }
+
+  if (hasDetailHash) {
+    window.addEventListener(
+      "load",
+      () => {
+        const targetLink = Array.from(menuLinks).find((link) => link.hash === window.location.hash);
+        targetLink?.click();
+      },
+      { once: true }
+    );
+  }
+})();
+
+(() => {
+  "use strict";
+
+  const stepper = document.querySelector(".prep-stepper");
+  const items = Array.from(document.querySelectorAll("[data-prep-step]"));
+  const PREP_STEPS = Object.freeze([
+    { key: "deal", selector: "#game-setup", transitionDuration: 0.5 },
+    {
+      key: "large-tichu",
+      selector: "#prep-large-tichu",
+      settleProgress: 0.96,
+      transitionDuration: 0.5
+    },
+    {
+      key: "receive-six",
+      selector: "#prep-receive-six",
+      transitionDuration: 0.5
+    },
+    {
+      key: "exchange",
+      selector: "#prep-exchange",
+      transitionDuration: 0.5
+    },
+    {
+      key: "small-tichu",
+      selector: "#prep-small-tichu",
+      settleProgress: 0.92,
+      transitionDuration: 0.5
+    }
+  ]);
+  const steps = PREP_STEPS.map((step) => ({
+    ...step,
+    element: document.querySelector(step.selector)
+  }));
+  const gameStage = document.querySelector("#game-play");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (
+    !stepper ||
+    items.length !== steps.length ||
+    items.some((item, index) => item.dataset.prepTarget !== PREP_STEPS[index].selector) ||
+    steps.some((step) => !step.element) ||
+    !gameStage
+  ) {
+    return;
+  }
+
+  let currentIndex = 0;
+  let active = false;
+  let moving = false;
+  let settleTimer = 0;
+  let settleHandler = null;
+  let scrollTween = null;
+  let originalScrollBehavior = null;
+  let ignoreInputUntil = 0;
+  let wheelDelta = 0;
+  let wheelGestureTriggered = false;
+  let wheelGestureTimer = 0;
+  let touchStartY = null;
+  let syncFrame = 0;
+
+  const renderStep = (nextIndex) => {
+    currentIndex = Math.max(0, Math.min(steps.length - 1, nextIndex));
+    items.forEach((item, index) => {
+      const isCurrent = index === currentIndex;
+      item.classList.toggle("is-current", isCurrent);
+      item.classList.toggle("is-complete", index < currentIndex);
+      if (isCurrent) {
+        item.setAttribute("aria-current", "step");
+      } else {
+        item.removeAttribute("aria-current");
+      }
+    });
+  };
+
+  const announceStepArrival = (index) => {
+    if (![1, 2, 4].includes(index)) {
+      return;
+    }
+
+    window.dispatchEvent(
+      new CustomEvent("tichu:prep-step", {
+        detail: { index }
+      })
+    );
+  };
+
+  const syncVisibility = () => {
+    const visible =
+      active &&
+      document.body.classList.contains("stage-tabs-visible") &&
+      document.body.dataset.activeStage === "#game-setup";
+    stepper.setAttribute("aria-hidden", String(!visible));
+  };
+
+  const scrollTriggerFor = (element) => {
+    if (!window.ScrollTrigger) {
+      return null;
+    }
+    return window.ScrollTrigger.getAll().find((trigger) => trigger.trigger === element) || null;
+  };
+
+  const scrollPositionFor = (index) => {
+    const step = steps[index];
+    const trigger = scrollTriggerFor(step.element);
+
+    if (
+      trigger &&
+      Number.isFinite(trigger.start) &&
+      Number.isFinite(trigger.end) &&
+      Number.isFinite(step.settleProgress)
+    ) {
+      return trigger.start + (trigger.end - trigger.start) * step.settleProgress;
+    }
+
+    return Math.max(
+      0,
+      step.element.getBoundingClientRect().top + window.scrollY - (step.topOffset || 0)
+    );
+  };
+
+  const unlockGateFor = (element) => {
+    window.tichuProgressGates?.forEach((gate) => {
+      if (
+        gate.section === element ||
+        gate.section?.contains(element) ||
+        element.contains(gate.section)
+      ) {
+        gate.unlock();
+      }
+    });
+  };
+
+  const finishMovement = () => {
+    window.clearTimeout(settleTimer);
+    if (settleHandler) {
+      window.removeEventListener("scrollend", settleHandler);
+    }
+    settleHandler = null;
+    scrollTween = null;
+    moving = false;
+    ignoreInputUntil = performance.now() + 180;
+    if (originalScrollBehavior !== null) {
+      document.documentElement.style.scrollBehavior = originalScrollBehavior;
+      originalScrollBehavior = null;
+    }
+    window.ScrollTrigger?.update();
+    syncVisibility();
+  };
+
+  const startMovement = (top, behavior, onSettled, duration = 0.68) => {
+    window.clearTimeout(settleTimer);
+    scrollTween?.kill();
+    scrollTween = null;
+    if (settleHandler) {
+      window.removeEventListener("scrollend", settleHandler);
+    }
+    if (originalScrollBehavior === null) {
+      originalScrollBehavior = document.documentElement.style.scrollBehavior;
+    }
+    document.documentElement.style.scrollBehavior = "auto";
+    moving = true;
+    settleHandler = () => {
+      onSettled?.();
+      finishMovement();
+    };
+    if (behavior === "smooth" && window.gsap) {
+      const scrollState = { y: window.scrollY };
+      scrollTween = window.gsap.to(scrollState, {
+        y: top,
+        duration,
+        ease: "power3.inOut",
+        overwrite: true,
+        onUpdate: () => window.scrollTo(0, scrollState.y),
+        onComplete: () => {
+          window.scrollTo(0, top);
+          settleHandler();
+        }
+      });
+      settleTimer = window.setTimeout(settleHandler, duration * 1000 + 240);
+      return;
+    }
+
+    window.addEventListener("scrollend", settleHandler, { once: true });
+    window.scrollTo({ top, left: 0, behavior });
+    settleTimer = window.setTimeout(settleHandler, behavior === "smooth" ? 1050 : 80);
+  };
+
+  const goTo = (nextIndex, behavior = reducedMotion ? "auto" : "smooth") => {
+    const safeIndex = Math.max(0, Math.min(steps.length - 1, nextIndex));
+    unlockGateFor(steps[currentIndex].element);
+    active = true;
+    if (document.body.dataset.activeStage !== "#game-setup") {
+      window.tichuStageNav?.setActive("#game-setup");
+    }
+    renderStep(safeIndex);
+    syncVisibility();
+    startMovement(
+      scrollPositionFor(safeIndex),
+      behavior,
+      () => {
+        renderStep(safeIndex);
+        announceStepArrival(safeIndex);
+      },
+      steps[safeIndex].transitionDuration || 0.68
+    );
+  };
+
+  const goToGame = (behavior = reducedMotion ? "auto" : "smooth") => {
+    unlockGateFor(steps[currentIndex].element);
+    active = false;
+    syncVisibility();
+    startMovement(
+      Math.max(0, gameStage.getBoundingClientRect().top + window.scrollY),
+      behavior,
+      () => window.tichuStageNav?.setActive("#game-play")
+    );
+  };
+
+  const next = () => {
+    if (currentIndex < steps.length - 1) {
+      goTo(currentIndex + 1);
+    } else {
+      goToGame();
+    }
+  };
+
+  const previous = () => {
+    if (currentIndex > 0) {
+      goTo(currentIndex - 1);
+      return true;
+    }
+    return false;
+  };
+
+  const syncFromViewport = () => {
+    if (moving) {
+      return;
+    }
+
+    const marker = window.innerHeight * 0.45;
+    const insidePrep =
+      steps[0].element.getBoundingClientRect().top <= marker &&
+      gameStage.getBoundingClientRect().top > marker;
+
+    active = insidePrep;
+    if (!insidePrep) {
+      syncVisibility();
+      return;
+    }
+
+    if (document.body.dataset.activeStage !== "#game-setup") {
+      window.tichuStageNav?.setActive("#game-setup");
+    }
+    const nearestIndex = steps.reduce(
+      (nearest, step, index) =>
+        Math.abs(window.scrollY - scrollPositionFor(index)) <
+        Math.abs(window.scrollY - scrollPositionFor(nearest))
+          ? index
+          : nearest,
+      0
+    );
+    renderStep(nearestIndex);
+    syncVisibility();
+  };
+
+  const requestSync = () => {
+    if (!syncFrame) {
+      syncFrame = window.requestAnimationFrame(() => {
+        syncFrame = 0;
+        syncFromViewport();
+      });
+    }
+  };
+
+  const shouldHandleInput = () =>
+    (active || moving) &&
+    !document.documentElement.classList.contains("modal-open") &&
+    document.body.classList.contains("stage-tabs-visible");
+
+  const consumeInput = (event) => {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  };
+
+  const onWheel = (event) => {
+    if (!shouldHandleInput()) {
+      wheelDelta = 0;
+      return;
+    }
+
+    consumeInput(event);
+    window.clearTimeout(wheelGestureTimer);
+    wheelGestureTimer = window.setTimeout(() => {
+      wheelGestureTriggered = false;
+      wheelDelta = 0;
+    }, 180);
+
+    if (moving || performance.now() < ignoreInputUntil || wheelGestureTriggered) {
+      return;
+    }
+
+    wheelDelta += event.deltaY;
+    if (Math.abs(wheelDelta) < 18) {
+      return;
+    }
+
+    const direction = Math.sign(wheelDelta);
+    wheelDelta = 0;
+    wheelGestureTriggered = true;
+    if (direction > 0) {
+      next();
+    } else if (!previous()) {
+      active = false;
+      syncVisibility();
+    }
+  };
+
+  const onTouchStart = (event) => {
+    touchStartY = event.touches[0]?.clientY ?? null;
+  };
+
+  const onTouchMove = (event) => {
+    if (!shouldHandleInput() || touchStartY === null) {
+      return;
+    }
+    if (moving || performance.now() < ignoreInputUntil) {
+      consumeInput(event);
+      return;
+    }
+
+    const currentY = event.touches[0]?.clientY;
+    if (currentY === undefined || Math.abs(touchStartY - currentY) < 44) {
+      return;
+    }
+
+    const direction = Math.sign(touchStartY - currentY);
+    touchStartY = null;
+    consumeInput(event);
+    if (direction > 0) {
+      next();
+    } else if (!previous()) {
+      active = false;
+      syncVisibility();
+    }
+  };
+
+  const onKeyDown = (event) => {
+    if (
+      !shouldHandleInput() ||
+      event.target instanceof Element && event.target.closest("button, a, input, select, textarea")
+    ) {
+      return;
+    }
+    if (event.repeat) {
+      consumeInput(event);
+      return;
+    }
+    if (["ArrowDown", "PageDown"].includes(event.key) || (event.key === " " && !event.shiftKey)) {
+      consumeInput(event);
+      if (!moving) next();
+    } else if (["ArrowUp", "PageUp"].includes(event.key) || (event.key === " " && event.shiftKey)) {
+      if (currentIndex > 0) {
+        consumeInput(event);
+        if (!moving) previous();
+      }
+    }
+  };
+
+  const observer = new MutationObserver(() => {
+    syncVisibility();
+    requestSync();
+  });
+  observer.observe(document.body, {
+    attributes: true,
+    attributeFilter: ["class", "data-active-stage"]
+  });
+
+  window.addEventListener("wheel", onWheel, { passive: false, capture: true });
+  window.addEventListener("touchstart", onTouchStart, { passive: true, capture: true });
+  window.addEventListener("touchmove", onTouchMove, { passive: false, capture: true });
+  window.addEventListener("keydown", onKeyDown, { capture: true });
+  window.addEventListener("scroll", requestSync, { passive: true });
+  window.addEventListener("resize", requestSync, { passive: true });
+  window.addEventListener("load", requestSync, { once: true });
+
+  if (window.ScrollTrigger) {
+    window.ScrollTrigger.addEventListener("refresh", requestSync);
+  }
+
+  window.tichuPrepFlow = {
+    steps: PREP_STEPS,
+    goTo,
+    next,
+    previous,
+    current: () => currentIndex,
+    isActive: () => active
+  };
+
+  renderStep(0);
+  syncVisibility();
+  requestSync();
 })();
 
 (() => {
@@ -34,17 +599,27 @@
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const teamLayout = document.querySelector(".hero__team-layout");
-  const introBackButton = document.querySelector(".hero__scene-nav--back");
   const introPreviousButton = document.querySelector(".hero__scene-nav--previous");
   const introNextButton = document.querySelector(".hero__scene-nav--next");
+  const introViewport = document.querySelector(".hero__intro-viewport");
   const introTrack = document.querySelector(".hero__intro-track");
   const introDots = document.querySelectorAll("[data-intro-slide]");
+  const introMenuLink = document.querySelector('.chapter-menu__links a[href="#game-intro"]');
   let introSlideIndex = 0;
+  let swipeStart = null;
+
+  const setDetailScrollLock = (locked) => {
+    document.documentElement.classList.toggle("detail-view-open", locked);
+    document.body.classList.toggle("detail-view-open", locked);
+  };
 
   const showIntroSlide = (nextIndex) => {
-    introSlideIndex = Math.max(0, Math.min(2, nextIndex));
+    const lastSlideIndex = Math.max(0, introDots.length - 1);
+    introSlideIndex = Math.max(0, Math.min(lastSlideIndex, nextIndex));
     const isPastFirstSlide = introSlideIndex > 0;
+    const isLastSlide = introSlideIndex === lastSlideIndex;
     teamLayout?.classList.toggle("is-showing-deck", isPastFirstSlide);
+    teamLayout?.classList.toggle("is-last-slide", isLastSlide);
     if (introTrack) {
       introTrack.style.transform = `translate3d(-${introSlideIndex * 100}%, 0, 0)`;
     }
@@ -58,6 +633,11 @@
       dot.classList.toggle("is-active", isCurrent);
       dot.setAttribute("aria-current", String(isCurrent));
     });
+    if (introNextButton) {
+      introNextButton.disabled = isLastSlide;
+      introNextButton.tabIndex = isLastSlide ? -1 : 0;
+      introNextButton.setAttribute("aria-hidden", String(isLastSlide));
+    }
     const nextLabels = ["카드 한 벌 안내 보기", "승리 조건 보기", "게임 목표로 계속하기"];
     introNextButton?.setAttribute(
       "aria-label",
@@ -71,34 +651,70 @@
     dot.addEventListener("click", () => showIntroSlide(Number(dot.dataset.introSlide)));
   });
 
-  const returnToChapterMenu = () => {
-    document.querySelector(".chapter-menu")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+  introViewport?.addEventListener("pointerdown", (event) => {
+    if (!event.isPrimary) {
+      return;
+    }
+    swipeStart = { x: event.clientX, y: event.clientY };
+  });
+
+  introViewport?.addEventListener("pointerup", (event) => {
+    if (!swipeStart || !event.isPrimary) {
+      swipeStart = null;
+      return;
+    }
+
+    const deltaX = event.clientX - swipeStart.x;
+    const deltaY = event.clientY - swipeStart.y;
+    swipeStart = null;
+
+    if (Math.abs(deltaX) < 42 || Math.abs(deltaX) <= Math.abs(deltaY)) {
+      return;
+    }
+
+    showIntroSlide(introSlideIndex + (deltaX < 0 ? 1 : -1));
+  });
+
+  introViewport?.addEventListener("pointercancel", () => {
+    swipeStart = null;
+  });
+
+  const enterStaticIntroDetail = () => {
+    window.tichuMenuView?.unlock();
+    showIntroSlide(0);
+    const hero = document.querySelector("#game-intro");
+    window.scrollTo({ top: hero?.offsetTop || 0, left: 0, behavior: "auto" });
+    window.requestAnimationFrame(() => setDetailScrollLock(true));
+    window.history.replaceState(null, "", "#game-intro");
   };
 
   if (reducedMotion.matches) {
-    introBackButton?.addEventListener("click", returnToChapterMenu);
+    introMenuLink?.addEventListener("click", (event) => {
+      event.preventDefault();
+      enterStaticIntroDetail();
+    });
     introPreviousButton?.addEventListener("click", () => showIntroSlide(introSlideIndex - 1));
     introNextButton?.addEventListener("click", () => {
       if (introSlideIndex < 2) {
         showIntroSlide(introSlideIndex + 1);
         return;
       }
-      document.querySelector(".goal")?.scrollIntoView({ behavior: "auto", block: "start" });
     });
     return;
   }
 
   if (!window.gsap || !window.ScrollTrigger) {
     document.documentElement.classList.add("animation-unavailable");
-    introBackButton?.addEventListener("click", returnToChapterMenu);
+    introMenuLink?.addEventListener("click", (event) => {
+      event.preventDefault();
+      enterStaticIntroDetail();
+    });
     introPreviousButton?.addEventListener("click", () => showIntroSlide(introSlideIndex - 1));
     introNextButton?.addEventListener("click", () => {
       if (introSlideIndex < 2) {
         showIntroSlide(introSlideIndex + 1);
         return;
       }
-      document.querySelector(".goal")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
     return;
   }
@@ -107,11 +723,6 @@
 
   const shell = document.querySelector(".app-shell");
   const copy = document.querySelector(".hero__copy");
-  const goal = document.querySelector(".goal");
-  const goalIntro = gsap.utils.toArray(".goal__time, .goal__eyebrow");
-  const goalCore = document.querySelector(".goal__core");
-  const goalWays = gsap.utils.toArray(".goal__way");
-  const goalStroke = document.querySelector(".goal__stroke");
   const cards = document.querySelector(".cards");
   const cardsCount = document.querySelector(".cards__count");
   const playingCard = document.querySelector(".playing-card");
@@ -130,12 +741,21 @@
     scrollTrigger: {
       trigger: ".hero",
       start: "top top",
-      end: "+=700%",
+      end: "+=520%",
       pin: ".hero__stage",
       pinSpacing: true,
       scrub: 0.65,
       anticipatePin: 1,
-      invalidateOnRefresh: true
+      invalidateOnRefresh: true,
+      onUpdate: (self) => {
+        if (!document.body.classList.contains("stage-tabs-visible")) {
+          return;
+        }
+        if (document.querySelector("#game-setup")?.getBoundingClientRect().top <= window.innerHeight * 0.4) {
+          return;
+        }
+        window.tichuStageNav?.setActive(self.progress < 0.2 ? "#game-intro" : "#card-guide");
+      }
     }
   });
 
@@ -151,7 +771,7 @@
       },
       0.12
     )
-    // 구간 C: 인원 안내가 사라진 뒤 짧은 간격을 두고 게임 목표가 이어진다.
+    // 게임 소개가 사라진 뒤 일반 카드 구성과 숫자 서열을 소개한다.
     .to(
       copy,
       {
@@ -163,78 +783,6 @@
       1.05
     )
     .to(
-      goal,
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.55,
-        ease: "power2.out"
-      },
-      1.65
-    )
-    .to(
-      goalIntro,
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.32,
-        stagger: 0.1,
-        ease: "power2.out"
-      },
-      1.75
-    )
-    .to(
-      goalCore,
-      {
-        y: 0,
-        scale: 1,
-        opacity: 1,
-        duration: 0.48,
-        ease: "power2.out"
-      },
-      2.25
-    )
-    .to(
-      goalWays,
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.4,
-        stagger: 0.1,
-        ease: "power2.out"
-      },
-      2.78
-    )
-    .to(
-      goalStroke,
-      {
-        scaleX: 1,
-        duration: 0.38,
-        ease: "power2.out"
-      },
-      3.22
-    )
-    .to(
-      goal,
-      {
-        opacity: 1,
-        duration: 0.7,
-        ease: "none"
-      },
-      3.6
-    )
-    // 구간 D: 게임 목표를 닫고 일반 카드 구성과 숫자 서열을 소개한다.
-    .to(
-      goal,
-      {
-        y: () => -Math.max(window.innerHeight, 560) * 0.5,
-        opacity: 0,
-        duration: 0.55,
-        ease: "power2.inOut"
-      },
-      4.35
-    )
-    .to(
       cards,
       {
         y: 0,
@@ -242,7 +790,7 @@
         duration: 0.5,
         ease: "power2.out"
       },
-      5
+      1.65
     )
     .to(
       cardsCount,
@@ -252,7 +800,7 @@
         duration: 0.36,
         ease: "power2.out"
       },
-      5.12
+      1.77
     )
     .to(
       cardsCount,
@@ -262,7 +810,7 @@
         duration: 0.46,
         ease: "power2.inOut"
       },
-      5.9
+      2.55
     )
     .to(
       playingCard,
@@ -273,7 +821,7 @@
         duration: 0.52,
         ease: "power2.out"
       },
-      6.46
+      3.11
     )
     .to(
       quickReferenceBar,
@@ -282,7 +830,7 @@
         duration: 0.35,
         ease: "power1.out"
       },
-      6.46
+      3.11
     )
     .to(
       suitIntro,
@@ -291,7 +839,7 @@
         duration: 0.64,
         ease: "power2.out"
       },
-      6.8
+      3.45
     )
     .to(
       cardSuits,
@@ -303,7 +851,7 @@
         stagger: 0.1,
         ease: "power2.out"
       },
-      6.88
+      3.53
     )
     .to(
       suitIntroLabel,
@@ -313,7 +861,7 @@
         duration: 0.34,
         ease: "power2.out"
       },
-      7.34
+      3.99
     )
     .to(
       suitIntro,
@@ -322,7 +870,7 @@
         duration: 0.58,
         ease: "power2.inOut"
       },
-      7.92
+      4.57
     )
     .to(
       rankFace,
@@ -331,7 +879,7 @@
         duration: 0.58,
         ease: "power2.inOut"
       },
-      7.92
+      4.57
     )
     .to(
       rankItems,
@@ -344,7 +892,7 @@
         stagger: 0.04,
         ease: "power2.out"
       },
-      8.48
+      5.13
     )
     .to(
       rankFaceLabel,
@@ -354,7 +902,7 @@
         duration: 0.32,
         ease: "power2.out"
       },
-      9.24
+      5.89
     )
     .to(
       rankRules,
@@ -365,7 +913,7 @@
         stagger: 0.1,
         ease: "power2.out"
       },
-      9.62
+      6.27
     )
     .to(
       rankReferenceLabels,
@@ -376,7 +924,7 @@
         stagger: 0.1,
         ease: "power2.out"
       },
-      10.12
+      6.77
     )
     .to(
       playingCard,
@@ -385,14 +933,13 @@
         duration: 0.8,
         ease: "none"
       },
-      10.12
+      6.77
     );
 
   timeline
-    .to(shell, { backgroundColor: "#24100e", duration: 0.7, ease: "none" }, 1.25)
-    .to(shell, { backgroundColor: "#26150f", duration: 0.8, ease: "none" }, 4.45);
+    .to(shell, { backgroundColor: "#26150f", duration: 0.8, ease: "none" }, 1.25);
 
-  const scrollToHeroTime = (targetTime) => {
+  const scrollToHeroTime = (targetTime, behavior = "smooth") => {
     const trigger = timeline.scrollTrigger;
 
     if (!trigger || !Number.isFinite(targetTime)) {
@@ -401,10 +948,10 @@
 
     const progress = targetTime / timeline.duration();
     const targetY = trigger.start + (trigger.end - trigger.start) * progress;
-    window.scrollTo({ top: targetY, left: 0, behavior: "smooth" });
+    window.scrollTo({ top: targetY, left: 0, behavior });
+    ScrollTrigger.update();
   };
 
-  introBackButton?.addEventListener("click", returnToChapterMenu);
   introPreviousButton?.addEventListener("click", () => showIntroSlide(introSlideIndex - 1));
 
   introNextButton?.addEventListener("click", () => {
@@ -412,7 +959,6 @@
       showIntroSlide(introSlideIndex + 1);
       return;
     }
-    scrollToHeroTime(2.25);
   });
 
   document.querySelectorAll(".chapter-menu__links [data-hero-time]").forEach((link) => {
@@ -426,11 +972,16 @@
       event.preventDefault();
       if (link.hash === "#game-intro") {
         showIntroSlide(0);
+        scrollToHeroTime(targetTime, "auto");
+        window.requestAnimationFrame(() => setDetailScrollLock(true));
+      } else {
+        setDetailScrollLock(false);
+        scrollToHeroTime(targetTime);
       }
-      scrollToHeroTime(targetTime);
       window.history.replaceState(null, "", link.hash);
     });
   });
+
 })();
 
 (() => {
@@ -568,7 +1119,7 @@
 
     window.requestAnimationFrame(updateBoundary);
 
-    const controller = { unlock };
+    const controller = { section, unlock };
     window.tichuProgressGates.push(controller);
     return controller;
   };
@@ -595,19 +1146,37 @@
   const fans = Array.from(section.querySelectorAll(".deal-seat__fan"));
   const status = section.querySelector(".deal-status");
   const button = section.querySelector(".deal-button");
+  const replayButton = section.querySelector(".deal-replay");
+  const nextButton = section.querySelector(".deal-next");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const progressGate = window.createTichuProgressGate?.(section);
   let dealTimeline = null;
 
+  const goToNextStep = () => {
+    progressGate?.unlock();
+    if (window.tichuPrepFlow) {
+      window.tichuPrepFlow.goTo(1, reducedMotion ? "auto" : "smooth");
+      return;
+    }
+    document.querySelector("#prep-large-tichu")?.scrollIntoView({
+      behavior: reducedMotion ? "auto" : "smooth",
+      block: "start"
+    });
+    window.requestAnimationFrame(() => window.ScrollTrigger?.update());
+  };
+
+  nextButton?.addEventListener("click", goToNextStep);
+
   const showStaticResult = () => {
     section.classList.add("is-complete");
     button.hidden = true;
+    replayButton.hidden = false;
     status.removeAttribute("aria-hidden");
   };
 
   if (reducedMotion || !window.gsap) {
-    showStaticResult();
     button.addEventListener("click", showStaticResult);
+    replayButton.addEventListener("click", showStaticResult);
     return;
   }
 
@@ -617,14 +1186,14 @@
     const stackOffset = (round - 3.5) * 1.15;
 
     return [
-      { x: stackOffset, y: height * -0.34, rotation: stackOffset * 0.7 },
-      { x: width * 0.36, y: stackOffset, rotation: 90 + stackOffset * 0.7 },
-      { x: stackOffset, y: height * 0.34, rotation: 180 + stackOffset * 0.7 },
-      { x: width * -0.36, y: stackOffset, rotation: -90 + stackOffset * 0.7 }
+      { x: stackOffset, y: height * -0.43, rotation: stackOffset * 0.7 },
+      { x: width * 0.43, y: stackOffset, rotation: 90 + stackOffset * 0.7 },
+      { x: stackOffset, y: height * 0.43, rotation: 180 + stackOffset * 0.7 },
+      { x: width * -0.43, y: stackOffset, rotation: -90 + stackOffset * 0.7 }
     ];
   };
 
-  const resetDeal = () => {
+  const resetDeal = (showStartButton = true) => {
     if (dealTimeline) {
       dealTimeline.kill();
     }
@@ -632,16 +1201,18 @@
     layer.replaceChildren();
     section.classList.remove("is-complete");
     status.setAttribute("aria-hidden", "true");
-    button.hidden = false;
+    button.hidden = !showStartButton;
+    replayButton.hidden = true;
     gsap.set(button, { opacity: 1, scale: 1, xPercent: -50, yPercent: -50 });
+    gsap.set(replayButton, { opacity: 0, scale: 0.82, xPercent: -50 });
     gsap.set(deck, { opacity: 0, scale: 0.92, xPercent: -50, yPercent: -50 });
     gsap.set(fans, { opacity: 0, scale: 0.78 });
     gsap.set(status, { opacity: 0, xPercent: -50, yPercent: -50, y: 12 });
   };
 
-  const playDeal = () => {
+  const playDeal = (isReplay = false) => {
     progressGate?.unlock();
-    resetDeal();
+    resetDeal(!isReplay);
     const dealtCards = [];
     dealTimeline = gsap.timeline({
       onStart: () => {
@@ -649,8 +1220,8 @@
       }
     });
 
-    dealTimeline
-      .to(button, {
+    if (!isReplay) {
+      dealTimeline.to(button, {
         opacity: 0,
         scale: 0.94,
         duration: 0.16,
@@ -658,8 +1229,10 @@
         onComplete: () => {
           button.hidden = true;
         }
-      })
-      .to(deck, { opacity: 1, scale: 1, duration: 0.18, ease: "power2.out" }, ">-0.02");
+      });
+    }
+
+    dealTimeline.to(deck, { opacity: 1, scale: 1, duration: 0.18, ease: "power2.out" });
 
     const dealStart = dealTimeline.duration() + 0.06;
 
@@ -723,10 +1296,18 @@
       .call(() => {
         section.classList.add("is-complete");
         button.disabled = false;
+        replayButton.hidden = false;
+        gsap.to(replayButton, {
+          opacity: 1,
+          scale: 1,
+          duration: 0.22,
+          ease: "power2.out"
+        });
       });
   };
 
-  button.addEventListener("click", playDeal);
+  button.addEventListener("click", () => playDeal(false));
+  replayButton.addEventListener("click", () => playDeal(true));
 })();
 
 (() => {
@@ -744,62 +1325,58 @@
   const buttons = Array.from(section.querySelectorAll("[data-large-tichu-choice]"));
   const feedback = section.querySelector(".large-tichu__feedback");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let introTimeline = null;
   const messages = {
     declare: "선언 완료! 반드시 내가 1등으로 비워야 해요\u00a0🔥",
     pass: "패스! 나중에 스몰 티츄 기회가 또 있어요"
   };
 
-  if (reducedMotion || !window.gsap || !window.ScrollTrigger) {
+  if (reducedMotion || !window.gsap) {
     section.classList.add("is-static");
   } else {
-    gsap.registerPlugin(ScrollTrigger);
-
-    const stage = section.querySelector(".large-tichu__stage");
     const title = section.querySelector(".large-tichu__title");
     const question = section.querySelector(".large-tichu__question");
     const deadline = section.querySelector(".large-tichu__deadline");
     const controls = section.querySelector(".large-tichu__controls");
-    const entryY = () => Math.min(window.innerHeight * 0.38, 310);
+    const entryY = () => Math.min(window.innerHeight * 0.18, 145);
+    const controlsY = () => (window.innerHeight <= 720 ? 115 : 105);
 
-    gsap.set([title, question, deadline, controls], {
+    gsap.set([title, question], {
       xPercent: -50,
       yPercent: -50,
       y: entryY,
       autoAlpha: 0
     });
+    gsap.set(deadline, {
+      xPercent: -50,
+      yPercent: -50,
+      y: 26,
+      autoAlpha: 0
+    });
     gsap.set(controls, {
-      yPercent: 0,
-      y: () => entryY() + 80,
+      xPercent: -50,
+      yPercent: -50,
+      y: 184,
+      autoAlpha: 0,
       pointerEvents: "none"
     });
 
-    gsap
-      .timeline({
-        defaults: { ease: "power2.inOut" },
-        scrollTrigger: {
-          trigger: section,
-          start: "top top",
-          end: "+=150%",
-          pin: stage,
-          pinSpacing: true,
-          scrub: 0.5,
-          anticipatePin: 1,
-          invalidateOnRefresh: true
-        }
-      })
-      .to(title, { y: 0, autoAlpha: 1, duration: 0.44, ease: "power2.out" }, 0)
-      .to(title, { y: -150, scale: 0.7, duration: 0.46 }, 0.5)
-      .to(question, { y: 0, autoAlpha: 1, duration: 0.42, ease: "power2.out" }, 0.56)
-      .to(title, { y: -186, scale: 0.64, duration: 0.42 }, 1.04)
-      .to(question, { y: -78, duration: 0.42 }, 1.04)
-      .to(deadline, { y: 4, autoAlpha: 1, duration: 0.42, ease: "power2.out" }, 1.1)
-      .to(controls, { y: 42, autoAlpha: 1, duration: 0.44, ease: "power2.out" }, 1.1)
-      .to(title, { y: -205, scale: 0.62, duration: 0.42 }, 1.58)
-      .to(question, { y: -122, duration: 0.42 }, 1.58)
-      .to(deadline, { y: -48, duration: 0.42 }, 1.58)
-      .set(controls, { pointerEvents: "auto" }, 1.54)
-      .to({}, { duration: 0.08 });
+    introTimeline = gsap
+      .timeline({ paused: true, defaults: { ease: "power2.inOut" } })
+      .to(title, { y: 0, autoAlpha: 1, duration: 0.78, ease: "power2.inOut" }, 0)
+      .to(title, { y: -180, scale: 0.68, duration: 0.76, ease: "power2.inOut" }, 0.92)
+      .to(question, { y: -80, autoAlpha: 1, duration: 0.62, ease: "power2.inOut" }, 1.66)
+      .to(deadline, { y: 2, autoAlpha: 1, duration: 0.62, ease: "power2.inOut" }, 2.24)
+      .to(controls, { y: controlsY, autoAlpha: 1, duration: 0.62, ease: "power2.inOut" }, 2.24)
+      .set(controls, { pointerEvents: "auto" }, 2.86)
+      .to({}, { duration: 0.2 });
   }
+
+  window.addEventListener("tichu:prep-step", (event) => {
+    if (event.detail?.index === 1) {
+      introTimeline?.restart();
+    }
+  });
 
   const selectChoice = (choice) => {
     const declared = choice === "declare";
@@ -844,18 +1421,46 @@
   const incomingCards = Array.from(section.querySelectorAll("[data-exchange-source]"));
   const button = section.querySelector(".exchange-button");
   const status = section.querySelector(".exchange-status");
+  const replayButton = section.querySelector(".exchange-replay");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const progressGate = window.createTichuProgressGate?.(section);
+  let receiveTimeline = null;
+  let exchangeTimeline = null;
 
-  if (reducedMotion || !window.gsap || !window.ScrollTrigger) {
-    section.classList.add("is-static");
+  const showStaticExchange = () => {
+    progressGate?.unlock();
+    section.classList.add("is-complete");
     status.removeAttribute("aria-hidden");
+    button.hidden = true;
+    replayButton.hidden = false;
+  };
+
+  const resetStaticExchange = () => {
+    section.classList.remove("is-complete");
+    status.setAttribute("aria-hidden", "true");
+    button.hidden = false;
+    replayButton.hidden = true;
+  };
+
+  if (reducedMotion || !window.gsap) {
+    button.addEventListener("click", showStaticExchange);
+    replayButton.addEventListener("click", () => {
+      resetStaticExchange();
+      showStaticExchange();
+    });
     return;
   }
 
-  gsap.registerPlugin(ScrollTrigger);
   count.textContent = "8장";
-  gsap.set(receiveCards, { y: 24, scale: 0.86, autoAlpha: 0 });
+  gsap.set(receiveCards, {
+    xPercent: -50,
+    x: (index) => (index - (receiveCards.length - 1) / 2) * 11,
+    y: 18,
+    scale: 0.94,
+    rotation: (index) => (index - (receiveCards.length - 1) / 2) * 4.2,
+    transformOrigin: "50% 92%",
+    autoAlpha: 0
+  });
   gsap.set(outgoingCards, {
     top: "82%",
     left: "50%",
@@ -865,26 +1470,41 @@
     autoAlpha: 0
   });
 
-  const receiveTimeline = gsap.timeline({ paused: true });
+  gsap.set(count, { scale: 0.9, autoAlpha: 0 });
+  receiveTimeline = gsap.timeline({ paused: true });
   receiveTimeline
-    .to(receiveCards, {
-      y: 0,
-      scale: 1,
-      autoAlpha: 1,
-      duration: 0.18,
-      stagger: 0.055,
-      ease: "power2.out"
-    })
+    .fromTo(
+      receiveCards,
+      { y: 18, scale: 0.94, autoAlpha: 0 },
+      {
+        y: 0,
+        scale: 1,
+        autoAlpha: 1,
+        duration: 0.44,
+        stagger: 0.035,
+        ease: "power2.inOut"
+      }
+    )
     .call(() => {
       count.textContent = "14장";
     })
-    .fromTo(count, { scale: 0.86 }, { scale: 1, duration: 0.2, ease: "power2.out" });
+    .fromTo(
+      count,
+      { scale: 0.9, autoAlpha: 0 },
+      {
+        scale: 1,
+        autoAlpha: 1,
+        duration: 0.36,
+        ease: "power2.out"
+      }
+    );
 
-  ScrollTrigger.create({
-    trigger: section,
-    start: "top 82%",
-    once: true,
-    onEnter: () => receiveTimeline.play()
+  window.addEventListener("tichu:prep-step", (event) => {
+    if (event.detail?.index === 2) {
+      count.textContent = "8장";
+      gsap.set(count, { scale: 0.9, autoAlpha: 0 });
+      receiveTimeline.restart();
+    }
   });
 
   const targets = {
@@ -911,10 +1531,42 @@
     });
   });
 
-  button.addEventListener("click", () => {
+  const resetExchange = () => {
+    exchangeTimeline?.kill();
+    section.classList.remove("is-complete");
+    status.setAttribute("aria-hidden", "true");
+    button.hidden = false;
+    button.disabled = false;
+    replayButton.hidden = true;
+    gsap.set(button, { opacity: 1, scale: 1, xPercent: -50, yPercent: -50 });
+    gsap.set(replayButton, { opacity: 0, scale: 0.82, xPercent: -50, yPercent: 0 });
+    gsap.set(outgoingCards, {
+      top: "82%",
+      left: "50%",
+      xPercent: -50,
+      yPercent: -50,
+      rotation: 0,
+      autoAlpha: 0
+    });
+    incomingCards.forEach((card) => {
+      const source = targets[card.dataset.exchangeSource];
+      gsap.set(card, {
+        top: source.top,
+        left: source.left,
+        xPercent: -50,
+        yPercent: -50,
+        rotation: source.rotation,
+        autoAlpha: 0
+      });
+    });
+    gsap.set(status, { opacity: 0, xPercent: -50, yPercent: -50 });
+  };
+
+  const playExchange = () => {
     progressGate?.unlock();
+    resetExchange();
     button.disabled = true;
-    const exchangeTimeline = gsap.timeline();
+    exchangeTimeline = gsap.timeline();
 
     exchangeTimeline.to(button, {
       opacity: 0,
@@ -975,8 +1627,21 @@
         },
         1.98
       )
-      .call(() => section.classList.add("is-complete"));
-  });
+      .call(() => {
+        section.classList.add("is-complete");
+        button.disabled = false;
+        replayButton.hidden = false;
+        gsap.to(replayButton, {
+          opacity: 1,
+          scale: 1,
+          duration: 0.22,
+          ease: "power2.out"
+        });
+      });
+  };
+
+  button.addEventListener("click", playExchange);
+  replayButton.addEventListener("click", playExchange);
 })();
 
 (() => {
@@ -991,69 +1656,62 @@
   const buttons = Array.from(section.querySelectorAll("[data-small-tichu-choice]"));
   const declareButton = section.querySelector('[data-small-tichu-choice="declare"]');
   const feedback = section.querySelector(".large-tichu__feedback");
-  const eligibility = section.querySelector(".small-tichu__eligibility");
-  const blockedSub = section.querySelector(".small-tichu__blocked-sub");
-  const difference = section.querySelector(".small-tichu__difference");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let introTimeline = null;
   const messages = {
     declare: "선언 완료! 내가 1등으로 비우면 +100\u00a0🔥",
     pass: "패스! 편하게 플레이해요"
   };
 
-  if (reducedMotion || !window.gsap || !window.ScrollTrigger) {
+  if (reducedMotion || !window.gsap) {
     section.classList.add("is-static");
   } else {
-    gsap.registerPlugin(ScrollTrigger);
-
-    const stage = section.querySelector(".large-tichu__stage");
     const title = section.querySelector(".large-tichu__title");
     const question = section.querySelector(".large-tichu__question");
     const deadline = section.querySelector(".large-tichu__deadline");
     const controls = section.querySelector(".large-tichu__controls");
-    const entryY = () => Math.min(window.innerHeight * 0.38, 310);
+    const entryY = () => Math.min(window.innerHeight * 0.18, 145);
+    const controlsY = () => (window.innerHeight <= 720 ? 115 : 105);
 
-    gsap.set([title, question, deadline, controls], {
+    gsap.set([title, question], {
       xPercent: -50,
       yPercent: -50,
       y: entryY,
       autoAlpha: 0
     });
+    gsap.set(deadline, {
+      xPercent: -50,
+      yPercent: -50,
+      y: 26,
+      autoAlpha: 0
+    });
     gsap.set(controls, {
-      yPercent: 0,
-      y: () => entryY() + 80,
+      xPercent: -50,
+      yPercent: -50,
+      y: 184,
+      autoAlpha: 0,
       pointerEvents: "none"
     });
 
-    gsap
-      .timeline({
-        defaults: { ease: "power2.inOut" },
-        scrollTrigger: {
-          trigger: section,
-          start: "top top",
-          end: "+=150%",
-          pin: stage,
-          pinSpacing: true,
-          scrub: 0.5,
-          anticipatePin: 1,
-          invalidateOnRefresh: true
-        }
-      })
-      .to(title, { y: 0, autoAlpha: 1, duration: 0.44, ease: "power2.out" }, 0)
-      .to(title, { y: -150, scale: 0.7, duration: 0.46 }, 0.5)
-      .to(question, { y: 0, autoAlpha: 1, duration: 0.42, ease: "power2.out" }, 0.56)
-      .to(title, { y: -186, scale: 0.64, duration: 0.42 }, 1.04)
-      .to(question, { y: -78, duration: 0.42 }, 1.04)
-      .to(deadline, { y: 4, autoAlpha: 1, duration: 0.42, ease: "power2.out" }, 1.1)
-      .to(controls, { y: 42, autoAlpha: 1, duration: 0.44, ease: "power2.out" }, 1.1)
-      .to(title, { y: -205, scale: 0.62, duration: 0.42 }, 1.58)
-      .to(question, { y: -122, duration: 0.42 }, 1.58)
-      .to(deadline, { y: -48, duration: 0.42 }, 1.58)
-      .set(controls, { pointerEvents: "auto" }, 1.54)
-      .to({}, { duration: 0.08 });
+    introTimeline = gsap
+      .timeline({ paused: true, defaults: { ease: "power2.inOut" } })
+      .to(title, { y: 0, autoAlpha: 1, duration: 0.78, ease: "power2.inOut" }, 0)
+      .to(title, { y: -180, scale: 0.68, duration: 0.76 }, 0.92)
+      .to(question, { y: -80, autoAlpha: 1, duration: 0.62, ease: "power2.inOut" }, 1.66)
+      .to(deadline, { y: 2, autoAlpha: 1, duration: 0.62, ease: "power2.inOut" }, 2.24)
+      .to(controls, { y: controlsY, autoAlpha: 1, duration: 0.62, ease: "power2.inOut" }, 2.24)
+      .set(controls, { pointerEvents: "auto" }, 2.86)
+      .to({}, { duration: 0.2 });
   }
 
+  window.addEventListener("tichu:prep-step", (event) => {
+    if (event.detail?.index === 4) {
+      introTimeline?.restart();
+    }
+  });
+
   const selectChoice = (choice) => {
-    if (choice === "declare" && window.tichuGameState?.largeTichuDeclared) {
+    if (window.tichuGameState?.largeTichuDeclared) {
       return;
     }
 
@@ -1062,11 +1720,6 @@
     });
 
     feedback.classList.remove("is-visible", "is-declare");
-
-    if (window.tichuGameState?.largeTichuDeclared) {
-      feedback.textContent = "";
-      return;
-    }
 
     feedback.textContent = messages[choice];
     feedback.classList.toggle("is-declare", choice === "declare");
@@ -1079,17 +1732,14 @@
   const syncLargeTichuState = (declared) => {
     section.classList.toggle("is-large-declared", declared);
     declareButton.disabled = declared;
-    blockedSub.hidden = !declared;
-    eligibility.textContent = declared
-      ? "이미 라지 티츄를 외쳤어요!"
-      : "라지 티츄를 외치지 않았다면, 지금 스몰 티츄를 외칠 수 있어요!";
-    difference.textContent = declared
-      ? "실제로 라지 티츄를 외치지 않았다면, 스몰 티츄를 외칠 수 있어요"
-      : "라지 티츄(+200)보다 작지만, 교환까지 패를 다 보고 결정할 수 있어요.";
 
     if (declared) {
       buttons.forEach((button) => button.setAttribute("aria-pressed", "false"));
-      feedback.classList.remove("is-visible", "is-declare");
+      feedback.classList.remove("is-declare");
+      feedback.textContent = "이미 라지 티츄를 선언했어요. 스몰 티츄는 선택할 수 없어요.";
+      feedback.classList.add("is-visible");
+    } else if (feedback.textContent.startsWith("이미 라지 티츄를 선언했어요.")) {
+      feedback.classList.remove("is-visible");
       feedback.textContent = "";
     }
   };
@@ -1294,7 +1944,7 @@
         defaults: { ease: "power2.inOut" },
         scrollTrigger: {
           trigger: gameStart,
-          start: () => `top top+=${quickReferenceBar?.offsetHeight ?? 0}`,
+          start: "top top",
           end: "+=300%",
           pin: true,
           pinSpacing: true,
@@ -1749,6 +2399,9 @@
 
   const main = document.querySelector("main");
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const referenceButtons = Array.from(
+    document.querySelectorAll(".quick-reference-bar__button[data-open]")
+  );
   let activeModal = null;
   let returnFocus = null;
   let lockedScrollY = 0;
@@ -1758,6 +2411,14 @@
     Array.from(document.querySelectorAll("[data-modal]")).find(
       (modal) => modal.dataset.modal === name
     ) || null;
+
+  const setReferenceActive = (name = null) => {
+    referenceButtons.forEach((button) => {
+      const isActive = button.dataset.open === name;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-expanded", String(isActive));
+    });
+  };
 
   const lockPage = () => {
     lockedScrollY = window.scrollY;
@@ -1803,6 +2464,7 @@
     const focusTarget = returnFocus;
     activeModal = null;
     returnFocus = null;
+    setReferenceActive();
     closedModal.hidden = true;
     unlockPage();
 
@@ -1843,6 +2505,7 @@
 
     activeModal = modal;
     returnFocus = trigger instanceof HTMLElement ? trigger : document.activeElement;
+    setReferenceActive(name);
     if (trigger instanceof HTMLElement) {
       trigger.setAttribute("aria-expanded", "true");
     }
