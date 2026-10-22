@@ -187,10 +187,12 @@ img {
 
 .chapter-menu {
   display: grid;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   min-height: 100dvh;
   padding: max(44px, env(safe-area-inset-top)) clamp(24px, 7vw, 32px)
     max(44px, env(safe-area-inset-bottom));
+  overflow: hidden;
   place-items: center;
   background: #373132;
 }
@@ -495,6 +497,10 @@ body.menu-view-open .prep-stepper {
   visibility: hidden;
 }
 
+body[data-active-stage="#game-play"] .floating-tip-button {
+  bottom: max(82px, calc(env(safe-area-inset-bottom) + 80px));
+}
+
 .floating-tip-button.is-visible {
   opacity: 1;
   pointer-events: auto;
@@ -594,7 +600,7 @@ body.menu-view-open .prep-stepper {
   inset: 0;
   overflow: hidden;
   pointer-events: auto;
-  touch-action: pan-y;
+  touch-action: none;
 }
 
 .hero__intro-track {
@@ -1082,6 +1088,49 @@ body.menu-view-open .prep-stepper {
   pointer-events: none;
   transform: translate3d(0, 42svh, 0);
   will-change: transform, opacity;
+}
+
+.cards__scroll-cue {
+  position: absolute;
+  z-index: 5;
+  right: 0;
+  bottom: max(88px, calc(env(safe-area-inset-bottom) + 78px));
+  left: 0;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  color: rgb(255 255 255 / 0.78);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.cards__scroll-arrow {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  animation: cards-scroll-bounce 1.25s ease-in-out infinite;
+  transform: rotate(45deg);
+}
+
+@keyframes cards-scroll-bounce {
+  0%,
+  100% {
+    translate: 0 -2px;
+  }
+  50% {
+    translate: 0 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cards__scroll-arrow {
+    animation: none;
+  }
 }
 
 .cards__count {
@@ -3048,12 +3097,13 @@ body.modal-open .quick-reference-bar {
 .game-start__content {
   gap: 0;
   justify-content: center;
+  top: -60px;
 }
 
 .game-start__bird {
-  width: clamp(220px, 64vw, 252px);
-  max-height: 48dvh;
-  margin: 0 0 clamp(42px, 6dvh, 56px);
+  width: clamp(190px, 56vw, 220px);
+  max-height: 34dvh;
+  margin: 0 0 clamp(18px, 3dvh, 24px);
   object-fit: contain;
   border-radius: 11px;
   box-shadow: 0 12px 28px rgb(78 46 48 / 0.09);
@@ -6392,6 +6442,12 @@ body.combo-guide-open {
   overscroll-behavior: none;
 }
 
+html.gameplay-slides-active,
+body.gameplay-slides-active {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 .combo-guide h2 {
   color: #fff;
 }
@@ -6651,7 +6707,7 @@ body.combo-guide-open {
   }
 }
 
-/* Game play: card-cover guide followed by the trick-end screen. */
+/* Game play stays in one horizontal, viewport-sized slide deck. */
 .gameplay-carousel {
   position: relative;
   width: 100%;
@@ -6664,7 +6720,7 @@ body.combo-guide-open {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  touch-action: pan-y;
+  touch-action: none;
 }
 
 .gameplay-carousel__track {
@@ -6676,11 +6732,30 @@ body.combo-guide-open {
 }
 
 .gameplay-carousel__slide {
+  box-sizing: border-box;
   width: 100%;
   min-width: 0;
   height: 100%;
   min-height: 100%;
   flex: 0 0 100%;
+  overflow: hidden;
+}
+
+.gameplay-carousel .game-start {
+  height: 100%;
+  min-height: 100%;
+}
+
+.gameplay-carousel .game-start__content {
+  top: -30px;
+}
+
+.gameplay-carousel .gameplay-card-zones__inner,
+.gameplay-carousel .trick-end__inner,
+.gameplay-carousel .bomb-guide__inner,
+.gameplay-carousel .trick-repeat__inner {
+  position: relative;
+  top: 26px;
 }
 
 .gameplay-carousel .play-card-sequence {
@@ -6742,7 +6817,7 @@ body.combo-guide-open {
 .gameplay-carousel__dots {
   position: absolute;
   z-index: 12;
-  bottom: max(92px, calc(env(safe-area-inset-bottom) + 82px));
+  bottom: max(88px, calc(env(safe-area-inset-bottom) + 78px));
   left: 50%;
   display: flex;
   gap: 4px;
@@ -6901,13 +6976,13 @@ body.combo-guide-open {
 /* Game play main slide: keep the controls clear of the page dots. */
 .gameplay-carousel .play-card-sequence {
   padding-top: max(82px, calc(env(safe-area-inset-top) + 72px));
-  padding-bottom: max(158px, calc(env(safe-area-inset-bottom) + 146px));
+  padding-bottom: max(194px, calc(env(safe-area-inset-bottom) + 182px));
 }
 
 .gameplay-carousel .play-card-sequence__caption,
 .gameplay-carousel .play-card-sequence__board-wrap,
 .gameplay-carousel .play-card-sequence__rules {
-  transform: translateY(-18px);
+  transform: translateY(20px);
 }
 
 .play-card-sequence__actions .combo-guide-jump:not(.pass-guide-trigger) {
@@ -6935,12 +7010,12 @@ body.combo-guide-open {
 @media (max-height: 780px) {
   .gameplay-carousel .play-card-sequence {
     padding-top: max(70px, calc(env(safe-area-inset-top) + 62px));
-    padding-bottom: max(134px, calc(env(safe-area-inset-bottom) + 122px));
+    padding-bottom: max(194px, calc(env(safe-area-inset-bottom) + 182px));
   }
 
   .gameplay-carousel .play-card-sequence__caption,
   .gameplay-carousel .play-card-sequence__board-wrap,
   .gameplay-carousel .play-card-sequence__rules {
-    transform: translateY(-12px);
+    transform: translateY(16px);
   }
 }
