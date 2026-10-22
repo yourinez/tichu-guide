@@ -323,7 +323,9 @@ body.menu-view-open .chapter-menu {
 
 /* 목차는 단독 선택 화면이다. JS 상태와 관계없이 상단 단계 바를 숨긴다. */
 html.menu-view-open .stage-tab-bar,
-body.menu-view-open .stage-tab-bar {
+body.menu-view-open .stage-tab-bar,
+body.chapter-menu-visible .stage-tab-bar,
+body:not(.stage-isolated) .stage-tab-bar {
   opacity: 0 !important;
   pointer-events: none !important;
   transform: translate(-50%, -12px) scale(0.98) !important;
@@ -507,8 +509,12 @@ body.stage-tabs-visible[data-active-stage="#game-setup"] .prep-stepper {
 }
 
 html.menu-view-open .prep-stepper,
-body.menu-view-open .prep-stepper {
+body.menu-view-open .prep-stepper,
+body.chapter-menu-visible .prep-stepper,
+body:not(.stage-tabs-visible) .prep-stepper {
   opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translate(-50%, -8px) !important;
   visibility: hidden !important;
 }
 
@@ -6776,6 +6782,148 @@ body.gameplay-slides-active {
   .gameplay-carousel .play-card-sequence__actions .combo-guide-jump {
     min-height: 38px;
     font-size: 13px;
+  }
+}
+
+/* 준비 1단계: 타임라인 아래에서 제목과 네 방향 분배 구도가 온전히 보이도록 정렬. */
+.deal-section .deal-content {
+  /* 타임라인 바로 아래에서 시작하도록 분배 묶음을 화면 중심보다 위에 둔다. */
+  transform: translateY(-40px);
+}
+
+.deal-section .deal-seat--top,
+.deal-section .deal-seat--right,
+.deal-section .deal-seat--bottom,
+.deal-section .deal-seat--left {
+  display: block;
+  width: 0;
+  height: 0;
+  gap: 0;
+}
+
+.deal-section .deal-seat--top {
+  top: 0;
+  left: 50%;
+  transform: none;
+}
+
+.deal-section .deal-seat--right {
+  top: 50%;
+  right: 0;
+  transform: none;
+}
+
+.deal-section .deal-seat--bottom {
+  bottom: 0;
+  left: 50%;
+  transform: none;
+}
+
+.deal-section .deal-seat--left {
+  top: 50%;
+  left: 0;
+  transform: none;
+}
+
+.deal-section .deal-seat__pile {
+  position: absolute;
+  width: clamp(104px, 30vw, 120px);
+  min-height: 68px;
+}
+
+.deal-section .deal-seat--top .deal-seat__pile {
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%) rotate(180deg);
+}
+
+.deal-section .deal-seat--right .deal-seat__pile {
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%) rotate(-90deg);
+}
+
+.deal-section .deal-seat--bottom .deal-seat__pile {
+  bottom: 0;
+  left: 0;
+  transform: translate(-50%, 50%);
+}
+
+.deal-section .deal-seat--left .deal-seat__pile {
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.deal-section .deal-seat__label {
+  position: absolute;
+  z-index: 4;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.deal-section .deal-seat--top .deal-seat__label {
+  right: auto;
+  bottom: 12px;
+  left: 0;
+  background: rgb(255 242 241 / 0.9);
+  transform: translateX(-50%);
+}
+
+.deal-section .deal-seat--right .deal-seat__label {
+  top: 0;
+  right: auto;
+  left: 18px;
+  transform: translateY(-50%);
+}
+
+.deal-section .deal-seat--bottom .deal-seat__label {
+  top: 45px;
+  right: auto;
+  bottom: auto;
+  left: 0;
+  transform: translateX(-50%);
+}
+
+.deal-section .deal-seat--left .deal-seat__label {
+  top: 0;
+  right: 18px;
+  left: auto;
+  transform: translateY(-50%);
+}
+
+.deal-section .deal-seat--bottom .hand-privacy-note {
+  position: absolute;
+  top: 78px;
+  left: 0;
+  width: max-content;
+  margin: 0;
+  transform: translateX(-50%);
+}
+
+.deal-section .deal-next {
+  /* 나 라벨 → 설명 → 다음 화살표 순서를 좌석 기준으로 고정한다. */
+  top: 126px;
+  bottom: auto;
+  left: 0;
+  transform: translateX(-50%);
+}
+
+@media (max-height: 720px) {
+  .deal-section .deal-content {
+    transform: translateY(-55px);
+  }
+
+  .deal-section .deal-table {
+    width: min(100%, 270px);
+  }
+
+  .deal-section .deal-seat--bottom .hand-privacy-note {
+    top: 72px;
+  }
+
+  .deal-section .deal-next {
+    top: 116px;
   }
 }
 

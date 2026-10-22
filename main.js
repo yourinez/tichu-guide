@@ -33,6 +33,7 @@
   "use strict";
 
   const menuLinks = document.querySelectorAll(".chapter-menu__links a");
+  const chapterMenu = document.querySelector(".chapter-menu");
   const stageBar = document.querySelector(".stage-tab-bar");
   const stageTabs = Array.from(document.querySelectorAll("[data-stage-target]"));
   const stageGroups = new Map([
@@ -59,6 +60,7 @@
   const introView = document.querySelector(".hero__team-layout");
   const cardView = document.querySelector("#card-guide");
   let requestedStageTarget = null;
+  let chapterMenuOnScreen = false;
 
   const syncStageIsolation = (target = null) => {
     const activeContainers = new Set(stageGroups.get(target) || []);
@@ -106,7 +108,9 @@
   const applyStageBarState = () => {
     // 상세 단계에 들어간 뒤에는 스크롤 위치로 상태를 추측하지 않는다.
     // 목차 복귀는 hide()/menu lock처럼 명시적인 동작에서만 처리한다.
-    const visible = Boolean(requestedStageTarget);
+    const menuIsActive =
+      document.body.classList.contains("menu-view-open") || chapterMenuOnScreen;
+    const visible = Boolean(requestedStageTarget) && !menuIsActive;
     if (!visible && stageBar?.contains(document.activeElement)) {
       document.activeElement.blur();
     }
@@ -192,12 +196,22 @@
   });
 
   const updateStageFromScroll = () => {
+    if (chapterMenu) {
+      const rect = chapterMenu.getBoundingClientRect();
+      const nextMenuState = rect.top < window.innerHeight * 0.35 &&
+        rect.bottom > window.innerHeight * 0.65;
+      if (nextMenuState !== chapterMenuOnScreen) {
+        chapterMenuOnScreen = nextMenuState;
+        document.body.classList.toggle("chapter-menu-visible", chapterMenuOnScreen);
+      }
+    }
     applyStageBarState();
   };
 
   window.tichuStageNav.update = updateStageFromScroll;
   window.addEventListener("scroll", updateStageFromScroll, { passive: true });
   window.addEventListener("resize", updateStageFromScroll, { passive: true });
+  updateStageFromScroll();
 
   let correctingScoreBoundary = false;
   window.addEventListener(
