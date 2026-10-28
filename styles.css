@@ -3774,11 +3774,14 @@ body.modal-open .quick-reference-bar {
   -webkit-appearance: none;
   border: 0.08em solid currentColor;
   border-radius: 999px;
-  background: transparent;
+  background: rgb(39 26 28 / 0.06);
   color: inherit;
   font-size: inherit;
   line-height: 1;
   cursor: pointer;
+  transform: translateY(-0.13em);
+  box-shadow: 0 0 0 0 rgb(39 26 28 / 0.3);
+  animation: game-start-help-pulse 2.1s ease-in-out infinite;
 }
 
 .game-start__help span {
@@ -3788,7 +3791,23 @@ body.modal-open .quick-reference-bar {
 }
 
 .game-start__help:hover {
-  background: rgb(39 26 28 / 0.08);
+  background: rgb(39 26 28 / 0.14);
+}
+
+@keyframes game-start-help-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(39 26 28 / 0.26);
+  }
+  50% {
+    box-shadow: 0 0 0 0.28em rgb(39 26 28 / 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-start__help {
+    animation: none;
+  }
 }
 
 .game-start__help:focus-visible {
@@ -7739,6 +7758,13 @@ body.gameplay-slides-active {
 }
 
 .gameplay-carousel__nav:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* On the first "게임 시작" slide, the ▶ play button handles advancing,
+   so the right nav arrow would be a redundant duplicate — hide it here. */
+body.game-start-active .gameplay-carousel__nav--next {
   opacity: 0;
   pointer-events: none;
 }
