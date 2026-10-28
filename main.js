@@ -1,6 +1,88 @@
 (() => {
   "use strict";
 
+  const scoreScrollIsActive = () =>
+    document.documentElement.classList.contains("score-scroll-active") &&
+    !document.documentElement.classList.contains("modal-open");
+  const isScrollableOverlayTarget = (target) =>
+    target instanceof Element &&
+    Boolean(target.closest(".app-modal__dialog, .combo-guide.is-opened-from-game"));
+
+  window.addEventListener(
+    "wheel",
+    (event) => {
+      if (event.ctrlKey || scoreScrollIsActive() || isScrollableOverlayTarget(event.target)) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    },
+    { passive: false, capture: true }
+  );
+  window.addEventListener(
+    "touchmove",
+    (event) => {
+      if (scoreScrollIsActive() || isScrollableOverlayTarget(event.target)) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    },
+    { passive: false, capture: true }
+  );
+  window.addEventListener(
+    "keydown",
+    (event) => {
+      const verticalKey =
+        ["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End"].includes(event.key) ||
+        event.key === " ";
+      const isEditable =
+        event.target instanceof Element &&
+        event.target.closest("button, a, input, select, textarea, [contenteditable='true']");
+      if (!verticalKey || scoreScrollIsActive() || isEditable || isScrollableOverlayTarget(event.target)) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    },
+    { capture: true }
+  );
+})();
+
+(() => {
+  "use strict";
+
+  const steps = [
+    document.querySelector("#game-setup"),
+    document.querySelector("#prep-large-tichu"),
+    document.querySelector("#prep-receive-six"),
+    document.querySelector("#prep-exchange"),
+    document.querySelector("#prep-small-tichu")
+  ];
+  const exchangeSection = document.querySelector(".exchange-section");
+  if (steps.some((step) => !step) || !exchangeSection) return;
+
+  const syncPrepViewport = (index) => {
+    if (!Number.isInteger(index) || index < 0 || index >= steps.length) return;
+    document.body.dataset.prepPage = String(index);
+    steps.forEach((step, stepIndex) => {
+      step.classList.toggle("is-prep-current", stepIndex === index);
+    });
+    exchangeSection.classList.toggle("is-prep-current", [2, 3].includes(index));
+  };
+  window.tichuSyncPrepViewport = syncPrepViewport;
+
+  window.addEventListener("tichu:prep-step", (event) => {
+    syncPrepViewport(Number(event.detail?.index));
+  });
+
+  document.querySelectorAll("[data-prep-step] button").forEach((button, index) => {
+    button.addEventListener("click", () => {
+      window.requestAnimationFrame(() => {
+        window.tichuPrepFlow?.jumpToPage?.(index);
+        syncPrepViewport(index);
+      });
+    });
+  });
+})();
+
+(() => {
+  "use strict";
+
   const splash = document.querySelector(".splash-screen");
 
   if (!splash) {
@@ -26,7 +108,7 @@
       document.body.classList.remove("splash-active");
       window.ScrollTrigger?.refresh();
     }, 680);
-  }, 1500);
+  }, 1000);
 })();
 
 (() => {
@@ -35,6 +117,7 @@
   const menuLinks = document.querySelectorAll(".chapter-menu__links a");
   const chapterMenu = document.querySelector(".chapter-menu");
   const stageBar = document.querySelector(".stage-tab-bar");
+  const quickReferenceBar = document.querySelector(".quick-reference-bar");
   const stageTabs = Array.from(document.querySelectorAll("[data-stage-target]"));
   const stageGroups = new Map([
     ["#game-intro", [document.querySelector(".hero")]],
@@ -92,7 +175,18 @@
   };
 
   const setActiveStage = (target) => {
+    const referencesAvailable = target !== "#game-intro";
     document.body.dataset.activeStage = target;
+    document.body.classList.toggle("quick-reference-visible", referencesAvailable);
+    if (quickReferenceBar) {
+      if (!referencesAvailable && quickReferenceBar.contains(document.activeElement)) {
+        document.activeElement.blur();
+      }
+      quickReferenceBar.inert = !referencesAvailable;
+      quickReferenceBar.setAttribute("aria-hidden", String(!referencesAvailable));
+    }
+    document.documentElement.classList.toggle("score-scroll-active", target === "#score-victory");
+    document.body.classList.toggle("score-scroll-active", target === "#score-victory");
     syncStageIsolation(target);
     stageTabs.forEach((tab) => {
       const isActive = tab.dataset.stageTarget === target;
@@ -138,6 +232,12 @@
   };
 
   const setMenuScrollLock = (locked) => {
+    document.documentElement.classList.remove("score-scroll-active");
+    document.body.classList.remove("score-scroll-active");
+    if (!locked) {
+      chapterMenuOnScreen = false;
+      document.body.classList.remove("chapter-menu-visible");
+    }
     document.documentElement.classList.toggle("menu-view-open", locked);
     document.body.classList.toggle("menu-view-open", locked);
   };
@@ -157,16 +257,11 @@
   };
 
   const hasDetailHash = Boolean(window.location.hash && window.location.hash !== "#");
+  const initialStage = stageGroups.has(window.location.hash) ? window.location.hash : "#game-intro";
 
-  if (hasDetailHash) {
-    setMenuScrollLock(false);
-    setStageBarVisible(false);
-  } else {
-    setMenuScrollLock(false);
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-    setMenuScrollLock(true);
-    setStageBarVisible(false);
-  }
+  setMenuScrollLock(false);
+  window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  setStageBarVisible(true, initialStage);
   menuLinks.forEach((link) => {
     link.addEventListener("click", (event) => {
       if (!link.hasAttribute("data-hero-time")) {
@@ -196,7 +291,10 @@
   });
 
   const updateStageFromScroll = () => {
-    if (chapterMenu) {
+    if (requestedStageTarget) {
+      chapterMenuOnScreen = false;
+      document.body.classList.remove("chapter-menu-visible");
+    } else if (chapterMenu) {
       const rect = chapterMenu.getBoundingClientRect();
       const nextMenuState = rect.top < window.innerHeight * 0.35 &&
         rect.bottom > window.innerHeight * 0.65;
@@ -244,16 +342,12 @@
     { passive: true }
   );
 
-  if (hasDetailHash) {
-    window.addEventListener(
-      "load",
-      () => {
-        const targetLink = Array.from(menuLinks).find((link) => link.hash === window.location.hash);
-        targetLink?.click();
-      },
-      { once: true }
-    );
-  }
+  window.requestAnimationFrame(() => {
+    window.tichuStageNav?.goTo?.(initialStage);
+    if (!hasDetailHash) {
+      window.history.replaceState(null, "", "#game-intro");
+    }
+  });
 })();
 
 const legacyPrepFlow = () => {
@@ -274,7 +368,6 @@ const legacyPrepFlow = () => {
   }));
   const gameStage = document.querySelector("#game-play");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
   if (
     !stepper ||
     items.length !== pages.length ||
@@ -743,7 +836,6 @@ const legacyPrepFlow = () => {
     element: document.querySelector(step.selector)
   }));
   const gameStage = document.querySelector("#game-play");
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   if (
     !stepper ||
@@ -784,6 +876,18 @@ const legacyPrepFlow = () => {
   };
 
   const render = () => {
+    if (prepActive) {
+      document.body.dataset.prepPage = String(currentIndex);
+    } else {
+      delete document.body.dataset.prepPage;
+    }
+    steps.forEach((step, index) => {
+      step.element.classList.toggle("is-prep-current", prepActive && index === currentIndex);
+    });
+    steps[2]?.element.closest(".exchange-section")?.classList.toggle(
+      "is-prep-current",
+      prepActive && [2, 3].includes(currentIndex)
+    );
     stepItems.forEach((item, index) => {
       const isCurrent = prepActive && index === currentIndex;
       item.classList.toggle("is-current", isCurrent);
@@ -877,22 +981,8 @@ const legacyPrepFlow = () => {
     const target = () => documentPosition(steps[nextIndex].element);
 
     scrollTween?.kill();
-    if (!instant && !reducedMotion && window.gsap) {
-      const scrollState = { y: window.scrollY };
-      scrollTween = window.gsap.to(scrollState, {
-        y: target(),
-        duration: 0.68,
-        ease: "power3.inOut",
-        overwrite: true,
-        onUpdate: () => {
-          document.scrollingElement.scrollTop = scrollState.y;
-        },
-        onComplete: () => finishTransition(nextIndex, previousIndex, target)
-      });
-    } else {
-      document.scrollingElement.scrollTop = target();
-      finishTransition(nextIndex, previousIndex, target);
-    }
+    document.scrollingElement.scrollTop = target();
+    finishTransition(nextIndex, previousIndex, target);
     return true;
   };
 
@@ -923,22 +1013,8 @@ const legacyPrepFlow = () => {
       window.ScrollTrigger?.update();
     };
 
-    if (!instant && !reducedMotion && window.gsap) {
-      const scrollState = { y: window.scrollY };
-      scrollTween = window.gsap.to(scrollState, {
-        y: target(),
-        duration: 0.68,
-        ease: "power3.inOut",
-        overwrite: true,
-        onUpdate: () => {
-          document.scrollingElement.scrollTop = scrollState.y;
-        },
-        onComplete: finalize
-      });
-    } else {
-      document.scrollingElement.scrollTop = target();
-      finalize();
-    }
+    document.scrollingElement.scrollTop = target();
+    finalize();
     return true;
   };
 
@@ -1140,6 +1216,7 @@ const legacyPrepFlow = () => {
   const introViewport = document.querySelector(".hero__intro-viewport");
   const introTrack = document.querySelector(".hero__intro-track");
   const introDots = document.querySelectorAll("[data-intro-slide]");
+  const introTasteNext = document.querySelector(".hero__taste-next");
   const introMenuLink = document.querySelector('.chapter-menu__links a[href="#game-intro"]');
   let introSlideIndex = 0;
   let swipeStart = null;
@@ -1175,11 +1252,17 @@ const legacyPrepFlow = () => {
       dot.setAttribute("aria-current", String(isCurrent));
     });
     if (introNextButton) {
-      introNextButton.disabled = isLastSlide;
-      introNextButton.tabIndex = isLastSlide ? -1 : 0;
-      introNextButton.setAttribute("aria-hidden", String(isLastSlide));
+      const hideSceneNext = introSlideIndex === 0 || isLastSlide;
+      introNextButton.disabled = hideSceneNext;
+      introNextButton.tabIndex = hideSceneNext ? -1 : 0;
+      introNextButton.setAttribute("aria-hidden", String(hideSceneNext));
     }
-    const nextLabels = ["카드 한 벌 안내 보기", "승리 조건 보기", "게임 목표로 계속하기"];
+    const nextLabels = [
+      "4인 2팀 안내 보기",
+      "카드 한 벌 안내 보기",
+      "승리 조건 보기",
+      "소개 마지막 화면"
+    ];
     introNextButton?.setAttribute(
       "aria-label",
       nextLabels[introSlideIndex]
@@ -1192,27 +1275,19 @@ const legacyPrepFlow = () => {
     dot.addEventListener("click", () => showIntroSlide(Number(dot.dataset.introSlide)));
   });
 
+  introTasteNext?.addEventListener("click", () => showIntroSlide(1));
+
   introViewport?.addEventListener("pointerdown", (event) => {
-    if (!event.isPrimary) {
-      return;
-    }
-    swipeStart = { x: event.clientX, y: event.clientY };
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    swipeStart = { x: event.clientX, y: event.clientY, pointerId: event.pointerId };
   });
 
   introViewport?.addEventListener("pointerup", (event) => {
-    if (!swipeStart || !event.isPrimary) {
-      swipeStart = null;
-      return;
-    }
-
+    if (!swipeStart || swipeStart.pointerId !== event.pointerId) return;
     const deltaX = event.clientX - swipeStart.x;
     const deltaY = event.clientY - swipeStart.y;
     swipeStart = null;
-
-    if (Math.abs(deltaX) < 42 || Math.abs(deltaX) <= Math.abs(deltaY)) {
-      return;
-    }
-
+    if (Math.abs(deltaX) < 42 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
     showIntroSlide(introSlideIndex + (deltaX < 0 ? 1 : -1));
   });
 
@@ -1236,7 +1311,7 @@ const legacyPrepFlow = () => {
     });
     introPreviousButton?.addEventListener("click", () => showIntroSlide(introSlideIndex - 1));
     introNextButton?.addEventListener("click", () => {
-      if (introSlideIndex < 2) {
+      if (introSlideIndex < introDots.length - 1) {
         showIntroSlide(introSlideIndex + 1);
         return;
       }
@@ -1252,7 +1327,7 @@ const legacyPrepFlow = () => {
     });
     introPreviousButton?.addEventListener("click", () => showIntroSlide(introSlideIndex - 1));
     introNextButton?.addEventListener("click", () => {
-      if (introSlideIndex < 2) {
+      if (introSlideIndex < introDots.length - 1) {
         showIntroSlide(introSlideIndex + 1);
         return;
       }
@@ -1266,7 +1341,9 @@ const legacyPrepFlow = () => {
   const copy = document.querySelector(".hero__copy");
   const cards = document.querySelector(".cards");
   const cardsCount = document.querySelector(".cards__count");
-  const cardScrollCue = document.querySelector(".cards__scroll-cue");
+  const cardPreviousButton = document.querySelector(".cards__page-button--previous");
+  const cardNextButton = document.querySelector(".cards__page-button--next");
+  const cardPageStatus = document.querySelector(".cards__page-status");
   const playingCard = document.querySelector(".playing-card");
   const suitIntro = document.querySelector(".suit-intro");
   const cardSuits = gsap.utils.toArray(".cards__suit-box");
@@ -1346,16 +1423,7 @@ const legacyPrepFlow = () => {
         duration: 0.46,
         ease: "power2.inOut"
       },
-      2.55
-    )
-    .to(
-      cardScrollCue,
-      {
-        autoAlpha: 0,
-        duration: 0.28,
-        ease: "power1.out"
-      },
-      2.55
+      5.12
     )
     .to(
       playingCard,
@@ -1498,7 +1566,7 @@ const legacyPrepFlow = () => {
     ScrollTrigger.update();
   };
 
-  const CARD_PAGE_TIMES = Object.freeze([2.2, 5.1, 9.28]);
+  const CARD_PAGE_TIMES = Object.freeze([5.1, 9.28]);
   const cardPagePosition = (index) => {
     const trigger = timeline.scrollTrigger;
     if (!trigger) {
@@ -1532,12 +1600,16 @@ const legacyPrepFlow = () => {
   };
 
   window.tichuStageNav.goTo = (target) => {
+    const leavingScore = document.body.dataset.activeStage === "#score-victory" && target !== "#score-victory";
     window.tichuMenuView?.unlock();
     document.documentElement.classList.remove("detail-view-open");
     document.body.classList.remove("detail-view-open");
     window.tichuProgressGates?.forEach((gate) => gate.unlock());
     window.tichuStageNav.show(target);
     window.tichuStageNav.setActive(target);
+    if (leavingScore) {
+      window.ScrollTrigger?.refresh();
+    }
 
     if (target === "#game-intro") {
       cardPageIndex = -1;
@@ -1548,6 +1620,7 @@ const legacyPrepFlow = () => {
       cardPageIndex = 0;
       setDetailScrollLock(false);
       jumpToHeroTime(CARD_PAGE_TIMES[0]);
+      syncCardPageNav();
     } else if (target === "#game-setup") {
       window.tichuPrepFlow?.jumpToPage(0);
     } else if (target === "#game-play") {
@@ -1576,10 +1649,15 @@ const legacyPrepFlow = () => {
     if (window.scrollY < positions[1] - 2) {
       return 0;
     }
-    if (window.scrollY < positions[2] - 2) {
-      return 1;
-    }
-    return 2;
+    return 1;
+  };
+
+  const syncCardPageNav = () => {
+    const visibleIndex = Math.max(0, cardPageIndex);
+    cards?.classList.toggle("is-rank-page", visibleIndex === 1);
+    if (cardPreviousButton) cardPreviousButton.disabled = visibleIndex === 0;
+    if (cardNextButton) cardNextButton.disabled = visibleIndex === CARD_PAGE_TIMES.length - 1;
+    if (cardPageStatus) cardPageStatus.textContent = `${visibleIndex + 1} / ${CARD_PAGE_TIMES.length}`;
   };
 
   const moveToCardPage = (index) => {
@@ -1588,25 +1666,10 @@ const legacyPrepFlow = () => {
     }
 
     cardTransitioning = true;
-    cardScrollBehavior = document.documentElement.style.scrollBehavior;
-    document.documentElement.style.scrollBehavior = "auto";
-    const scrollState = { y: window.scrollY };
-    gsap.to(scrollState, {
-      y: cardPagePosition(index),
-      duration: 0.95,
-      ease: "power2.inOut",
-      overwrite: true,
-      onUpdate: () => {
-        document.scrollingElement.scrollTop = scrollState.y;
-      },
-      onComplete: () => {
-        document.scrollingElement.scrollTop = cardPagePosition(index);
-        cardPageIndex = index;
-        cardTransitioning = false;
-        document.documentElement.style.scrollBehavior = cardScrollBehavior;
-        ScrollTrigger.update();
-      }
-    });
+    jumpToHeroTime(CARD_PAGE_TIMES[index]);
+    cardPageIndex = index;
+    syncCardPageNav();
+    cardTransitioning = false;
     return true;
   };
 
@@ -1621,6 +1684,9 @@ const legacyPrepFlow = () => {
       moveToCardPage(nextIndex);
     }
   };
+
+  cardPreviousButton?.addEventListener("click", () => advanceCardPage(-1));
+  cardNextButton?.addEventListener("click", () => advanceCardPage(1));
 
   const isCardPageFlowActive = () => {
     return Boolean(
@@ -1831,7 +1897,7 @@ const legacyPrepFlow = () => {
   introPreviousButton?.addEventListener("click", () => showIntroSlide(introSlideIndex - 1));
 
   introNextButton?.addEventListener("click", () => {
-    if (introSlideIndex < 2) {
+    if (introSlideIndex < introDots.length - 1) {
       showIntroSlide(introSlideIndex + 1);
       return;
     }
@@ -1852,18 +1918,12 @@ const legacyPrepFlow = () => {
         setDetailScrollLock(true);
       } else {
         setDetailScrollLock(false);
-        scrollToHeroTime(targetTime);
+        jumpToHeroTime(targetTime);
+        cardPageIndex = 0;
+        syncCardPageNav();
       }
       window.history.replaceState(null, "", link.hash);
     });
-  });
-
-  introViewport?.addEventListener("keydown", (event) => {
-    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
-      return;
-    }
-    event.preventDefault();
-    showIntroSlide(introSlideIndex + (event.key === "ArrowRight" ? 1 : -1));
   });
 
   window.addEventListener(
@@ -2061,7 +2121,7 @@ const legacyPrepFlow = () => {
   const status = section.querySelector(".deal-status");
   const button = section.querySelector(".deal-button");
   const replayButton = section.querySelector(".deal-replay");
-  const nextButton = section.querySelector(".deal-next");
+  const nextButton = status;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const progressGate = window.createTichuProgressGate?.(section);
   let dealTimeline = null;
@@ -2077,6 +2137,7 @@ const legacyPrepFlow = () => {
     section.classList.add("is-complete");
     button.hidden = true;
     replayButton.hidden = false;
+    status.hidden = false;
     status.removeAttribute("aria-hidden");
   };
 
@@ -2106,6 +2167,7 @@ const legacyPrepFlow = () => {
 
     layer.replaceChildren();
     section.classList.remove("is-complete");
+    status.hidden = true;
     status.setAttribute("aria-hidden", "true");
     button.hidden = !showStartButton;
     replayButton.hidden = true;
@@ -2189,15 +2251,13 @@ const legacyPrepFlow = () => {
         },
         finishAt + 0.05
       )
-      .to(
-        status,
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.3,
-          ease: "power2.out",
-          onStart: () => status.removeAttribute("aria-hidden")
+      .call(
+        () => {
+          status.hidden = false;
+          status.removeAttribute("aria-hidden");
+          gsap.set(status, { opacity: 1, y: 0 });
         },
+        [],
         finishAt + 0.18
       )
       .call(() => {
@@ -2247,44 +2307,6 @@ const legacyPrepFlow = () => {
   }
 
   const buttons = Array.from(section.querySelectorAll("[data-large-tichu-choice]"));
-  const feedback = section.querySelector(".large-tichu__feedback");
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let introTimeline = null;
-  const messages = {
-    declare: "선언 완료! 반드시 내가 1등으로 비워야 해요\u00a0🔥",
-    pass: "패스! 나중에 스몰 티츄 기회가 또 있어요"
-  };
-
-  if (reducedMotion || !window.gsap) {
-    section.classList.add("is-static");
-  } else {
-    const stackItems = Array.from(section.querySelectorAll(".large-tichu__stack-item"));
-    const controls = section.querySelector(".large-tichu__controls");
-    gsap.set(controls, {
-      pointerEvents: "none"
-    });
-    gsap.set(stackItems, { y: 18, autoAlpha: 0 });
-
-    introTimeline = gsap
-      .timeline({ paused: true, defaults: { ease: "power2.inOut" } })
-      .to(stackItems[0], { y: 0, autoAlpha: 1, duration: 0.56 }, 0)
-      .to(stackItems[1], { y: 0, autoAlpha: 1, duration: 0.56 }, 0.65)
-      .to(stackItems[2], { y: 0, autoAlpha: 1, duration: 0.56 }, 1.3)
-      .to(stackItems[3], { y: 0, autoAlpha: 1, duration: 0.56 }, 1.95)
-      .set(controls, { pointerEvents: "auto" }, 2.51);
-  }
-
-  window.addEventListener("tichu:prep-step", (event) => {
-    if (event.detail?.index === 1) {
-      introTimeline?.restart();
-    }
-  });
-
-  window.addEventListener("tichu:prep-step-leave", (event) => {
-    if (event.detail?.index === 1) {
-      introTimeline?.pause();
-    }
-  });
 
   const selectChoice = (choice) => {
     const declared = choice === "declare";
@@ -2293,20 +2315,13 @@ const legacyPrepFlow = () => {
       button.setAttribute("aria-pressed", String(button.dataset.largeTichuChoice === choice));
     });
 
-    feedback.classList.remove("is-visible", "is-declare");
-    feedback.textContent = messages[choice];
-    feedback.classList.toggle("is-declare", choice === "declare");
-
-    window.requestAnimationFrame(() => {
-      feedback.classList.add("is-visible");
-    });
-
     window.tichuGameState.largeTichuDeclared = declared;
     window.dispatchEvent(
       new CustomEvent("tichu:large-tichu-change", {
         detail: { declared }
       })
     );
+    window.tichuPrepFlow?.next();
   };
 
   buttons.forEach((button) => {
@@ -2398,16 +2413,7 @@ const legacyPrepFlow = () => {
     .call(() => {
       count.textContent = "14장";
     })
-    .fromTo(
-      count,
-      { scale: 0.9, autoAlpha: 0 },
-      {
-        scale: 1,
-        autoAlpha: 1,
-        duration: 0.36,
-        ease: "power2.out"
-      }
-    );
+    .set(count, { scale: 1, autoAlpha: 1 });
 
   window.addEventListener("tichu:prep-step", (event) => {
     if (event.detail?.index === 2) {
@@ -2541,8 +2547,7 @@ const legacyPrepFlow = () => {
         status,
         {
           opacity: 1,
-          duration: 0.25,
-          ease: "power2.out",
+          duration: 0,
           onStart: () => status.removeAttribute("aria-hidden")
         },
         1.98
@@ -2592,62 +2597,16 @@ const legacyPrepFlow = () => {
 
   const buttons = Array.from(section.querySelectorAll("[data-small-tichu-choice]"));
   const declareButton = section.querySelector('[data-small-tichu-choice="declare"]');
-  const feedback = section.querySelector(".large-tichu__feedback");
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let introTimeline = null;
-  const messages = {
-    declare: "선언 완료! 내가 1등으로 비우면 +100\u00a0🔥",
-    pass: "패스! 편하게 플레이해요"
-  };
-
-  if (reducedMotion || !window.gsap) {
-    section.classList.add("is-static");
-  } else {
-    const stackItems = Array.from(section.querySelectorAll(".large-tichu__stack-item"));
-    const controls = section.querySelector(".large-tichu__controls");
-    gsap.set(controls, {
-      pointerEvents: "none"
-    });
-    gsap.set(stackItems, { y: 18, autoAlpha: 0 });
-
-    introTimeline = gsap
-      .timeline({ paused: true, defaults: { ease: "power2.inOut" } })
-      .to(stackItems[0], { y: 0, autoAlpha: 1, duration: 0.56 }, 0)
-      .to(stackItems[1], { y: 0, autoAlpha: 1, duration: 0.56 }, 0.65)
-      .to(stackItems[2], { y: 0, autoAlpha: 1, duration: 0.56 }, 1.3)
-      .to(stackItems[3], { y: 0, autoAlpha: 1, duration: 0.56 }, 1.95)
-      .set(controls, { pointerEvents: "auto" }, 2.51);
-  }
-
-  window.addEventListener("tichu:prep-step", (event) => {
-    if (event.detail?.index === 4) {
-      introTimeline?.restart();
-    }
-  });
-
-  window.addEventListener("tichu:prep-step-leave", (event) => {
-    if (event.detail?.index === 4) {
-      introTimeline?.pause();
-    }
-  });
 
   const selectChoice = (choice) => {
-    if (window.tichuGameState?.largeTichuDeclared) {
+    if (window.tichuGameState?.largeTichuDeclared && choice === "declare") {
       return;
     }
 
     buttons.forEach((button) => {
       button.setAttribute("aria-pressed", String(button.dataset.smallTichuChoice === choice));
     });
-
-    feedback.classList.remove("is-visible", "is-declare");
-
-    feedback.textContent = messages[choice];
-    feedback.classList.toggle("is-declare", choice === "declare");
-
-    window.requestAnimationFrame(() => {
-      feedback.classList.add("is-visible");
-    });
+    window.tichuStageNav?.goTo?.("#game-play");
   };
 
   const syncLargeTichuState = (declared) => {
@@ -2656,12 +2615,6 @@ const legacyPrepFlow = () => {
 
     if (declared) {
       buttons.forEach((button) => button.setAttribute("aria-pressed", "false"));
-      feedback.classList.remove("is-declare");
-      feedback.textContent = "이미 라지 티츄를 선언했어요. 스몰 티츄는 선택할 수 없어요.";
-      feedback.classList.add("is-visible");
-    } else if (feedback.textContent.startsWith("이미 라지 티츄를 선언했어요.")) {
-      feedback.classList.remove("is-visible");
-      feedback.textContent = "";
     }
   };
 
@@ -2765,48 +2718,6 @@ const legacyPrepFlow = () => {
     pointerId = null;
   };
 
-  carousel.addEventListener("pointerdown", (event) => {
-    if (event.pointerType === "mouse" && event.button !== 0) {
-      return;
-    }
-
-    pointerId = event.pointerId;
-    startX = event.clientX;
-    startY = event.clientY;
-    dragX = -slideOffset(currentIndex);
-    carousel.classList.add("is-dragging");
-    carousel.setPointerCapture(pointerId);
-  });
-
-  carousel.addEventListener("pointermove", (event) => {
-    if (event.pointerId !== pointerId) {
-      return;
-    }
-
-    let distance = event.clientX - startX;
-    if ((currentIndex === 0 && distance > 0) || (currentIndex === lastIndex && distance < 0)) {
-      distance *= 0.28;
-    }
-    track.style.transform = `translate3d(${dragX + distance}px, 0, 0)`;
-  });
-
-  carousel.addEventListener("pointerup", finishDrag);
-  carousel.addEventListener("pointercancel", (event) => {
-    if (event.pointerId !== pointerId) {
-      return;
-    }
-    carousel.classList.remove("is-dragging");
-    pointerId = null;
-    render(currentIndex);
-  });
-
-  carousel.addEventListener("keydown", (event) => {
-    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-      event.preventDefault();
-      render(currentIndex + (event.key === "ArrowRight" ? 1 : -1));
-    }
-  });
-
   dots.forEach((dot, index) => {
     dot.addEventListener("click", () => render(index));
   });
@@ -2846,24 +2757,8 @@ const legacyPrepFlow = () => {
     ].filter(Boolean);
 
     const revealStart = () => {
-      if (reducedMotion || !window.gsap) {
-        window.gsap?.set(introElements, { clearProps: "all" });
-        return;
-      }
-
-      window.gsap.killTweensOf(introElements);
-      window.gsap.fromTo(
-        introElements,
-        { y: 24, autoAlpha: 0 },
-        {
-          y: 0,
-          autoAlpha: 1,
-          duration: 0.55,
-          stagger: 0.09,
-          ease: "power2.out",
-          overwrite: true
-        }
-      );
+      window.gsap?.killTweensOf(introElements);
+      window.gsap?.set(introElements, { clearProps: "transform,opacity,visibility" });
     };
 
     if (window.ScrollTrigger) {
@@ -2925,11 +2820,10 @@ const legacyPrepFlow = () => {
         pair.style.opacity = "1";
       });
     } else {
-      const resetSequence = () => {
-        coverTimeline?.kill();
+      const setSequenceStart = (timeline = window.gsap) => {
         pairs.forEach((pair) => {
           const entry = entryPositions[pair.dataset.entry] || entryPositions.bottom;
-          window.gsap.set(pair, {
+          timeline.set(pair, {
             xPercent: -50,
             yPercent: -50,
             x: entry.x,
@@ -2937,14 +2831,20 @@ const legacyPrepFlow = () => {
             rotation: entry.rotation,
             scale: 0.94,
             autoAlpha: 0
-          });
+          }, 0);
         });
+      };
 
+      const resetSequence = () => {
+        coverTimeline?.kill();
+        coverTimeline = null;
+        setSequenceStart();
       };
 
       const playSequence = () => {
         resetSequence();
-        coverTimeline = window.gsap.timeline();
+        coverTimeline = window.gsap.timeline({ repeat: -1, repeatDelay: 0.2 });
+        setSequenceStart(coverTimeline);
 
         pairs.forEach((pair, index) => {
           const finalState = getFinalState(pair);
@@ -2962,6 +2862,10 @@ const legacyPrepFlow = () => {
             startAt
           );
         });
+
+        coverTimeline
+          .to(pairs, { autoAlpha: 1, duration: 1, ease: "none" }, 4.87)
+          .to(pairs, { autoAlpha: 0, duration: 0.4, ease: "power1.out" }, 5.87);
       };
 
       resetSequence();
@@ -3147,40 +3051,6 @@ const legacyPrepFlow = () => {
     dot.addEventListener("click", () => goToSlide(index));
   });
 
-  viewport.addEventListener("pointerdown", (event) => {
-    if (!event.isPrimary || (event.pointerType === "mouse" && event.button !== 0)) {
-      return;
-    }
-    swipeStart = { x: event.clientX, y: event.clientY };
-  });
-
-  viewport.addEventListener("pointerup", (event) => {
-    if (!swipeStart || !event.isPrimary) {
-      swipeStart = null;
-      return;
-    }
-
-    const deltaX = event.clientX - swipeStart.x;
-    const deltaY = event.clientY - swipeStart.y;
-    swipeStart = null;
-
-    if (Math.abs(deltaX) >= 42 && Math.abs(deltaX) > Math.abs(deltaY)) {
-      goToSlide(currentIndex + (deltaX < 0 ? 1 : -1));
-    }
-  });
-
-  viewport.addEventListener("pointercancel", () => {
-    swipeStart = null;
-  });
-
-  viewport.addEventListener("keydown", (event) => {
-    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
-      return;
-    }
-    event.preventDefault();
-    goToSlide(currentIndex + (event.key === "ArrowRight" ? 1 : -1));
-  });
-
   carousel.addEventListener("gameplay:show-slide", (event) => {
     goToSlide(Number(event.detail?.index || 0));
   });
@@ -3297,13 +3167,6 @@ const legacyPrepFlow = () => {
     trickEnd.classList.remove("is-visible");
     void trickEnd.offsetWidth;
     trickEnd.classList.add("is-visible");
-    if (!reducedMotion && window.gsap) {
-      window.gsap.fromTo(
-        inner,
-        { y: 24, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, ease: "power2.out", overwrite: true }
-      );
-    }
   };
 
   const resetCollection = () => {
@@ -3326,14 +3189,8 @@ const legacyPrepFlow = () => {
 
   const inner = bombGuide.querySelector(".bomb-guide__inner");
   const playEntrance = () => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !window.gsap) {
-      return;
-    }
-    window.gsap.fromTo(
-      inner,
-      { y: 24, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6, ease: "power2.out", overwrite: true }
-    );
+    window.gsap?.killTweensOf(inner);
+    window.gsap?.set(inner, { clearProps: "transform,opacity" });
   };
   const resetEntrance = () => {
     window.gsap?.killTweensOf(inner);
@@ -3360,13 +3217,6 @@ const legacyPrepFlow = () => {
     trickRepeat.classList.remove("is-visible");
     void trickRepeat.offsetWidth;
     trickRepeat.classList.add("is-visible");
-    if (!reducedMotion && window.gsap) {
-      window.gsap.fromTo(
-        inner,
-        { y: 24, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, ease: "power2.out", overwrite: true }
-      );
-    }
   };
 
   const resetLoop = () => {
@@ -3405,28 +3255,6 @@ const legacyPrepFlow = () => {
 
   if (window.gsap && window.ScrollTrigger) {
     gsap.registerPlugin(ScrollTrigger);
-
-    gsap
-      .timeline({
-        scrollTrigger: {
-          trigger: roundEnd,
-          start: "top 82%",
-          end: "bottom 18%",
-          scrub: 0.5,
-          invalidateOnRefresh: true
-        }
-      })
-      .fromTo(
-        roundEnd.querySelector(".round-end__inner"),
-        { y: 38, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.22, ease: "none" },
-        0
-      )
-      .to(
-        roundEnd.querySelector(".round-end__inner"),
-        { y: -38, opacity: 0, duration: 0.22, ease: "none" },
-        0.78
-      );
 
     ScrollTrigger.create({
       trigger: roundEnd,

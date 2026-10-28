@@ -149,8 +149,8 @@ img {
 .app-shell {
   --reference-gap: 8px;
   --reference-track-width: min(78vw, 320px);
-  --prep-safe-top: max(126px, calc(env(safe-area-inset-top) + 116px));
-  --prep-safe-bottom: max(88px, calc(env(safe-area-inset-bottom) + 72px));
+  --prep-safe-top: max(88px, calc(env(safe-area-inset-top) + 72px));
+  --prep-safe-bottom: max(126px, calc(env(safe-area-inset-bottom) + 116px));
   position: relative;
   width: min(100%, 440px);
   margin-inline: auto;
@@ -676,6 +676,209 @@ body[data-active-stage="#game-play"] .floating-tip-button {
   place-items: center;
 }
 
+.hero__taste-content,
+.hero__team-content {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  padding: max(82px, calc(env(safe-area-inset-top) + 72px)) 22px
+    max(112px, calc(env(safe-area-inset-bottom) + 100px));
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.hero__taste-content {
+  gap: clamp(12px, 2.2svh, 20px);
+}
+
+.hero__taste-title,
+.hero__team-title {
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: clamp(38px, 11vw, 50px);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.055em;
+}
+
+.hero__taste-subtitle {
+  margin: 0;
+  color: rgb(255 255 255 / 0.78);
+  font-size: clamp(16px, 4.5vw, 20px);
+  font-weight: 750;
+  line-height: 1.35;
+  letter-spacing: -0.035em;
+  word-break: keep-all;
+}
+
+.hero__taste-board {
+  position: relative;
+  width: clamp(222px, 61vw, 270px);
+  aspect-ratio: 1;
+  margin-block: clamp(2px, 0.7svh, 7px);
+  overflow: hidden;
+  border-radius: 30px;
+  background: #2d292a;
+  box-shadow: 0 18px 38px rgb(0 0 0 / 0.24);
+  isolation: isolate;
+}
+
+.hero__taste-pair {
+  --taste-final-x: 0px;
+  --taste-final-y: 0px;
+  --taste-final-rotation: 0deg;
+  position: absolute;
+  z-index: var(--taste-layer, 1);
+  top: 50%;
+  left: 50%;
+  display: flex;
+  gap: 7px;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  will-change: transform, opacity;
+  animation: taste-card-cover 5.4s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+
+.hero__taste-pair[data-cover-value="3"] {
+  --taste-layer: 1;
+  --taste-entry-x: 0px;
+  --taste-entry-y: 142px;
+  --taste-final-x: -6px;
+  --taste-final-y: 6px;
+  --taste-final-rotation: -2deg;
+  animation-delay: 0s;
+}
+
+.hero__taste-pair[data-cover-value="6"] {
+  --taste-layer: 2;
+  --taste-entry-x: 142px;
+  --taste-entry-y: 0px;
+  --taste-final-x: 6px;
+  --taste-final-y: 3px;
+  --taste-final-rotation: 1.5deg;
+  animation-delay: 1.15s;
+}
+
+.hero__taste-pair[data-cover-value="9"] {
+  --taste-layer: 3;
+  --taste-entry-x: 0px;
+  --taste-entry-y: -142px;
+  --taste-final-x: -5px;
+  --taste-final-y: -3px;
+  --taste-final-rotation: -1deg;
+  animation-delay: 2.3s;
+}
+
+.hero__taste-pair[data-cover-value="K"] {
+  --taste-layer: 4;
+  --taste-entry-x: -142px;
+  --taste-entry-y: 0px;
+  --taste-final-x: 5px;
+  --taste-final-y: -6px;
+  --taste-final-rotation: 2deg;
+  animation-delay: 3.45s;
+}
+
+.hero__taste-pair img {
+  width: clamp(49px, 14.2vw, 62px);
+  height: auto;
+  border-radius: 5px;
+  box-shadow: 0 8px 16px rgb(0 0 0 / 0.28);
+}
+
+@keyframes taste-card-cover {
+  0% {
+    opacity: 0;
+    transform: translate(
+      calc(-50% + var(--taste-entry-x)),
+      calc(-50% + var(--taste-entry-y))
+    ) rotate(var(--taste-final-rotation)) scale(0.94);
+  }
+  8%,
+  76% {
+    opacity: 1;
+    transform: translate(
+      calc(-50% + var(--taste-final-x)),
+      calc(-50% + var(--taste-final-y))
+    ) rotate(var(--taste-final-rotation)) scale(1);
+  }
+  92%,
+  100% {
+    opacity: 0;
+    transform: translate(
+      calc(-50% + var(--taste-final-x)),
+      calc(-50% + var(--taste-final-y))
+    ) rotate(var(--taste-final-rotation)) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__taste-pair {
+    opacity: 1;
+    animation: none;
+    transform: translate(
+      calc(-50% + var(--taste-final-x)),
+      calc(-50% + var(--taste-final-y))
+    ) rotate(var(--taste-final-rotation));
+  }
+}
+
+.hero__taste-next {
+  min-height: 50px;
+  padding: 0 23px;
+  border: 1px solid rgb(255 255 255 / 0.52);
+  border-radius: 999px;
+  background: #fff;
+  color: #292526;
+  box-shadow: 0 12px 24px rgb(0 0 0 / 0.18);
+  font: inherit;
+  font-size: clamp(15px, 4.2vw, 18px);
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.hero__taste-next span {
+  display: inline-block;
+  margin-left: 5px;
+}
+
+.hero__taste-next:focus-visible {
+  outline: 3px solid #ffcf43;
+  outline-offset: 4px;
+}
+
+.hero__team-content {
+  gap: clamp(15px, 2.3svh, 22px);
+}
+
+.hero__team-diagram {
+  flex: 0 0 auto;
+  transform: translateY(-5px) scale(0.72);
+  margin-block: clamp(-42px, -5svh, -28px);
+}
+
+.hero__team-description {
+  display: grid;
+  gap: 6px;
+  color: rgb(255 255 255 / 0.78);
+  font-size: clamp(15px, 4.2vw, 18px);
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.035em;
+}
+
+.hero__team-description p {
+  margin: 0;
+}
+
+.hero__team-description p:last-child {
+  color: #fff;
+  font-weight: 850;
+}
+
 .hero__team-diagram {
   position: relative;
   width: min(82vw, 360px);
@@ -713,8 +916,8 @@ body[data-active-stage="#game-play"] .floating-tip-button {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(24px, 5vh, 36px);
-  transform: translateY(-2svh) scale(0.85);
+  gap: 0;
+  transform: translateY(-1svh);
   transform-origin: center;
 }
 
@@ -726,9 +929,26 @@ body[data-active-stage="#game-play"] .floating-tip-button {
   line-height: 1.14;
   letter-spacing: -0.05em;
   text-align: center;
-  transform: translateY(-30%);
+  transform: none;
   word-break: keep-all;
   white-space: nowrap;
+}
+
+.hero__deck-labels {
+  display: grid;
+  width: min(100%, 246px);
+  margin-top: clamp(25px, 3.6svh, 34px);
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 9px;
+  color: rgb(255 255 255 / 0.68);
+  font-size: clamp(12px, 3.35vw, 14px);
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+
+.hero__deck-equals {
+  color: rgb(255 255 255 / 0.5);
 }
 
 .hero__deck-cards {
@@ -736,6 +956,7 @@ body[data-active-stage="#game-play"] .floating-tip-button {
   width: fit-content;
   max-width: 100%;
   padding: clamp(6px, 1.7vw, 8.5px);
+  margin-top: clamp(9px, 1.4svh, 13px);
   align-items: center;
   justify-content: center;
   gap: clamp(7px, 2.1vw, 10px);
@@ -743,6 +964,24 @@ body[data-active-stage="#game-play"] .floating-tip-button {
   border-radius: 13px;
   background: #050505;
   box-shadow: 0 12px 26px rgb(0 0 0 / 0.24);
+}
+
+.hero__deck-description {
+  display: grid;
+  max-width: 380px;
+  margin-top: clamp(24px, 3.4svh, 32px);
+  gap: clamp(15px, 2.2svh, 21px);
+  color: rgb(255 255 255 / 0.7);
+  font-size: clamp(13px, 3.65vw, 16px);
+  font-weight: 650;
+  line-height: 1.55;
+  letter-spacing: -0.035em;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.hero__deck-description p {
+  margin: 0;
 }
 
 .hero__deck-cards img {
@@ -2063,11 +2302,24 @@ body.modal-open .quick-reference-bar {
 .deal-status {
   position: absolute;
   z-index: 4;
-  top: calc(50% - 30px);
+  top: calc(50% - 20px);
   left: 50%;
-  width: min(78%, 260px);
+  display: inline-flex;
+  width: auto;
+  min-width: min(78%, 240px);
+  min-height: 50px;
   margin: 0;
-  color: #f5f5f7;
+  padding: 0 20px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid rgb(255 255 255 / 0.72);
+  border-radius: 999px;
+  background: #382c2d;
+  box-shadow: 0 10px 24px rgb(56 44 45 / 0.22);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
   font-size: clamp(17px, 4.8vw, 20px);
   font-weight: 790;
   line-height: 1.2;
@@ -2077,12 +2329,31 @@ body.modal-open .quick-reference-bar {
   opacity: 0;
   transform: translate3d(-50%, calc(-50% + 12px), 0);
   will-change: transform, opacity;
+  animation: deal-button-float 2s ease-in-out infinite;
+}
+
+.deal-status[hidden] {
+  display: none;
+}
+
+.deal-status__arrow {
+  font-size: 1.25em;
+  line-height: 1;
+}
+
+.deal-status:hover {
+  background: #4a383a;
+}
+
+.deal-status:focus-visible {
+  outline: 3px solid #a91462;
+  outline-offset: 4px;
 }
 
 .deal-replay {
   position: absolute;
   z-index: 5;
-  top: 50%;
+  top: calc(50% + 42px);
   left: 50%;
   display: grid;
   width: 34px;
@@ -2144,41 +2415,6 @@ body.modal-open .quick-reference-bar {
   50% {
     margin-top: -5px;
   }
-}
-
-.deal-next {
-  position: absolute;
-  z-index: 8;
-  bottom: max(78px, calc(env(safe-area-inset-bottom) + 72px));
-  left: 50%;
-  display: inline-grid;
-  width: 46px;
-  height: 46px;
-  margin: 0;
-  padding: 0 0 3px;
-  place-items: center;
-  border: 1px solid rgb(56 44 45 / 0.28);
-  border-radius: 50%;
-  background: rgb(255 255 255 / 0.74);
-  box-shadow: 0 7px 18px rgb(90 56 45 / 0.12);
-  color: #382c2d;
-  font: inherit;
-  font-size: 22px;
-  font-weight: 850;
-  line-height: 1;
-  cursor: pointer;
-  transform: translateX(-50%);
-  transition: transform 180ms ease, background-color 180ms ease;
-}
-
-.deal-next:hover {
-  background: #fff;
-  transform: translate(-50%, 2px);
-}
-
-.deal-next:focus-visible {
-  outline: 2px solid #382c2d;
-  outline-offset: 3px;
 }
 
 .deal-button:focus-visible {
@@ -3926,9 +4162,12 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   background-image: radial-gradient(circle at 50% 48%, rgb(255 197 161 / 0.22), transparent 48%);
 }
 
-.deal-section h2,
-.deal-status {
+.deal-section h2 {
   color: #28211e;
+}
+
+.deal-section .deal-status {
+  color: #fff;
 }
 
 .deal-table {
@@ -4222,10 +4461,6 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 }
 
 @media (max-height: 720px) {
-  .deal-next {
-    left: calc(50% + 132px);
-  }
-
   .large-tichu .large-tichu__stack-item {
     top: auto;
   }
@@ -6368,11 +6603,17 @@ body.modal-open {
     display: none;
   }
 
-  .deal-seat__fan,
-  .deal-status {
+  .deal-seat__fan {
     opacity: 1;
     transform: none;
     will-change: auto;
+  }
+
+  .deal-status {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+    will-change: auto;
+    animation: none;
   }
 
   .large-tichu__actions button,
@@ -6901,14 +7142,6 @@ body.gameplay-slides-active {
   transform: translateX(-50%);
 }
 
-.deal-section .deal-next {
-  /* 나 라벨 → 설명 → 다음 화살표 순서를 좌석 기준으로 고정한다. */
-  top: 126px;
-  bottom: auto;
-  left: 0;
-  transform: translateX(-50%);
-}
-
 @media (max-height: 720px) {
   .deal-section .deal-content {
     transform: translateY(-55px);
@@ -6922,9 +7155,6 @@ body.gameplay-slides-active {
     top: 72px;
   }
 
-  .deal-section .deal-next {
-    top: 116px;
-  }
 }
 
 /* Game play stays in one horizontal, viewport-sized slide deck. */
@@ -7237,5 +7467,707 @@ body.gameplay-slides-active {
   .gameplay-carousel .play-card-sequence__board-wrap,
   .gameplay-carousel .play-card-sequence__rules {
     transform: translateY(16px);
+  }
+}
+
+/* Text and page copy appear immediately. Explicit card play/replay motion stays. */
+.hero__intro-track,
+.gameplay-carousel__track {
+  transition: none;
+}
+
+.special-description,
+.large-tichu__feedback,
+.progress-gate__hint,
+.app-modal__backdrop,
+.app-modal__dialog {
+  transition: none;
+}
+
+.app-modal__dialog {
+  transform: none;
+}
+
+.trick-end.is-visible .trick-end__collection-copy {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+.round-finale__lead,
+.round-finale__cycle,
+.round-finale__repeat,
+.round-finale h2,
+.round-finale.is-visible .round-finale__lead,
+.round-finale.is-visible .round-finale__cycle,
+.round-finale.is-visible .round-finale__repeat,
+.round-finale.is-visible h2 {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+:where(h1, h2, h3, h4, p, li, dt, dd, figcaption, label) {
+  animation-delay: 0s !important;
+  animation-duration: 0s !important;
+  transition-delay: 0s !important;
+  transition-duration: 0s !important;
+}
+
+/* Page changes are button-driven. Only the score stage keeps document scrolling. */
+html:not(.score-scroll-active),
+html:not(.score-scroll-active) body {
+  overflow-y: hidden;
+  overscroll-behavior-y: none;
+}
+
+html.score-scroll-active,
+html.score-scroll-active body {
+  height: auto;
+  min-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+
+body.score-scroll-active .chapter-menu,
+body.score-scroll-active .is-stage-inactive {
+  display: none !important;
+}
+
+body.stage-isolated .chapter-menu {
+  display: none !important;
+}
+
+body:is([data-active-stage="#game-intro"], [data-active-stage="#card-guide"]) .hero {
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: min(100%, 440px);
+  height: 100svh;
+  overflow: hidden;
+  transform: translateX(-50%);
+}
+
+body:is([data-active-stage="#game-intro"], [data-active-stage="#card-guide"]) .hero > .pin-spacer {
+  width: 100% !important;
+  height: 100svh !important;
+  padding: 0 !important;
+}
+
+body:is([data-active-stage="#game-intro"], [data-active-stage="#card-guide"]) .hero__stage {
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100svh !important;
+  transform: none !important;
+}
+
+body:not(.score-scroll-active) {
+  touch-action: pan-x;
+}
+
+html.modal-open body,
+body.modal-open {
+  overflow: hidden;
+}
+
+/* Card guide: combined 56-card heading + four suits, then 2-to-A. */
+body[data-active-stage="#card-guide"] .cards {
+  position: fixed !important;
+  z-index: 20;
+  inset: 0 !important;
+  display: flex;
+  width: min(100%, 440px);
+  height: 100svh;
+  margin: auto;
+  padding: max(78px, calc(env(safe-area-inset-top) + 68px)) 22px
+    max(126px, calc(env(safe-area-inset-bottom) + 114px));
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(12px, 2dvh, 18px);
+  opacity: 1 !important;
+  pointer-events: auto;
+  transform: none !important;
+  visibility: visible !important;
+}
+
+body[data-active-stage="#card-guide"] .hero__copy {
+  display: none !important;
+}
+
+body[data-active-stage="#card-guide"] .quick-reference-bar {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+body.stage-tabs-visible .quick-reference-bar {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+body.stage-tabs-visible .stage-tab-bar {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translate(-50%, 0) scale(1) !important;
+  visibility: visible !important;
+}
+
+body.stage-tabs-visible[data-active-stage="#game-setup"] .prep-stepper {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translate(-50%, 0) !important;
+  visibility: visible !important;
+}
+
+body[data-active-stage="#game-setup"] :where(
+  .deal-section,
+  #prep-large-tichu,
+  .exchange-section,
+  #prep-small-tichu
+) {
+  display: none !important;
+}
+
+body[data-active-stage="#game-setup"][data-prep-page="0"] .deal-section,
+body[data-active-stage="#game-setup"][data-prep-page="1"] #prep-large-tichu,
+body[data-active-stage="#game-setup"][data-prep-page="2"] .exchange-section,
+body[data-active-stage="#game-setup"][data-prep-page="3"] .exchange-section,
+body[data-active-stage="#game-setup"][data-prep-page="4"] #prep-small-tichu,
+body[data-active-stage="#game-setup"] :is(.deal-section, .large-tichu, .exchange-section).is-prep-current {
+  position: fixed !important;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  display: block !important;
+  width: min(100%, 440px);
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  opacity: 1 !important;
+  transform: translateX(-50%);
+  visibility: visible !important;
+}
+
+body[data-active-stage="#game-setup"]:not([data-prep-page]) .deal-section {
+  position: fixed !important;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  display: block !important;
+  width: min(100%, 440px);
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  opacity: 1 !important;
+  transform: translateX(-50%);
+  visibility: visible !important;
+}
+
+body[data-active-stage="#game-setup"][data-prep-page="2"] #prep-exchange,
+body[data-active-stage="#game-setup"][data-prep-page="3"] #prep-receive-six {
+  display: none !important;
+}
+
+body[data-active-stage="#game-setup"] .exchange-section__inner {
+  height: 100%;
+}
+
+body[data-active-stage="#game-setup"] .deal-content {
+  transform: none;
+}
+
+body[data-active-stage="#card-guide"] .cards__count {
+  position: relative;
+  z-index: 4;
+  flex: 0 0 auto;
+  min-height: 48px;
+  color: #fff;
+  font-size: clamp(22px, 6vw, 28px);
+  line-height: 1.08;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+body[data-active-stage="#card-guide"] .cards__count strong {
+  color: #fff;
+  font-size: 1.35em;
+}
+
+body[data-active-stage="#card-guide"] .playing-card {
+  flex: 0 0 auto;
+  width: min(68vw, 286px);
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+body[data-active-stage="#card-guide"] .suit-intro {
+  transform: none !important;
+}
+
+body[data-active-stage="#card-guide"] .cards__suit-box,
+body[data-active-stage="#card-guide"] .suit-intro__label {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.cards.is-rank-page .suit-intro-anchor {
+  display: none;
+}
+
+body[data-active-stage="#card-guide"] .cards.is-rank-page .cards__count {
+  opacity: 0 !important;
+  visibility: hidden;
+}
+
+.cards.is-rank-page .rank-face {
+  top: 0;
+  justify-content: center;
+  padding: 28px 18px;
+  border-radius: inherit;
+  transform: none !important;
+}
+
+.cards.is-rank-page .rank-face::before {
+  display: none;
+}
+
+.cards.is-rank-page .rank-item {
+  visibility: visible !important;
+  transform: none !important;
+}
+
+.cards.is-rank-page .rank-face__label,
+.cards.is-rank-page .rank-rule,
+.cards.is-rank-page .rank-reference-label {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.cards__page-nav {
+  position: absolute;
+  z-index: 8;
+  right: 0;
+  bottom: max(68px, calc(env(safe-area-inset-bottom) + 58px));
+  left: 0;
+  display: grid;
+  grid-template-columns: 48px auto 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.cards__page-button {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 0.5);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.12);
+  color: #fff;
+  cursor: pointer;
+}
+
+.cards__page-button span {
+  display: block;
+  width: 13px;
+  height: 13px;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+}
+
+.cards__page-button--previous span {
+  margin-left: 5px;
+  transform: rotate(-135deg);
+}
+
+.cards__page-button--next span {
+  margin-right: 5px;
+  transform: rotate(45deg);
+}
+
+.cards__page-button:disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+
+.cards__page-button:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+.cards__page-status {
+  min-width: 48px;
+  color: rgb(255 255 255 / 0.82);
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+}
+
+@media (max-height: 720px) {
+  body[data-active-stage="#card-guide"] .cards {
+    padding-top: 68px;
+    padding-bottom: 108px;
+    gap: 8px;
+  }
+
+  body[data-active-stage="#card-guide"] .playing-card {
+    width: min(60vw, 238px);
+  }
+
+  body[data-active-stage="#card-guide"] .cards__count {
+    min-height: 38px;
+    font-size: 20px;
+  }
+}
+
+/* Swap the persistent navigation bars: card references on top, stages below. */
+.quick-reference-bar {
+  top: max(10px, calc(env(safe-area-inset-top) + 6px));
+  bottom: auto;
+}
+
+.stage-tab-bar {
+  top: auto;
+  bottom: max(10px, calc(env(safe-area-inset-bottom) + 8px));
+  transform: translate(-50%, 12px) scale(0.98);
+}
+
+.stage-tab-bar.is-visible {
+  transform: translate(-50%, 0) scale(1);
+}
+
+html.menu-view-open .stage-tab-bar,
+body.menu-view-open .stage-tab-bar,
+body.chapter-menu-visible .stage-tab-bar,
+body:not(.stage-isolated) .stage-tab-bar {
+  transform: translate(-50%, 12px) scale(0.98) !important;
+}
+
+.prep-stepper {
+  top: auto;
+  bottom: max(58px, calc(env(safe-area-inset-bottom) + 54px));
+  transform: translate(-50%, 8px);
+}
+
+/* Intro polish: keep its dedicated CTA clear, and give the team diagram room to breathe. */
+.hero__team-layout:not(.is-showing-deck) .hero__scene-nav--next {
+  display: none;
+}
+
+.hero__team-slide .hero__team-content {
+  padding: max(70px, calc(env(safe-area-inset-top) + 60px)) 22px
+    max(90px, calc(env(safe-area-inset-bottom) + 78px));
+  gap: clamp(18px, 3.2svh, 30px);
+}
+
+.hero__team-slide .hero__team-title {
+  font-size: clamp(38px, 10vw, 48px);
+}
+
+.hero__team-slide .hero__team-diagram {
+  width: clamp(220px, 34svh, 290px);
+  height: clamp(220px, 34svh, 290px);
+  margin: 0;
+  transform: none;
+}
+
+.hero__team-slide .hero__team-description {
+  gap: clamp(5px, 0.8svh, 8px);
+}
+
+.hero__deck-emphasis {
+  color: #fff;
+  font-weight: 780;
+}
+
+.hero__swipe-cue {
+  width: min(calc(100% - 96px), 340px);
+  justify-content: center;
+  gap: 0;
+  line-height: 1.35;
+  text-align: center;
+  white-space: normal;
+}
+
+/* Card references become available from the card stage onward. */
+.quick-reference-bar {
+  transition:
+    opacity 220ms ease,
+    transform 260ms ease,
+    visibility 0s linear 260ms;
+}
+
+body:not(.quick-reference-visible) .quick-reference-bar {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateX(50%) translateY(-8px) !important;
+  visibility: hidden !important;
+}
+
+body.quick-reference-visible .quick-reference-bar {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translateX(50%) translateY(0) !important;
+  visibility: visible !important;
+  transition-delay: 0s;
+}
+
+body.stage-tabs-visible[data-active-stage="#game-setup"] .prep-stepper {
+  transform: translate(-50%, 0);
+}
+
+html.menu-view-open .prep-stepper,
+body.menu-view-open .prep-stepper,
+body.chapter-menu-visible .prep-stepper,
+body:not(.stage-tabs-visible) .prep-stepper {
+  transform: translate(-50%, 8px) !important;
+}
+
+html.modal-open .app-modal__close,
+body.modal-open .app-modal__close {
+  top: max(76px, calc(env(safe-area-inset-top) + 66px));
+}
+
+html.modal-open .bomb-modal__content,
+body.modal-open .bomb-modal__content,
+html.modal-open .combo-dictionary,
+body.modal-open .combo-dictionary,
+html.modal-open .special-cards__stage,
+body.modal-open .special-cards__stage,
+html.modal-open .score-sheet,
+body.modal-open .score-sheet,
+html.modal-open .tichu-tip,
+body.modal-open .tichu-tip {
+  padding-top: max(88px, calc(env(safe-area-inset-top) + 78px));
+}
+
+/* Unified Large/Small Tichu decision screen. */
+.large-tichu .large-tichu__stage {
+  padding: var(--prep-safe-top) 22px var(--prep-safe-bottom);
+  background-color: #fff3f3;
+  background-image: none;
+}
+
+.tichu-choice-panel {
+  display: flex;
+  width: min(100%, 360px);
+  min-height: clamp(500px, 58svh, 540px);
+  padding: clamp(28px, 4.5dvh, 36px) 22px 24px;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  border: 3px solid #a91462;
+  border-radius: clamp(38px, 10vw, 52px);
+  background: #373132;
+  box-shadow: 0 20px 46px rgb(73 34 50 / 0.16);
+  color: #fff;
+  text-align: center;
+}
+
+.tichu-choice-panel__intro {
+  display: flex;
+  margin: 0;
+  flex-direction: column;
+  color: #fff;
+  font-size: clamp(22px, 6.2vw, 27px);
+  font-weight: 880;
+  line-height: 1.12;
+  letter-spacing: -0.055em;
+  text-wrap: balance;
+}
+
+.tichu-choice-panel__statement {
+  display: flex;
+  margin: clamp(42px, 5.5dvh, 52px) 0 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+}
+
+.tichu-choice-panel__term-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  font-size: clamp(32px, 9vw, 40px);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.tichu-choice-panel__term {
+  display: inline-flex;
+  min-height: 62px;
+  padding: 7px 16px 9px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1.5px solid rgb(255 255 255 / 0.88);
+  border-radius: 16px;
+  background: #706667;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(28px, 8vw, 36px);
+  font-weight: 920;
+  line-height: 1;
+  letter-spacing: -0.055em;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.tichu-choice-panel__term:hover {
+  background: #817576;
+  transform: translateY(-2px);
+}
+
+.tichu-choice-panel__term:focus-visible {
+  outline: 3px solid #ffca61;
+  outline-offset: 4px;
+}
+
+.tichu-choice-panel__term > span:last-child {
+  font-size: 1.12em;
+  font-weight: 600;
+}
+
+.tichu-choice-panel__statement > strong {
+  font-size: clamp(34px, 9.8vw, 43px);
+  font-weight: 920;
+  line-height: 1.06;
+  letter-spacing: -0.065em;
+  white-space: nowrap;
+}
+
+.tichu-choice-panel__score {
+  display: flex;
+  margin: clamp(40px, 5dvh, 48px) 0 16px;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  font-size: clamp(18px, 5.2vw, 23px);
+  font-weight: 850;
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+.tichu-choice-panel__score-success {
+  color: #ffd000;
+}
+
+.tichu-choice-panel__score-fail {
+  color: #c8c3c5;
+}
+
+.tichu-choice-panel__actions {
+  display: grid;
+  gap: 12px;
+}
+
+.tichu-choice-panel__action {
+  width: 100%;
+  min-height: 58px;
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 18px;
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(23px, 6.6vw, 29px);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.045em;
+  transition: filter 160ms ease, transform 160ms ease;
+}
+
+.tichu-choice-panel__action:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.tichu-choice-panel__action:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+.tichu-choice-panel__action--declare,
+.tichu-choice-panel__action--declare[aria-pressed="true"] {
+  background: #ffca61;
+  color: #0e0c0c;
+  box-shadow: none;
+}
+
+.tichu-choice-panel__action--pass,
+.tichu-choice-panel__action--pass[aria-pressed="true"] {
+  background: #716b6c;
+  color: #fff;
+  box-shadow: none;
+}
+
+.tichu-choice-panel__action[aria-pressed="true"] {
+  outline: 3px solid #fff;
+  outline-offset: -5px;
+}
+
+.small-tichu .tichu-choice-panel__action--declare:disabled {
+  background: #575153;
+  color: rgb(255 255 255 / 0.42);
+  box-shadow: none;
+  cursor: not-allowed;
+  filter: none;
+  opacity: 1;
+  transform: none;
+}
+
+@media (max-height: 720px) {
+  .tichu-choice-panel {
+    min-height: 420px;
+    padding: 22px 20px 20px;
+    border-radius: 36px;
+  }
+
+  .tichu-choice-panel__statement {
+    margin-top: 28px;
+  }
+
+  .tichu-choice-panel__score {
+    margin-top: 28px;
+    margin-bottom: 10px;
+  }
+
+  .tichu-choice-panel__term {
+    min-height: 54px;
+  }
+
+  .tichu-choice-panel__action {
+    min-height: 48px;
+  }
+
+  .tichu-choice-panel__actions {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .tichu-choice-panel {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .tichu-choice-panel__term-line {
+    gap: 9px;
+  }
+
+  .tichu-choice-panel__score {
+    gap: 10px;
   }
 }
