@@ -2530,9 +2530,9 @@ const legacyPrepFlow = () => {
   };
 
   const receivedPositions = {
-    left: { top: "80%", left: "46%", rotation: -7 },
-    top: { top: "79%", left: "50%", rotation: 0 },
-    right: { top: "80%", left: "54%", rotation: 7 }
+    left: { top: "87%", left: "46%", rotation: -7 },
+    top: { top: "86%", left: "50%", rotation: 0 },
+    right: { top: "87%", left: "54%", rotation: 7 }
   };
 
   incomingCards.forEach((card) => {
