@@ -9656,8 +9656,9 @@ body[data-active-stage="#card-guide"] .card-deck-guide {
 }
 
 /* Match the first deal composition to the vertically centered exchange screen. */
+/* Slightly raised so the bottom privacy note isn't cramped against the timeline. */
 body[data-active-stage="#game-setup"] .deal-section .deal-content {
-  transform: translateY(62px);
+  transform: translateY(48px);
 }
 
 .tichu-choice-panel__help-icon {
