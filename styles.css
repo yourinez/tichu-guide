@@ -8614,3 +8614,124 @@ body.modal-open .tichu-tip {
     letter-spacing: -0.075em;
   }
 }
+
+/* Compact reference-window headings and lift their content toward the top. */
+:is(
+    .hierarchy-modal__content h2,
+    #combo-modal .combo-dictionary__title,
+    #bomb-modal .bomb-modal__content h2,
+    #special-modal .special-cards__title
+  ) {
+  margin: 0 48px 12px;
+  font-size: clamp(21px, 5.8vw, 26px);
+  line-height: 1.05;
+}
+
+.hierarchy-modal__content {
+  padding: 16px 14px 18px;
+}
+
+#combo-modal .combo-dictionary {
+  min-height: 0;
+  padding: 16px 12px 24px;
+}
+
+#bomb-modal .bomb-modal__content {
+  padding-top: 16px;
+  padding-bottom: 20px;
+}
+
+#special-modal .special-cards__stage {
+  padding-top: 16px;
+  padding-bottom: 14px;
+}
+
+#special-modal .special-cards__current-name {
+  margin-bottom: 6px;
+}
+
+#bomb-modal .bomb-modal__lead {
+  margin-top: 0;
+}
+
+#bomb-modal .bomb-modal__rules {
+  margin-top: 18px;
+}
+
+/* Keep the full combination guide reachable while its compact title remains visible. */
+#combo-modal .app-modal__dialog {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-padding-top: 54px;
+}
+
+#combo-modal .combo-dictionary__title {
+  position: sticky;
+  z-index: 5;
+  top: -16px;
+  margin-right: 38px;
+  margin-left: 38px;
+  padding: 6px 10px 10px;
+  background: linear-gradient(#fff 82%, rgb(255 255 255 / 0));
+}
+
+#combo-modal .combo-dictionary__row {
+  min-height: 72px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+#combo-modal .combo-dictionary__cards,
+#combo-modal .combo-dictionary__cards[data-card-count="4"],
+#combo-modal .combo-dictionary__cards[data-card-count="5"] {
+  --combo-card-width: clamp(25px, 7.2vw, 30px);
+}
+
+#combo-modal .combo-dictionary__tip {
+  margin-top: 12px;
+  margin-bottom: 2px;
+}
+
+/* Give the hierarchy row breathing room while preserving group-only overlap. */
+.hierarchy-modal__visual {
+  width: calc(100% - 12px);
+  margin: 12px auto 0;
+}
+
+.hierarchy-card-group img,
+.hierarchy-card-group--single img,
+.hierarchy-modal__bomb-badge {
+  height: clamp(46px, 12vw, 52px);
+}
+
+.hierarchy-modal__bomb-badge {
+  width: clamp(32px, 8.8vw, 37px);
+  font-size: clamp(9px, 2.65vw, 12px);
+}
+
+.hierarchy-modal__summary {
+  margin-top: 24px;
+  font-size: clamp(12px, 3.4vw, 14px);
+  letter-spacing: -0.07em;
+}
+
+@media (max-width: 370px) {
+  .hierarchy-modal__visual {
+    width: calc(100% - 8px);
+  }
+
+  .hierarchy-card-group img,
+  .hierarchy-card-group--single img,
+  .hierarchy-modal__bomb-badge {
+    height: 45px;
+  }
+
+  .hierarchy-modal__bomb-badge {
+    width: 31px;
+  }
+
+  .hierarchy-modal__summary {
+    font-size: 12px;
+    letter-spacing: -0.085em;
+  }
+}
