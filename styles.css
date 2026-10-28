@@ -3755,7 +3755,12 @@ body.modal-open .quick-reference-bar {
   align-items: center;
   justify-content: center;
   gap: 0.14em;
+  margin-bottom: 0.18em;
   font-size: 0.84em;
+}
+
+.game-start__launch {
+  display: block;
 }
 
 .game-start__help {
@@ -3770,11 +3775,10 @@ body.modal-open .quick-reference-bar {
   border: 0.08em solid currentColor;
   border-radius: 999px;
   background: transparent;
-  color: #b6005b;
+  color: inherit;
   font-size: inherit;
   line-height: 1;
   cursor: pointer;
-  transform: translateY(-0.02em);
 }
 
 .game-start__help span {
@@ -3784,7 +3788,7 @@ body.modal-open .quick-reference-bar {
 }
 
 .game-start__help:hover {
-  background: rgb(182 0 91 / 0.1);
+  background: rgb(39 26 28 / 0.08);
 }
 
 .game-start__help:focus-visible {
@@ -3794,8 +3798,8 @@ body.modal-open .quick-reference-bar {
 
 .game-start__play {
   display: flex;
-  width: clamp(84px, 24vw, 94px);
-  height: clamp(84px, 24vw, 94px);
+  width: clamp(64px, 18vw, 72px);
+  height: clamp(64px, 18vw, 72px);
   margin: clamp(17px, 2.7dvh, 24px) 0 0;
   padding: 0;
   flex: 0 0 auto;
@@ -3815,10 +3819,10 @@ body.modal-open .quick-reference-bar {
   display: block;
   width: 0;
   height: 0;
-  margin-left: 7px;
-  border-top: 18px solid transparent;
-  border-bottom: 18px solid transparent;
-  border-left: 29px solid #fff;
+  margin-left: 6px;
+  border-top: 14px solid transparent;
+  border-bottom: 14px solid transparent;
+  border-left: 22px solid #fff;
   font-size: 0;
   line-height: 0;
 }
