@@ -21,7 +21,7 @@
       crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
     />
-    <link rel="stylesheet" href="styles.css?v=20261030-deal-raise-1" />
+    <link rel="stylesheet" href="styles.css?v=20261030-sparrow-info-1" />
   </head>
   <body>
     <div class="splash-screen">
@@ -563,7 +563,20 @@
               <div class="game-start__content">
                 <img class="game-start__bird" src="참새.png" alt="참새 카드" />
                 <h2 id="game-start-title">
-                  <span class="game-start__holder">참새 보유자</span>
+                  <span class="game-start__holder">
+                    참새 보유자
+                    <button
+                      class="game-start__help"
+                      type="button"
+                      data-open="sparrow-info"
+                      aria-haspopup="dialog"
+                      aria-controls="sparrow-info-modal"
+                      aria-expanded="false"
+                      aria-label="참새 보유자 자세히 보기"
+                    >
+                      <span aria-hidden="true">?</span>
+                    </button>
+                  </span>
                   <strong class="game-start__launch">게임 시작!</strong>
                 </h2>
                 <button class="game-start__play" type="button" aria-label="다음 게임 진행 화면으로 이동">
@@ -1595,6 +1608,43 @@
           </div>
 
           <p class="tichu-tip__beginner"><strong>처음이라면?</strong> 스몰 티츄부터 가볍게 도전해 보세요!</p>
+        </section>
+      </div>
+    </div>
+
+    <div class="app-modal" id="sparrow-info-modal" data-modal="sparrow-info" hidden>
+      <div class="app-modal__backdrop" data-close-modal aria-hidden="true"></div>
+      <div
+        class="app-modal__dialog tichu-tip-modal__dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="sparrow-info-title"
+        tabindex="-1"
+      >
+        <button class="app-modal__close" type="button" data-close-modal aria-label="참새 보유자 설명 닫기">×</button>
+        <section class="tichu-tip" aria-labelledby="sparrow-info-title">
+          <h2 id="sparrow-info-title">참새 보유자가 누구예요?</h2>
+
+          <p class="tichu-tip__lead">
+            <strong>참새 카드</strong>를 가진 사람이에요.<br />참새는 <strong>가장 낮은 카드(숫자 1)</strong>랍니다.
+          </p>
+
+          <dl class="tichu-tip__facts">
+            <div>
+              <dt>역할</dt>
+              <dd>그 라운드의 <strong>첫 트릭을 시작</strong>해요<br /><small>아무 카드(조합)나 먼저 낼 수 있어요</small></dd>
+            </div>
+            <div>
+              <dt>참새콜</dt>
+              <dd>참새를 내면서 <strong>특정 숫자를 요구</strong>할 수 있어요<br /><small>예: “8!” → 그 값을 낼 수 있는 사람은 반드시 내야 해요</small></dd>
+            </div>
+            <div>
+              <dt>언제까지?</dt>
+              <dd>요구한 숫자를 <strong>누군가 낼 때까지</strong> 계속 유효해요</dd>
+            </div>
+          </dl>
+
+          <p class="tichu-tip__beginner"><strong>한마디로?</strong> 참새를 쥔 사람이 그 판의 <strong>시작 신호</strong>를 쏘는 거예요!</p>
         </section>
       </div>
     </div>
