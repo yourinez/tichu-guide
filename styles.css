@@ -173,27 +173,11 @@ img {
   isolation: isolate;
 }
 
-.splash-screen__dragon {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  background-image:
-    linear-gradient(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.08)),
-    url("d.bg.png");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-.splash-screen__logo {
-  position: absolute;
-  z-index: 1;
-  top: 50%;
-  left: 50%;
-  width: clamp(190px, 58vw, 250px);
-  height: auto;
-  filter: drop-shadow(0 8px 24px rgb(255 255 255 / 0.08));
-  transform: translate(-50%, -50%);
+.splash-screen__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .splash-screen.is-leaving {
@@ -2754,6 +2738,231 @@ body.modal-open .quick-reference-bar {
 
   .large-tichu__score-values {
     gap: 3px;
+  }
+}
+
+/* Floating card-reference windows */
+.quick-reference-bar {
+  z-index: 6000;
+}
+
+.quick-reference-bar__inner {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 2px;
+}
+
+.quick-reference-bar__button {
+  min-height: 44px;
+  padding-inline: 3px;
+  font-size: clamp(11px, 3.25vw, 14px);
+  letter-spacing: -0.045em;
+  white-space: nowrap;
+}
+
+.app-modal.reference-window {
+  display: block;
+  padding: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+.app-modal.reference-window[hidden] {
+  display: none;
+}
+
+.reference-window .app-modal__backdrop {
+  display: none;
+}
+
+:is(#hierarchy-modal, #combo-modal, #bomb-modal, #special-modal) .app-modal__dialog {
+  position: absolute;
+  top: calc(max(76px, calc(env(safe-area-inset-top) + 68px)) + var(--reference-offset, 0px));
+  left: 50%;
+  width: min(calc(100% - 20px), 420px);
+  max-height: calc(100svh - 154px - var(--reference-offset, 0px));
+  border: 1px solid rgb(64 48 49 / 0.12);
+  border-radius: clamp(28px, 8vw, 38px);
+  background: #fff;
+  box-shadow: 0 24px 64px rgb(15 8 10 / 0.34);
+  color: #161313;
+  opacity: 0;
+  pointer-events: auto;
+  transform: translate(-50%, 12px) scale(0.98);
+}
+
+:is(#hierarchy-modal, #combo-modal, #bomb-modal, #special-modal).is-open .app-modal__dialog {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+:is(#hierarchy-modal, #combo-modal, #bomb-modal, #special-modal).is-front .app-modal__dialog {
+  box-shadow: 0 30px 78px rgb(15 8 10 / 0.44);
+}
+
+:is(#hierarchy-modal, #combo-modal, #bomb-modal, #special-modal) .app-modal__close {
+  top: 14px;
+  right: 14px;
+  width: 38px;
+  height: 38px;
+  padding: 0 0 2px;
+  border: 0;
+  background: #971f27;
+  color: #fff;
+  box-shadow: 0 5px 14px rgb(116 16 25 / 0.24);
+  font-size: 28px;
+  font-weight: 300;
+}
+
+:is(#hierarchy-modal, #combo-modal, #bomb-modal, #special-modal) .app-modal__close:hover {
+  background: #7f1720;
+}
+
+.hierarchy-modal__content {
+  min-height: 350px;
+  padding: 28px 16px 32px;
+  background: #fff;
+  color: #171313;
+  text-align: center;
+}
+
+.hierarchy-modal__content h2,
+#combo-modal .combo-dictionary__title,
+#bomb-modal .bomb-modal__content h2,
+#special-modal .special-cards__title {
+  margin: 0 48px 26px;
+  color: #151112;
+  font-family: var(--font-display);
+  font-size: clamp(29px, 8vw, 38px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.055em;
+  text-align: center;
+  text-shadow: none;
+}
+
+.hierarchy-modal__visual {
+  display: grid;
+  grid-template-columns: auto 10px auto 10px auto 10px auto 10px auto;
+  width: 100%;
+  margin-top: 35px;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2px, 1vw, 5px);
+}
+
+.hierarchy-card-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.hierarchy-card-group img {
+  width: clamp(21px, 6.5vw, 29px);
+  height: auto;
+  border-radius: 2px;
+  box-shadow: 0 4px 10px rgb(29 19 20 / 0.12);
+}
+
+.hierarchy-card-group--single img {
+  width: clamp(27px, 8vw, 37px);
+}
+
+.hierarchy-modal__less {
+  font-size: clamp(17px, 5vw, 22px);
+  font-weight: 900;
+}
+
+.hierarchy-modal__bomb-badge {
+  display: grid;
+  min-width: clamp(40px, 11vw, 52px);
+  min-height: clamp(54px, 15vw, 70px);
+  padding: 5px;
+  place-items: center;
+  border-radius: 10px;
+  background: #971f27;
+  color: #fff;
+  font-size: clamp(12px, 3.5vw, 15px);
+  font-weight: 900;
+}
+
+.hierarchy-modal__summary {
+  margin: 48px auto 0;
+  color: #171313;
+  font-size: clamp(13px, 3.65vw, 16px);
+  font-weight: 800;
+  line-height: 1.65;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.hierarchy-modal__summary strong {
+  color: #971f27;
+  font-weight: 900;
+}
+
+#combo-modal .combo-dictionary,
+#special-modal .special-cards__stage,
+#bomb-modal .bomb-modal__content {
+  min-height: 0;
+  padding-top: 28px;
+  padding-bottom: 28px;
+  background: #fff;
+  color: #171313;
+}
+
+#combo-modal .combo-dictionary__title,
+#special-modal .special-cards__title {
+  margin-bottom: 24px;
+}
+
+#bomb-modal .bomb-modal__lead {
+  margin-top: -14px;
+  color: #971f27;
+  font-weight: 800;
+}
+
+#bomb-modal .bomb-modal__rules {
+  margin-top: 28px;
+}
+
+#special-modal .special-cards__current-name,
+#special-modal .special-description h3 {
+  color: #171313;
+}
+
+#special-modal .special-description__lead {
+  color: #971f27;
+}
+
+#special-modal .special-description ul {
+  color: #555052;
+}
+
+#special-modal .special-dot {
+  background: rgb(45 36 38 / 0.24);
+}
+
+#special-modal .special-dot.is-active {
+  background: #971f27;
+}
+
+@media (max-height: 650px) {
+  :is(#hierarchy-modal, #combo-modal, #bomb-modal, #special-modal) .app-modal__dialog {
+    top: calc(max(70px, calc(env(safe-area-inset-top) + 62px)) + var(--reference-offset, 0px));
+    max-height: calc(100svh - 136px - var(--reference-offset, 0px));
+  }
+
+  .hierarchy-modal__content {
+    min-height: 300px;
+  }
+
+  .hierarchy-modal__visual {
+    margin-top: 20px;
+  }
+
+  .hierarchy-modal__summary {
+    margin-top: 28px;
   }
 }
 
@@ -7864,20 +8073,22 @@ body:not(.stage-isolated) .stage-tab-bar {
 }
 
 .hero__team-slide .hero__team-content {
-  padding: max(70px, calc(env(safe-area-inset-top) + 60px)) 22px
-    max(90px, calc(env(safe-area-inset-bottom) + 78px));
-  gap: clamp(18px, 3.2svh, 30px);
+  padding: max(64px, calc(env(safe-area-inset-top) + 54px)) 22px
+    max(76px, calc(env(safe-area-inset-bottom) + 64px));
+  gap: clamp(12px, 1.8svh, 16px);
 }
 
 .hero__team-slide .hero__team-title {
-  font-size: clamp(38px, 10vw, 48px);
+  font-size: clamp(36px, 9.5vw, 44px);
+  transform: translateY(-8px);
 }
 
 .hero__team-slide .hero__team-diagram {
-  width: clamp(220px, 34svh, 290px);
-  height: clamp(220px, 34svh, 290px);
-  margin: 0;
-  transform: none;
+  width: min(82vw, 360px);
+  height: min(82vw, 360px);
+  margin-block: clamp(-40px, -5svh, -28px);
+  transform: scale(0.72);
+  transform-origin: center;
 }
 
 .hero__team-slide .hero__team-description {
@@ -8169,5 +8380,237 @@ body.modal-open .tichu-tip {
 
   .tichu-choice-panel__score {
     gap: 10px;
+  }
+}
+
+/* Keep the floating reference-window close control consistent after legacy modal themes. */
+:is(#hierarchy-modal, #combo-modal, #bomb-modal, #special-modal) .app-modal__close {
+  top: 14px !important;
+  right: 14px !important;
+  display: grid !important;
+  width: 38px !important;
+  height: 38px !important;
+  padding: 0 0 2px !important;
+  place-items: center !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: #971f27 !important;
+  color: #fff !important;
+  box-shadow: 0 5px 14px rgb(116 16 25 / 0.24) !important;
+  font-size: 28px !important;
+  font-weight: 300 !important;
+  line-height: 1 !important;
+}
+
+/* Compact card-hierarchy composition, matching the physical card proportions. */
+.hierarchy-modal__content {
+  min-height: 0;
+  padding: 22px 10px 22px;
+}
+
+.hierarchy-modal__content h2 {
+  margin-bottom: 18px;
+}
+
+.hierarchy-modal__visual {
+  display: flex;
+  gap: clamp(2px, 0.65vw, 3px);
+  margin-top: 18px;
+  align-items: center;
+  justify-content: center;
+}
+
+.hierarchy-card-group {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 1px;
+  align-items: center;
+  isolation: isolate;
+}
+
+.hierarchy-card-group img,
+.hierarchy-card-group--single img {
+  display: block;
+  flex: 0 0 auto;
+  width: auto;
+  height: clamp(49px, 13vw, 56px);
+  border-radius: 3px;
+}
+
+.hierarchy-card-group--overlap {
+  gap: 0;
+}
+
+.hierarchy-card-group--overlap img + img {
+  z-index: 1;
+  margin-left: clamp(-8px, -1.8vw, -6px);
+}
+
+.hierarchy-card-group--high {
+  gap: 0;
+}
+
+.hierarchy-card-group--high img + img {
+  z-index: 1;
+  margin-left: clamp(-10px, -2.4vw, -8px);
+}
+
+.hierarchy-modal__less {
+  position: relative;
+  z-index: 3;
+  flex: 0 0 auto;
+  margin-inline: clamp(1px, 0.4vw, 2px);
+  color: #4f4748;
+  font-size: clamp(15px, 4vw, 18px);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.hierarchy-modal__bomb-badge {
+  flex: 0 0 auto;
+  width: clamp(34px, 9.5vw, 41px);
+  min-width: 0;
+  height: clamp(49px, 13vw, 56px);
+  min-height: 0;
+  padding: 2px;
+  border-radius: 7px;
+  font-size: clamp(10px, 2.9vw, 13px);
+  line-height: 1.05;
+}
+
+.hierarchy-modal__summary {
+  margin-top: 30px;
+  font-size: clamp(11px, 3vw, 13px);
+  line-height: 1.2;
+  letter-spacing: -0.065em;
+  text-wrap: nowrap;
+  white-space: nowrap;
+}
+
+/* Special cards: compact image + readable copy, with swipe and explicit controls. */
+#special-modal .special-cards__stage {
+  min-height: 0;
+  justify-content: flex-start;
+  padding: 22px 8px 18px;
+  overflow: hidden;
+}
+
+#special-modal .special-cards__title {
+  margin-bottom: 3px;
+}
+
+#special-modal .special-cards__current-name {
+  margin-bottom: 8px;
+  font-size: clamp(19px, 5.2vw, 23px);
+}
+
+#special-modal .special-carousel {
+  position: relative;
+  width: min(100%, 330px);
+  overflow: hidden;
+}
+
+#special-modal .special-carousel__track {
+  gap: 6%;
+  padding-inline: 22%;
+}
+
+#special-modal .special-slide__image {
+  width: clamp(96px, 27vw, 118px);
+  border-radius: 9px;
+  box-shadow: 0 12px 24px rgb(30 16 18 / 0.18);
+}
+
+.special-carousel__nav {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  padding: 0 0 3px;
+  place-items: center;
+  border: 1px solid rgb(151 31 39 / 0.18);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.94);
+  box-shadow: 0 5px 14px rgb(74 35 39 / 0.15);
+  color: #971f27;
+  font: inherit;
+  font-size: 27px;
+  line-height: 1;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.special-carousel__nav--previous {
+  left: 6px;
+}
+
+.special-carousel__nav--next {
+  right: 6px;
+}
+
+.special-carousel__nav:disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+
+.special-carousel__nav:focus-visible {
+  outline: 3px solid #971f27;
+  outline-offset: 2px;
+}
+
+#special-modal .special-descriptions {
+  width: min(94%, 390px);
+  min-height: 154px;
+  margin-top: 10px;
+}
+
+#special-modal .special-description h3 {
+  margin-top: 0;
+  font-size: clamp(16px, 4.4vw, 19px);
+  line-height: 1.16;
+}
+
+#special-modal .special-description__lead {
+  margin-top: 5px;
+  font-size: clamp(12px, 3.25vw, 14px);
+}
+
+#special-modal .special-description ul {
+  gap: 3px;
+  margin-top: 8px;
+  font-size: clamp(11px, 2.95vw, 13px);
+  line-height: 1.28;
+}
+
+#special-modal .special-dots {
+  margin-top: 8px;
+}
+
+@media (max-width: 370px) {
+  .hierarchy-modal__content {
+    padding-inline: 6px;
+  }
+
+  .hierarchy-modal__visual {
+    gap: 2px;
+  }
+
+  .hierarchy-card-group img,
+  .hierarchy-card-group--single img,
+  .hierarchy-modal__bomb-badge {
+    height: 49px;
+  }
+
+  .hierarchy-modal__bomb-badge {
+    width: 32px;
+    font-size: 9px;
+  }
+
+  .hierarchy-modal__summary {
+    font-size: 10.5px;
+    letter-spacing: -0.075em;
   }
 }

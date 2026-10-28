@@ -94,6 +94,8 @@
   if (reducedMotion) {
     splash.hidden = true;
     splash.setAttribute("aria-hidden", "true");
+    document.documentElement.classList.remove("menu-view-open");
+    document.body.classList.remove("menu-view-open", "splash-active");
     return;
   }
 
@@ -105,8 +107,15 @@
     window.setTimeout(() => {
       splash.hidden = true;
       splash.setAttribute("aria-hidden", "true");
-      document.body.classList.remove("splash-active");
+      document.documentElement.classList.remove("menu-view-open");
+      document.body.classList.remove("menu-view-open", "splash-active");
+      window.tichuMenuView?.unlock();
       window.ScrollTrigger?.refresh();
+      window.requestAnimationFrame(() => {
+        if (!window.location.hash || window.location.hash === "#game-intro") {
+          window.tichuStageNav?.goTo?.("#game-intro");
+        }
+      });
     }, 680);
   }, 1000);
 })();
@@ -1266,6 +1275,9 @@ const legacyPrepFlow = () => {
     introNextButton?.setAttribute(
       "aria-label",
       nextLabels[introSlideIndex]
+    );
+    document.querySelector(".hero__taste-slide")?.dispatchEvent(
+      new CustomEvent(introSlideIndex === 0 ? "intro-taste:enter" : "intro-taste:exit")
     );
   };
 
@@ -2644,6 +2656,8 @@ const legacyPrepFlow = () => {
   const slides = Array.from(section.querySelectorAll(".special-slide"));
   const descriptions = Array.from(section.querySelectorAll(".special-description"));
   const dots = Array.from(section.querySelectorAll(".special-dot"));
+  const previousButton = section.querySelector(".special-carousel__nav--previous");
+  const nextButton = section.querySelector(".special-carousel__nav--next");
   const currentName = section.querySelector(".special-cards__current-name");
   const lastIndex = slides.length - 1;
 
@@ -2692,6 +2706,16 @@ const legacyPrepFlow = () => {
         dot.removeAttribute("aria-current");
       }
     });
+
+    if (previousButton) {
+      previousButton.disabled = currentIndex === 0;
+      previousButton.setAttribute("aria-disabled", String(currentIndex === 0));
+    }
+
+    if (nextButton) {
+      nextButton.disabled = currentIndex === lastIndex;
+      nextButton.setAttribute("aria-disabled", String(currentIndex === lastIndex));
+    }
   };
 
   const finishDrag = (event) => {
@@ -2722,6 +2746,44 @@ const legacyPrepFlow = () => {
     dot.addEventListener("click", () => render(index));
   });
 
+  previousButton?.addEventListener("click", () => render(currentIndex - 1));
+  nextButton?.addEventListener("click", () => render(currentIndex + 1));
+
+  carousel.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      render(currentIndex - 1);
+    } else if (event.key === "ArrowRight") {
+      event.preventDefault();
+      render(currentIndex + 1);
+    }
+  });
+
+  carousel.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0 || event.target.closest("button")) {
+      return;
+    }
+
+    pointerId = event.pointerId;
+    startX = event.clientX;
+    startY = event.clientY;
+    dragX = 0;
+    carousel.classList.add("is-dragging");
+    carousel.setPointerCapture(pointerId);
+  });
+
+  carousel.addEventListener("pointermove", (event) => {
+    if (pointerId === null || event.pointerId !== pointerId) {
+      return;
+    }
+
+    dragX = event.clientX - startX;
+    track.style.transform = `translate3d(${-slideOffset(currentIndex) + dragX}px, 0, 0)`;
+  });
+
+  carousel.addEventListener("pointerup", finishDrag);
+  carousel.addEventListener("pointercancel", finishDrag);
+
   window.addEventListener("resize", () => render(currentIndex, true), { passive: true });
 
   section.addEventListener("carousel:refresh", () => render(currentIndex, true));
@@ -2733,6 +2795,7 @@ const legacyPrepFlow = () => {
   "use strict";
 
   const cardSequence = document.querySelector(".play-card-sequence");
+  const introTasteSlide = document.querySelector(".hero__taste-slide");
   const gameStart = document.querySelector(".game-start");
   const comboGuide = document.querySelector(".combo-guide");
   const comboGuideJump = document.querySelector("[data-scroll-to-combo]");
@@ -2797,6 +2860,94 @@ const legacyPrepFlow = () => {
     });
   }
 
+  if (introTasteSlide && !reducedMotion && window.gsap) {
+    const tastePairs = Array.from(introTasteSlide.querySelectorAll(".hero__taste-pair"));
+    const tasteEntryPositions = {
+      bottom: { x: 0, y: 142, rotation: -2 },
+      right: { x: 142, y: 0, rotation: 3 },
+      top: { x: 0, y: -142, rotation: -2 },
+      left: { x: -142, y: 0, rotation: -3 }
+    };
+    const tasteFinalStates = {
+      "3": { x: -6, y: 6, rotation: -2 },
+      "6": { x: 6, y: 3, rotation: 1.5 },
+      "9": { x: -5, y: -3, rotation: -1 },
+      K: { x: 5, y: -6, rotation: 2 }
+    };
+    let tasteTimeline = null;
+
+    tastePairs.forEach((pair) => {
+      pair.style.animation = "none";
+    });
+
+    const getTasteEntryState = (pair) => {
+      const entry = tasteEntryPositions[pair.dataset.entry] || tasteEntryPositions.bottom;
+      return {
+        xPercent: -50,
+        yPercent: -50,
+        x: entry.x,
+        y: entry.y,
+        rotation: entry.rotation,
+        scale: 0.94,
+        autoAlpha: 0
+      };
+    };
+
+    const resetTasteSequence = () => {
+      tasteTimeline?.kill();
+      tasteTimeline = null;
+      tastePairs.forEach((pair) => window.gsap.set(pair, getTasteEntryState(pair)));
+    };
+
+    const playTasteSequence = () => {
+      resetTasteSequence();
+      tasteTimeline = window.gsap.timeline({ repeat: -1, repeatDelay: 0.2 });
+
+      tastePairs.forEach((pair) => {
+        tasteTimeline.set(pair, getTasteEntryState(pair), 0);
+      });
+
+      tastePairs.forEach((pair, index) => {
+        const finalState = tasteFinalStates[pair.dataset.coverValue] || { x: 0, y: 0, rotation: 0 };
+        tasteTimeline.fromTo(
+          pair,
+          getTasteEntryState(pair),
+          {
+            ...finalState,
+            scale: 1,
+            autoAlpha: 1,
+            duration: 1.02,
+            ease: "power2.inOut",
+            immediateRender: false
+          },
+          0.25 + index * 1.2
+        );
+      });
+
+      tasteTimeline.to(
+        tastePairs,
+        { autoAlpha: 0, duration: 0.4, ease: "power1.out" },
+        ">+=1"
+      );
+    };
+
+    introTasteSlide.addEventListener("intro-taste:enter", playTasteSequence);
+    introTasteSlide.addEventListener("intro-taste:exit", resetTasteSequence);
+
+    const syncTasteSequence = () => {
+      const tasteIsActive =
+        document.body.dataset.activeStage === "#game-intro" &&
+        document.querySelector('[data-intro-slide="0"]')?.getAttribute("aria-current") === "true";
+      if (tasteIsActive && !tasteTimeline) playTasteSequence();
+      if (!tasteIsActive && tasteTimeline) resetTasteSequence();
+    };
+    new MutationObserver(syncTasteSequence).observe(document.body, {
+      attributes: true,
+      attributeFilter: ["data-active-stage"]
+    });
+    syncTasteSequence();
+  }
+
   if (cardSequence) {
     const pairs = Array.from(cardSequence.querySelectorAll(".play-card-sequence__pair"));
     const replayButton = cardSequence.querySelector(".play-card-sequence__replay");
@@ -2820,18 +2971,22 @@ const legacyPrepFlow = () => {
         pair.style.opacity = "1";
       });
     } else {
-      const setSequenceStart = (timeline = window.gsap) => {
+      const getEntryState = (pair) => {
+        const entry = entryPositions[pair.dataset.entry] || entryPositions.bottom;
+        return {
+          xPercent: -50,
+          yPercent: -50,
+          x: entry.x,
+          y: entry.y,
+          rotation: entry.rotation,
+          scale: 0.94,
+          autoAlpha: 0
+        };
+      };
+
+      const setSequenceStart = () => {
         pairs.forEach((pair) => {
-          const entry = entryPositions[pair.dataset.entry] || entryPositions.bottom;
-          timeline.set(pair, {
-            xPercent: -50,
-            yPercent: -50,
-            x: entry.x,
-            y: entry.y,
-            rotation: entry.rotation,
-            scale: 0.94,
-            autoAlpha: 0
-          }, 0);
+          window.gsap.set(pair, getEntryState(pair));
         });
       };
 
@@ -2843,29 +2998,39 @@ const legacyPrepFlow = () => {
 
       const playSequence = () => {
         resetSequence();
-        coverTimeline = window.gsap.timeline({ repeat: -1, repeatDelay: 0.2 });
-        setSequenceStart(coverTimeline);
+        coverTimeline = window.gsap.timeline({
+          repeat: -1,
+          repeatDelay: 0.2
+        });
+
+        pairs.forEach((pair) => {
+          coverTimeline.set(pair, getEntryState(pair), 0);
+        });
 
         pairs.forEach((pair, index) => {
           const finalState = getFinalState(pair);
           const startAt = 0.25 + index * 1.2;
 
-          coverTimeline.to(
+          coverTimeline.fromTo(
             pair,
+            getEntryState(pair),
             {
               ...finalState,
               scale: 1,
               autoAlpha: 1,
               duration: 1.02,
-              ease: "power2.inOut"
+              ease: "power2.inOut",
+              immediateRender: false
             },
             startAt
           );
         });
 
-        coverTimeline
-          .to(pairs, { autoAlpha: 1, duration: 1, ease: "none" }, 4.87)
-          .to(pairs, { autoAlpha: 0, duration: 0.4, ease: "power1.out" }, 5.87);
+        coverTimeline.to(
+          pairs,
+          { autoAlpha: 0, duration: 0.4, ease: "power1.out" },
+          ">+=1"
+        );
       };
 
       resetSequence();
@@ -3322,9 +3487,13 @@ const legacyPrepFlow = () => {
 
   const main = document.querySelector("main");
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const referenceNames = new Set(["hierarchy", "combo", "bomb", "special"]);
   const referenceButtons = Array.from(
     document.querySelectorAll(".quick-reference-bar__button[data-open]")
   );
+  const openReferences = new Map();
+  const referenceCloseTimers = new Map();
+  let referenceZIndex = 1200;
   let activeModal = null;
   let returnFocus = null;
   let lockedScrollY = 0;
@@ -3336,11 +3505,84 @@ const legacyPrepFlow = () => {
       (modal) => modal.dataset.modal === name
     ) || null;
 
-  const setReferenceActive = (name = null) => {
+  const setReferenceActive = () => {
     referenceButtons.forEach((button) => {
-      const isActive = button.dataset.open === name;
+      const isActive = openReferences.has(button.dataset.open);
       button.classList.toggle("is-active", isActive);
       button.setAttribute("aria-expanded", String(isActive));
+    });
+  };
+
+  const bringReferenceToFront = (modal) => {
+    referenceZIndex += 1;
+    modal.style.zIndex = String(referenceZIndex);
+    openReferences.forEach((state) => {
+      state.modal.classList.toggle("is-front", state.modal === modal);
+    });
+  };
+
+  const finishReferenceClose = (name, modal, trigger, restoreFocus) => {
+    referenceCloseTimers.delete(name);
+    modal.hidden = true;
+    modal.setAttribute("aria-hidden", "true");
+    modal.style.removeProperty("z-index");
+    modal.style.removeProperty("--reference-offset");
+    if (restoreFocus && trigger instanceof HTMLElement && trigger.isConnected) {
+      trigger.focus({ preventScroll: true });
+    }
+  };
+
+  const closeReference = (name, { restoreFocus = true } = {}) => {
+    const state = openReferences.get(name);
+    if (!state) return;
+
+    openReferences.delete(name);
+    state.modal.classList.remove("is-open", "is-front");
+    setReferenceActive();
+    window.clearTimeout(referenceCloseTimers.get(name));
+    const timer = window.setTimeout(
+      () => finishReferenceClose(name, state.modal, state.trigger, restoreFocus),
+      prefersReducedMotion.matches ? 0 : 260
+    );
+    referenceCloseTimers.set(name, timer);
+
+    const topState = Array.from(openReferences.values()).sort(
+      (a, b) => Number(a.modal.style.zIndex) - Number(b.modal.style.zIndex)
+    ).at(-1);
+    if (topState) bringReferenceToFront(topState.modal);
+  };
+
+  const openReference = (name, trigger = null) => {
+    const modal = modalFor(name);
+    if (!modal) return;
+
+    const existing = openReferences.get(name);
+    if (existing) {
+      bringReferenceToFront(modal);
+      modal.querySelector("[data-close-modal]")?.focus({ preventScroll: true });
+      return;
+    }
+
+    window.clearTimeout(referenceCloseTimers.get(name));
+    referenceCloseTimers.delete(name);
+    const opener = trigger instanceof HTMLElement
+      ? trigger
+      : referenceButtons.find((button) => button.dataset.open === name) || null;
+    modal.hidden = false;
+    modal.setAttribute("aria-hidden", "false");
+    modal.style.setProperty(
+      "--reference-offset",
+      `${Math.min(openReferences.size, 3) * 12}px`
+    );
+    openReferences.set(name, { modal, trigger: opener });
+    bringReferenceToFront(modal);
+    setReferenceActive();
+
+    window.requestAnimationFrame(() => {
+      modal.classList.add("is-open");
+      modal.querySelector(".special-cards")?.dispatchEvent(new Event("carousel:refresh"));
+      const focusTarget = modal.querySelector("[data-close-modal]") || modal.querySelector('[role="dialog"]');
+      focusTarget?.focus({ preventScroll: true });
     });
   };
 
@@ -3394,7 +3636,6 @@ const legacyPrepFlow = () => {
     const focusTarget = returnFocus;
     activeModal = null;
     returnFocus = null;
-    setReferenceActive();
     closedModal.hidden = true;
     unlockPage();
 
@@ -3421,6 +3662,11 @@ const legacyPrepFlow = () => {
   };
 
   const openModal = (name, trigger = null) => {
+    if (referenceNames.has(name)) {
+      openReference(name, trigger);
+      return;
+    }
+
     const modal = modalFor(name);
 
     if (!modal || modal === activeModal) {
@@ -3435,7 +3681,6 @@ const legacyPrepFlow = () => {
 
     activeModal = modal;
     returnFocus = trigger instanceof HTMLElement ? trigger : document.activeElement;
-    setReferenceActive(name);
     if (trigger instanceof HTMLElement) {
       trigger.setAttribute("aria-expanded", "true");
     }
@@ -3459,24 +3704,41 @@ const legacyPrepFlow = () => {
     }
 
     const closer = event.target.closest("[data-close-modal]");
-    if (closer && activeModal && closer.closest("[data-modal]") === activeModal) {
-      event.preventDefault();
-      closeModal();
+    if (closer) {
+      const modal = closer.closest("[data-modal]");
+      if (modal?.classList.contains("reference-window")) {
+        event.preventDefault();
+        closeReference(modal.dataset.modal);
+      } else if (activeModal && modal === activeModal) {
+        event.preventDefault();
+        closeModal();
+      }
     }
   });
 
+  document.addEventListener("pointerdown", (event) => {
+    const modal = event.target.closest(".reference-window.is-open");
+    if (modal) bringReferenceToFront(modal);
+  });
+
   document.addEventListener("keydown", (event) => {
-    if (!activeModal) {
-      return;
-    }
-
     if (event.key === "Escape") {
-      event.preventDefault();
-      closeModal();
+      if (activeModal) {
+        event.preventDefault();
+        closeModal();
+        return;
+      }
+      const topReference = Array.from(openReferences.entries()).sort(
+        ([, a], [, b]) => Number(a.modal.style.zIndex) - Number(b.modal.style.zIndex)
+      ).at(-1);
+      if (topReference) {
+        event.preventDefault();
+        closeReference(topReference[0]);
+      }
       return;
     }
 
-    if (event.key !== "Tab") {
+    if (!activeModal || event.key !== "Tab") {
       return;
     }
 
@@ -3499,7 +3761,13 @@ const legacyPrepFlow = () => {
   });
 
   window.openModal = openModal;
-  window.closeModal = closeModal;
+  window.closeModal = (name = null) => {
+    if (name && referenceNames.has(name)) {
+      closeReference(name);
+      return;
+    }
+    closeModal();
+  };
 })();
 
 (() => {

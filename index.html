@@ -21,12 +21,11 @@
       crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
     />
-    <link rel="stylesheet" href="styles.css?v=20261028-guide-polish-1" />
+    <link rel="stylesheet" href="styles.css?v=20261028-hierarchy-spacing-1" />
   </head>
   <body>
-    <div class="splash-screen" aria-label="티츄 시작 화면">
-      <div class="splash-screen__dragon" role="img" aria-label="용"></div>
-      <img class="splash-screen__logo" src="TICHU.F.png" alt="티츄 로고" />
+    <div class="splash-screen">
+      <img class="splash-screen__image" src="TICHU.F.png" alt="티츄" />
     </div>
 
     <main class="app-shell">
@@ -224,6 +223,16 @@
 
       <nav class="quick-reference-bar" aria-label="카드 빠른 참고" aria-hidden="true" inert>
         <div class="quick-reference-bar__inner">
+          <button
+            class="quick-reference-bar__button"
+            type="button"
+            data-open="hierarchy"
+            aria-haspopup="dialog"
+            aria-controls="hierarchy-modal"
+            aria-expanded="false"
+          >
+            카드위계
+          </button>
           <button
             class="quick-reference-bar__button"
             type="button"
@@ -1005,13 +1014,13 @@
       <span>팁</span>
     </button>
 
-    <div class="app-modal" id="special-modal" data-modal="special" hidden>
+    <div class="app-modal reference-window" id="special-modal" data-modal="special" aria-hidden="true" hidden>
       <div class="app-modal__backdrop" data-close-modal aria-hidden="true"></div>
 
       <div
         class="app-modal__dialog"
         role="dialog"
-        aria-modal="true"
+        aria-modal="false"
         aria-labelledby="special-cards-title"
         tabindex="-1"
       >
@@ -1029,7 +1038,7 @@
             aria-label="특수카드 4장"
             tabindex="0"
           >
-            <div class="special-carousel__track">
+            <div class="special-carousel__track" id="special-carousel-track">
               <article class="special-slide is-active" aria-label="1 / 4: 참새" data-card-name="참새">
                 <img class="special-slide__image" src="참새.png" alt="참새" draggable="false" />
               </article>
@@ -1043,6 +1052,22 @@
                 <img class="special-slide__image" src="용.png" alt="용" draggable="false" />
               </article>
             </div>
+            <button
+              class="special-carousel__nav special-carousel__nav--previous"
+              type="button"
+              aria-label="이전 특수카드 보기"
+              aria-controls="special-carousel-track"
+            >
+              <span aria-hidden="true">‹</span>
+            </button>
+            <button
+              class="special-carousel__nav special-carousel__nav--next"
+              type="button"
+              aria-label="다음 특수카드 보기"
+              aria-controls="special-carousel-track"
+            >
+              <span aria-hidden="true">›</span>
+            </button>
           </div>
 
           <div class="special-descriptions" aria-live="polite">
@@ -1101,13 +1126,13 @@
       </div>
     </div>
 
-    <div class="app-modal" id="combo-modal" data-modal="combo" hidden>
+    <div class="app-modal reference-window" id="combo-modal" data-modal="combo" aria-hidden="true" hidden>
       <div class="app-modal__backdrop" data-close-modal aria-hidden="true"></div>
 
       <div
         class="app-modal__dialog"
         role="dialog"
-        aria-modal="true"
+        aria-modal="false"
         aria-labelledby="combo-dictionary-title"
         tabindex="-1"
       >
@@ -1240,18 +1265,18 @@
       </div>
     </div>
 
-    <div class="app-modal" id="bomb-modal" data-modal="bomb" hidden>
+    <div class="app-modal reference-window" id="bomb-modal" data-modal="bomb" aria-hidden="true" hidden>
       <div class="app-modal__backdrop" data-close-modal aria-hidden="true"></div>
       <div
         class="app-modal__dialog bomb-modal__dialog"
         role="dialog"
-        aria-modal="true"
+        aria-modal="false"
         aria-labelledby="bomb-modal-title"
         tabindex="-1"
       >
         <button class="app-modal__close" type="button" data-close-modal aria-label="폭탄 설명 닫기">×</button>
         <section class="bomb-modal__content">
-          <h2 id="bomb-modal-title">폭탄은 예외!</h2>
+          <h2 id="bomb-modal-title">폭탄</h2>
           <p class="bomb-modal__lead">아무 때나 낼 수 있고 모든 조합을 이겨요.</p>
           <div class="bomb-modal__rules" aria-label="폭탄 두 종류와 예시">
             <article class="bomb-modal__rule">
@@ -1282,6 +1307,49 @@
               <p class="bomb-modal__note">같은 무늬 2장 연속은 X, 5장 이상 모았다면 ! 폭탄 !</p>
             </article>
           </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="app-modal reference-window" id="hierarchy-modal" data-modal="hierarchy" aria-hidden="true" hidden>
+      <div class="app-modal__backdrop" aria-hidden="true"></div>
+      <div
+        class="app-modal__dialog hierarchy-modal__dialog"
+        role="dialog"
+        aria-modal="false"
+        aria-labelledby="hierarchy-modal-title"
+        tabindex="-1"
+      >
+        <button class="app-modal__close" type="button" data-close-modal aria-label="카드위계 닫기">×</button>
+        <section class="hierarchy-modal__content" aria-labelledby="hierarchy-modal-title">
+          <h2 id="hierarchy-modal-title">카드위계</h2>
+          <div class="hierarchy-modal__visual" aria-label="낮은 숫자 카드부터 높은 숫자 카드, 용, 폭탄 순서">
+            <div class="hierarchy-card-group hierarchy-card-group--overlap">
+              <img src="별2.png" alt="별 2" />
+              <img src="별3.png" alt="별 3" />
+            </div>
+            <span class="hierarchy-modal__less" aria-hidden="true">&lt;</span>
+            <div class="hierarchy-card-group hierarchy-card-group--overlap">
+              <img src="별9.png" alt="별 9" />
+              <img src="별10.png" alt="별 10" />
+            </div>
+            <span class="hierarchy-modal__less" aria-hidden="true">&lt;</span>
+            <div class="hierarchy-card-group hierarchy-card-group--high">
+              <img src="별J.png" alt="별 J" />
+              <img src="별Q.png" alt="별 Q" />
+              <img src="별K.png" alt="별 K" />
+              <img src="별A.png" alt="별 A" />
+            </div>
+            <span class="hierarchy-modal__less" aria-hidden="true">&lt;</span>
+            <div class="hierarchy-card-group hierarchy-card-group--single">
+              <img src="용.png" alt="용" />
+            </div>
+            <span class="hierarchy-modal__less" aria-hidden="true">&lt;</span>
+            <span class="hierarchy-modal__bomb-badge">폭탄</span>
+          </div>
+          <p class="hierarchy-modal__summary">
+            2 &lt; 3 &lt; 4 &lt; 5 &lt; 6 &lt; 7 &lt; 8 &lt; 9 &lt; 10 &lt; J &lt; Q &lt; K &lt; <strong>A</strong> &lt; <strong>용</strong> &lt; <strong>폭탄</strong>
+          </p>
         </section>
       </div>
     </div>
@@ -1510,6 +1578,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
-    <script src="main.js?v=20261028-guide-polish-1" charset="UTF-8"></script>
+    <script src="main.js?v=20261028-reference-windows-2" charset="UTF-8"></script>
   </body>
 </html>
