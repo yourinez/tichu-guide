@@ -8648,6 +8648,22 @@ body.modal-open .tichu-tip {
   color: #c8c3c5;
 }
 
+.tichu-choice-panel__start-cue {
+  margin: 0 0 16px;
+  color: rgb(255 255 255 / 0.82);
+  font-size: clamp(13px, 3.7vw, 15px);
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: -0.03em;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.tichu-choice-panel__start-cue strong {
+  color: #ffd000;
+  font-weight: 850;
+}
+
 .tichu-choice-panel__actions {
   display: grid;
   gap: 12px;
