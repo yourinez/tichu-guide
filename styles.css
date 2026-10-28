@@ -3754,31 +3754,31 @@ body.modal-open .quick-reference-bar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.28em;
-  font-size: 0.62em;
+  gap: 0.14em;
+  font-size: 0.84em;
 }
 
 .game-start__help {
   display: inline-grid;
-  width: 1.02em;
-  height: 1.02em;
+  width: 0.82em;
+  height: 0.82em;
   padding: 0;
   flex: 0 0 auto;
   place-items: center;
   appearance: none;
   -webkit-appearance: none;
-  border: 0.09em solid currentColor;
+  border: 0.08em solid currentColor;
   border-radius: 999px;
   background: transparent;
   color: #b6005b;
   font-size: inherit;
   line-height: 1;
   cursor: pointer;
-  transform: translateY(-0.04em);
+  transform: translateY(-0.02em);
 }
 
 .game-start__help span {
-  font-size: 0.6em;
+  font-size: 0.52em;
   font-weight: 900;
   line-height: 1;
 }
