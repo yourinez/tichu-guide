@@ -2524,9 +2524,9 @@ const legacyPrepFlow = () => {
   });
 
   const targets = {
-    left: { top: "50%", left: "14%", rotation: -90, opacity: 0.72 },
-    top: { top: "20%", left: "50%", rotation: 0, opacity: 1 },
-    right: { top: "50%", left: "86%", rotation: 90, opacity: 0.72 }
+    left: { top: "50%", left: "7%", rotation: -90, opacity: 0.72 },
+    top: { top: "12%", left: "50%", rotation: 0, opacity: 1 },
+    right: { top: "50%", left: "93%", rotation: 90, opacity: 0.72 }
   };
 
   const receivedPositions = {

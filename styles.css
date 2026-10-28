@@ -3285,7 +3285,7 @@ body.modal-open .quick-reference-bar {
 }
 
 .exchange-seat--top {
-  top: -34px;
+  top: -26px;
   left: 50%;
   color: #147847;
   transform: translateX(-50%);
@@ -3293,7 +3293,7 @@ body.modal-open .quick-reference-bar {
 
 .exchange-seat--left {
   top: 50%;
-  left: -28px;
+  left: -20px;
   min-width: 22px;
   min-height: 0;
   padding: 5px 0;
@@ -3304,7 +3304,7 @@ body.modal-open .quick-reference-bar {
 
 .exchange-seat--right {
   top: 50%;
-  right: -28px;
+  right: -20px;
   min-width: 22px;
   min-height: 0;
   padding: 5px 0;
@@ -3314,7 +3314,7 @@ body.modal-open .quick-reference-bar {
 }
 
 .exchange-seat--bottom {
-  bottom: -34px;
+  bottom: -26px;
   left: 50%;
   transform: translateX(-50%);
 }
@@ -3472,10 +3472,8 @@ body.modal-open .quick-reference-bar {
 
 .exchange-completion p {
   margin: 0;
-  padding: 7px 16px;
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.92);
-  box-shadow: 0 6px 16px rgb(56 44 45 / 0.16);
+  padding: 0;
+  background: transparent;
   color: #3c3030;
   font-size: clamp(14px, 3.8vw, 16px);
   font-weight: 800;
