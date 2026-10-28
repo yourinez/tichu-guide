@@ -6165,6 +6165,18 @@ body.modal-open {
   font-weight: 600;
 }
 
+.tichu-tip__mark {
+  display: inline-block;
+  margin: 3px 0 1px;
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: linear-gradient(transparent 40%, #ffe588 40%);
+  color: #2d2521;
+  font-size: inherit;
+  font-weight: 880;
+  letter-spacing: -0.03em;
+}
+
 .tichu-tip__plus {
   color: #157447;
 }
