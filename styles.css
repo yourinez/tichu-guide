@@ -3213,6 +3213,7 @@ body.modal-open .quick-reference-bar {
   letter-spacing: -0.055em;
 }
 
+.deal-subtitle,
 .exchange-main__rule {
   margin: 8px 0 0;
   color: #7d5a45;
@@ -3221,6 +3222,25 @@ body.modal-open .quick-reference-bar {
   line-height: 1.35;
   letter-spacing: -0.025em;
   text-align: center;
+}
+
+.deal-subtitle {
+  width: 100%;
+}
+
+.prep-table-heading {
+  display: flex;
+  width: 100%;
+  min-height: 78px;
+  flex: 0 0 78px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.deal-table,
+.exchange-table {
+  margin-top: 48px;
 }
 
 .exchange-table {
@@ -3423,6 +3443,83 @@ body.modal-open .quick-reference-bar {
   align-items: center;
   gap: 8px;
   margin-top: 44px;
+}
+
+.exchange-completion {
+  display: flex;
+  min-height: 68px;
+  margin-top: 10px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.exchange-completion.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.exchange-completion p {
+  margin: 0;
+  color: #3c3030;
+  font-size: clamp(14px, 3.8vw, 16px);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+.exchange-main__next {
+  display: inline-flex;
+  min-height: 34px;
+  margin: 0;
+  padding-inline: 16px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1px solid rgb(113 76 50 / 0.22);
+  border-radius: 999px;
+  background: #ffca61;
+  box-shadow: 0 6px 14px rgb(88 54 36 / 0.18);
+  color: #241915;
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(12px, 3.25vw, 14px);
+  font-weight: 820;
+  white-space: nowrap;
+}
+
+.exchange-main__next:focus-visible {
+  outline: 3px solid #9c155b;
+  outline-offset: 3px;
+}
+
+@media (max-height: 720px) {
+  .prep-table-heading {
+    min-height: 68px;
+    flex-basis: 68px;
+  }
+
+  .deal-table,
+  .exchange-table {
+    margin-top: 38px;
+  }
+
+  .exchange-completion {
+    min-height: 57px;
+    margin-top: 6px;
+    gap: 5px;
+  }
+
+  .exchange-main__next {
+    min-height: 30px;
+    padding-inline: 14px;
+    font-size: 11px;
+  }
 }
 
 .exchange-role {
@@ -7813,6 +7910,145 @@ body[data-active-stage="#card-guide"] .quick-reference-bar {
   visibility: visible !important;
 }
 
+.card-reference-intro {
+  position: fixed;
+  z-index: 18;
+  inset: 0;
+  display: flex;
+  width: min(100%, 440px);
+  height: 100svh;
+  margin: auto;
+  padding: max(116px, calc(env(safe-area-inset-top) + 104px)) 16px
+    max(118px, calc(env(safe-area-inset-bottom) + 106px));
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+  background:
+    radial-gradient(circle at 50% 34%, rgb(113 29 35 / 0.24), transparent 42%),
+    #130e0d;
+  color: #fff;
+  text-align: center;
+}
+
+.card-reference-intro__content {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.card-reference-intro.is-revealed .card-reference-intro__content {
+  opacity: 1;
+  visibility: visible;
+}
+
+.card-reference-intro__content h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(15px, 5vw, 22px);
+  font-weight: 400;
+  line-height: 1.16;
+  letter-spacing: -0.065em;
+  white-space: nowrap;
+}
+
+.card-reference-intro__content p {
+  margin: 18px 0 0;
+  color: rgb(255 255 255 / 0.66);
+  font-size: clamp(13px, 3.45vw, 15px);
+  font-weight: 650;
+  line-height: 1.65;
+}
+
+.card-reference-intro__bar-hint {
+  position: fixed;
+  z-index: 79;
+  top: max(76px, calc(env(safe-area-inset-top) + 72px));
+  right: 0;
+  left: 0;
+  display: inline-flex;
+  margin: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #ffcd70;
+  font-size: 13px;
+  font-weight: 800;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  white-space: nowrap;
+}
+
+.card-reference-intro.is-revealed .card-reference-intro__bar-hint {
+  opacity: 1;
+  visibility: visible;
+}
+
+.card-reference-intro__bar-arrow {
+  display: inline-block;
+  font-size: 18px;
+  line-height: 1;
+  animation: reference-hint-bounce 1.15s ease-in-out infinite;
+}
+
+.card-reference-intro__next {
+  display: inline-flex;
+  min-height: 56px;
+  padding: 0 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgb(255 255 255 / 0.72);
+  border-radius: 999px;
+  background: #ffcd70;
+  box-shadow:
+    0 12px 28px rgb(0 0 0 / 0.3),
+    0 0 0 3px rgb(255 205 112 / 0.12);
+  color: #140d0b;
+  font: inherit;
+  font-size: clamp(16px, 4.3vw, 18px);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.card-reference-intro__next span {
+  font-size: 21px;
+}
+
+.card-reference-intro__next:focus-visible,
+.card-reference-intro__content h2:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
+}
+
+@keyframes reference-hint-bounce {
+  0%,
+  100% {
+    transform: translateY(1px);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-reference-intro__content {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .card-reference-intro__bar-hint {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .card-reference-intro__bar-arrow {
+    animation: none;
+  }
+
+}
+
 body.stage-tabs-visible .quick-reference-bar {
   opacity: 1 !important;
   pointer-events: auto !important;
@@ -8615,6 +8851,365 @@ body.modal-open .tichu-tip {
   }
 }
 
+/* The combination window is a fixed frame; only its labelled content scrolls. */
+#combo-modal .app-modal__dialog {
+  overflow: hidden;
+}
+
+#combo-modal .combo-dictionary {
+  max-height: inherit;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(151 31 39 / 0.35) transparent;
+}
+
+#combo-modal .combo-dictionary:focus-visible {
+  outline: 3px solid rgb(151 31 39 / 0.35);
+  outline-offset: -4px;
+}
+
+#combo-modal .combo-dictionary__title {
+  top: 0;
+  background: #fff;
+  box-shadow: 0 8px 12px -12px rgb(40 27 29 / 0.45);
+}
+
+/* One compressed 2–A run; hierarchy separators remain only before dragon and bomb. */
+.hierarchy-card-group--sequence {
+  gap: 0;
+}
+
+.hierarchy-card-group--sequence img + img {
+  z-index: 1;
+  margin-left: clamp(-11px, -2.6vw, -9px);
+}
+
+.hierarchy-modal__visual {
+  gap: clamp(2px, 0.55vw, 3px);
+}
+
+.hierarchy-card-group--sequence img,
+.hierarchy-card-group--single img,
+.hierarchy-modal__bomb-badge {
+  height: clamp(40px, 10.5vw, 46px);
+}
+
+.hierarchy-modal__bomb-badge {
+  width: clamp(28px, 7.8vw, 32px);
+  font-size: clamp(8px, 2.35vw, 10px);
+}
+
+.hierarchy-modal__less {
+  margin-inline: 1px;
+  font-size: clamp(13px, 3.5vw, 16px);
+}
+
+/* Reuse the combination guide's crossed-card visual in the bomb guide. */
+.bomb-modal__invalid-example {
+  width: min(104px, 34vw);
+  margin: 12px auto 0;
+  padding: 5px 8px;
+  border: 1px solid rgb(168 46 57 / 0.16);
+  border-radius: 11px;
+  background: #fff;
+}
+
+.bomb-modal__invalid-example .combo-dictionary__cards {
+  --combo-card-width: clamp(25px, 7.2vw, 30px);
+  justify-content: center;
+}
+
+.bomb-modal__invalid-example .combo-dictionary__tip-x {
+  inset: 5px 8px;
+}
+
+@media (max-width: 370px) {
+  .hierarchy-card-group--sequence img,
+  .hierarchy-card-group--single img,
+  .hierarchy-modal__bomb-badge {
+    height: 39px;
+  }
+
+  .hierarchy-card-group--sequence img + img {
+    margin-left: -10px;
+  }
+
+  .hierarchy-modal__bomb-badge {
+    width: 27px;
+  }
+}
+
+/* Card guide redesign: 52 standard cards + 4 special cards. */
+body[data-active-stage="#card-guide"] .card-deck-guide {
+  justify-content: flex-start;
+  gap: clamp(7px, 1.25dvh, 11px);
+  padding: max(30px, calc(env(safe-area-inset-top) + 22px)) 14px
+    max(72px, calc(env(safe-area-inset-bottom) + 64px));
+}
+
+body[data-active-stage="#card-guide"] .card-deck-guide .cards__count {
+  min-height: 0;
+  margin: 0 0 2px;
+  font-size: clamp(24px, 7vw, 31px);
+  text-align: center;
+}
+
+.card-deck-guide__panel {
+  width: 100%;
+  border-radius: clamp(28px, 8vw, 42px);
+  background: #fff;
+  box-shadow: 0 14px 30px rgb(24 6 2 / 0.22);
+  color: #0c0908;
+}
+
+.card-deck-guide__panel h3 {
+  margin: 0;
+  font-size: clamp(22px, 6.5vw, 29px);
+  line-height: 1;
+  text-align: center;
+}
+
+.card-deck-guide__panel h3 strong {
+  color: #991f27;
+  font-size: 1.15em;
+}
+
+.card-deck-guide__panel--standard {
+  padding: clamp(17px, 2.8dvh, 24px) clamp(14px, 4vw, 18px)
+    clamp(14px, 2.4dvh, 20px);
+}
+
+.card-deck-guide__summary {
+  display: grid;
+  gap: 2px;
+  margin: 9px 0 12px;
+  color: #595352;
+  font-size: clamp(10px, 2.8vw, 12px);
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.card-deck-guide__suit-list {
+  display: grid;
+  gap: clamp(7px, 1.3dvh, 11px);
+}
+
+.card-rank-row {
+  --hue: 355;
+  --sat: 74%;
+  display: grid;
+  grid-template-columns: clamp(38px, 10.5vw, 46px) minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.card-rank-row--sword {
+  --hue: 12;
+  --sat: 10%;
+}
+
+.card-rank-row--jade {
+  --hue: 143;
+  --sat: 42%;
+}
+
+.card-rank-row--house {
+  --hue: 205;
+  --sat: 55%;
+}
+
+.card-rank-row__suit {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+
+.card-rank-row__track {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  height: clamp(43px, 11.5vw, 50px);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 5px 12px rgb(50 18 16 / 0.12);
+  list-style: none;
+}
+
+.card-rank-row__card {
+  position: relative;
+  z-index: var(--rank);
+  display: grid;
+  flex: 0 0 15%;
+  width: 15%;
+  height: 100%;
+  margin-left: -7.92%;
+  align-items: center;
+  justify-items: start;
+  padding-left: clamp(4px, 1.3vw, 6px);
+  border: 1px solid hsl(var(--hue) var(--sat) var(--rank-border-lightness) / 0.5);
+  border-radius: 10px;
+  background: hsl(var(--hue) var(--sat) var(--rank-lightness));
+  box-shadow:
+    -3px 0 7px rgb(40 12 10 / 0.11),
+    inset 1px 0 rgb(255 255 255 / 0.22);
+  color: var(--rank-text-color);
+  font-size: var(--rank-font-size);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-shadow: var(--rank-text-shadow);
+}
+
+.card-rank-row__card:first-child {
+  margin-left: 0;
+}
+
+.card-rank-row__card:last-child {
+  border-color: transparent;
+  border-radius: 11px;
+  justify-items: center;
+  padding-left: 0;
+  font-weight: 950;
+  transform: scale(1.05);
+  transform-origin: right center;
+}
+
+.card-deck-guide__plus {
+  flex: 0 0 auto;
+  color: #fff;
+  font-size: clamp(31px, 8.5vw, 40px);
+  font-weight: 500;
+  line-height: 0.8;
+  text-align: center;
+}
+
+.card-deck-guide__panel--special {
+  padding: clamp(15px, 2.4dvh, 20px) 20px clamp(14px, 2.2dvh, 18px);
+}
+
+.card-deck-guide__specials {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: center;
+  gap: 8px;
+  margin-top: 11px;
+}
+
+.card-deck-guide__specials img {
+  display: block;
+  width: clamp(38px, 12vw, 48px);
+  height: clamp(58px, 16vw, 72px);
+  padding: 2px;
+  justify-self: center;
+  border: 1.5px solid #171313;
+  border-radius: 5px;
+  background: #fff;
+  object-fit: contain;
+}
+
+.card-deck-guide__next {
+  display: inline-flex;
+  min-height: 42px;
+  margin: 1px auto 0;
+  padding: 0 24px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgb(255 255 255 / 0.72);
+  border-radius: 999px;
+  background: #ffcd70;
+  box-shadow: 0 8px 18px rgb(15 4 1 / 0.22);
+  color: #140d0b;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.card-deck-guide__next span {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.card-deck-guide__next:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+body[data-active-stage="#card-guide"] .quick-reference-bar {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateX(50%) translateY(-8px) !important;
+  visibility: hidden !important;
+}
+
+@media (max-height: 720px) {
+  body[data-active-stage="#card-guide"] .card-deck-guide {
+    gap: 6px;
+    padding-top: 24px;
+    padding-bottom: 66px;
+  }
+
+  body[data-active-stage="#card-guide"] .card-deck-guide .cards__count {
+    font-size: 22px;
+  }
+
+  .card-deck-guide__panel--standard {
+    padding-top: 14px;
+    padding-bottom: 12px;
+  }
+
+  .card-deck-guide__summary {
+    margin: 7px 0 9px;
+  }
+
+  .card-deck-guide__suit-list {
+    gap: 6px;
+  }
+
+  .card-rank-row__track {
+    height: 39px;
+  }
+
+  .card-deck-guide__panel--special {
+    padding-top: 12px;
+    padding-bottom: 11px;
+  }
+
+  .card-deck-guide__specials {
+    margin-top: 7px;
+  }
+
+  .card-deck-guide__specials img {
+    height: 50px;
+  }
+
+  .card-deck-guide__next {
+    min-height: 38px;
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-rank-row__card {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .card-rank-row__card:last-child {
+    transform: scale(1.05) !important;
+  }
+}
+
 /* Compact reference-window headings and lift their content toward the top. */
 :is(
     .hierarchy-modal__content h2,
@@ -8733,5 +9328,375 @@ body.modal-open .tichu-tip {
   .hierarchy-modal__summary {
     font-size: 12px;
     letter-spacing: -0.085em;
+  }
+}
+
+/* Final hierarchy/combination overrides must follow the legacy modal themes above. */
+#combo-modal .app-modal__dialog {
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+#combo-modal .combo-dictionary {
+  max-height: inherit;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(151 31 39 / 0.35) transparent;
+}
+
+#combo-modal .combo-dictionary__title {
+  top: 0;
+  background: #fff;
+  box-shadow: 0 8px 12px -12px rgb(40 27 29 / 0.45);
+}
+
+.hierarchy-card-group--sequence img,
+.hierarchy-card-group--single img,
+.hierarchy-modal__bomb-badge {
+  height: clamp(40px, 10.5vw, 46px);
+}
+
+.hierarchy-modal__bomb-badge {
+  width: clamp(28px, 7.8vw, 32px);
+  font-size: clamp(8px, 2.35vw, 10px);
+}
+
+@media (max-width: 370px) {
+  .hierarchy-card-group--sequence img,
+  .hierarchy-card-group--single img,
+  .hierarchy-modal__bomb-badge {
+    height: 39px;
+  }
+
+  .hierarchy-modal__bomb-badge {
+    width: 27px;
+  }
+}
+
+/* Final reference-window interaction overrides. */
+#hierarchy-modal .app-modal__close {
+  top: 8px !important;
+  right: 11px !important;
+  width: 32px !important;
+  height: 32px !important;
+  font-size: 23px !important;
+}
+
+#hierarchy-modal .hierarchy-modal__content {
+  padding-top: 18px;
+}
+
+#hierarchy-modal .hierarchy-modal__content h2 {
+  margin-right: 44px;
+  margin-bottom: 0;
+  margin-left: 44px;
+}
+
+#hierarchy-modal .hierarchy-modal__visual {
+  margin-top: 26px;
+}
+
+#combo-modal .app-modal__dialog {
+  display: flex;
+  height: min(720px, calc(100svh - 154px - var(--reference-offset, 0px)));
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#combo-modal .combo-dictionary {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-height: 650px) {
+  #combo-modal .app-modal__dialog {
+    height: calc(100svh - 136px - var(--reference-offset, 0px));
+  }
+}
+
+/* 2026-10-28: focused CTA and preparation-layout refinements. */
+.hero__taste-next {
+  min-height: 58px;
+  padding-inline: 30px;
+  font-size: clamp(17px, 4.8vw, 20px);
+  box-shadow:
+    0 12px 28px rgb(255 202 97 / 0.28),
+    0 0 0 1px rgb(255 255 255 / 0.72),
+    0 0 22px rgb(255 224 157 / 0.22);
+  animation: taste-next-glow 2.25s ease-in-out infinite;
+}
+
+@keyframes taste-next-glow {
+  0%, 100% {
+    box-shadow:
+      0 12px 28px rgb(255 202 97 / 0.24),
+      0 0 0 1px rgb(255 255 255 / 0.68),
+      0 0 18px rgb(255 224 157 / 0.18);
+    transform: translateY(0);
+  }
+  50% {
+    box-shadow:
+      0 15px 34px rgb(255 202 97 / 0.38),
+      0 0 0 2px rgb(255 255 255 / 0.82),
+      0 0 29px rgb(255 224 157 / 0.3);
+    transform: translateY(-2px);
+  }
+}
+
+.hero__win-next {
+  position: absolute;
+  z-index: 7;
+  right: 50%;
+  bottom: max(104px, calc(env(safe-area-inset-bottom) + 94px));
+  display: inline-flex;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 24px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid rgb(255 255 255 / 0.72);
+  border-radius: 999px;
+  background: #ffca61;
+  box-shadow: 0 9px 20px rgb(17 4 2 / 0.25);
+  color: #17100d;
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(14px, 3.9vw, 16px);
+  font-weight: 850;
+  transform: translateX(50%);
+}
+
+.hero__win-slide {
+  position: relative;
+}
+
+.hero__win-next:focus-visible,
+.exchange-receive__next:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+body[data-active-stage="#card-guide"] .card-deck-guide {
+  padding-top: max(42px, calc(env(safe-area-inset-top) + 34px));
+}
+
+.card-deck-guide__next {
+  min-height: 50px;
+  padding-inline: 29px;
+  font-size: clamp(15px, 4.1vw, 17px);
+  box-shadow: 0 11px 24px rgb(15 4 1 / 0.3);
+}
+
+.card-reference-intro__content h2 {
+  color: #fff;
+  font-family: "Pretendard Variable", "Pretendard", -apple-system,
+    BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
+  font-size: clamp(16px, 5.25vw, 23px);
+  font-weight: 800;
+  letter-spacing: -0.055em;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 0.42);
+  white-space: nowrap;
+}
+
+/* Match the first deal composition to the vertically centered exchange screen. */
+body[data-active-stage="#game-setup"] .deal-section .deal-content {
+  transform: translateY(62px);
+}
+
+.tichu-choice-panel__help-icon {
+  display: inline-grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  place-items: center;
+  border: 2.2px solid #fff4c7;
+  border-radius: 50%;
+  background: #ffca61;
+  box-shadow:
+    0 0 0 3px rgb(255 202 97 / 0.18),
+    0 0 20px rgb(255 202 97 / 0.62);
+  color: #2c211d;
+  font-size: 22px !important;
+  font-weight: 900 !important;
+  line-height: 1;
+  letter-spacing: 0;
+  animation: tichu-help-glow 2.1s ease-in-out infinite;
+}
+
+.tichu-choice-panel__term {
+  border-color: #ffda85;
+  background: #55494b;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    0 8px 20px rgb(255 202 97 / 0.16);
+}
+
+.tichu-choice-panel__term:hover {
+  background: #625456;
+}
+
+@keyframes tichu-help-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 0 3px rgb(255 202 97 / 0.16),
+      0 0 16px rgb(255 202 97 / 0.48);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow:
+      0 0 0 5px rgb(255 202 97 / 0.22),
+      0 0 26px rgb(255 202 97 / 0.72);
+    transform: scale(1.055);
+  }
+}
+
+.tichu-choice-panel__actions {
+  margin-top: 18px;
+}
+
+.tichu-choice-panel__action {
+  min-height: 48px;
+  padding-block: 4px;
+  border: 1px solid rgb(255 255 255 / 0.2);
+  border-radius: 15px;
+  font-size: clamp(20px, 5.7vw, 25px);
+  font-weight: 760;
+  box-shadow: none;
+}
+
+.tichu-choice-panel__action--declare,
+.tichu-choice-panel__action--declare[aria-pressed="true"] {
+  background: #817779;
+  color: #fff;
+}
+
+.tichu-choice-panel__action--pass,
+.tichu-choice-panel__action--pass[aria-pressed="true"] {
+  background: #625c5e;
+  color: rgb(255 255 255 / 0.9);
+}
+
+.exchange-receive {
+  transform: translateY(-18px);
+}
+
+.exchange-receive__next {
+  display: inline-flex;
+  min-height: 43px;
+  margin: 14px auto 0;
+  padding: 0 19px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid rgb(255 255 255 / 0.68);
+  border-radius: 999px;
+  background: #ffca61;
+  box-shadow: 0 9px 20px rgb(0 0 0 / 0.25);
+  color: #15100d;
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(13px, 3.65vw, 15px);
+  font-weight: 850;
+  letter-spacing: -0.035em;
+}
+
+.exchange-receive__visual {
+  margin-top: clamp(15px, 2.2dvh, 20px);
+}
+
+.exchange-receive__privacy {
+  margin-top: clamp(16px, 2.2dvh, 21px);
+  font-size: clamp(13px, 3.55vw, 15px);
+  line-height: 1.45;
+}
+
+@media (max-height: 720px) {
+  .hero__taste-next {
+    min-height: 52px;
+  }
+
+  .hero__win-next {
+    min-height: 40px;
+    bottom: max(92px, calc(env(safe-area-inset-bottom) + 84px));
+  }
+
+  body[data-active-stage="#card-guide"] .card-deck-guide {
+    padding-top: 30px;
+  }
+
+  .card-deck-guide__next {
+    min-height: 44px;
+  }
+
+  body[data-active-stage="#game-setup"] .deal-section .deal-content {
+    transform: translateY(42px);
+  }
+
+  .tichu-choice-panel__action {
+    min-height: 42px;
+    padding-block: 3px;
+  }
+
+  .tichu-choice-panel__actions {
+    margin-top: 12px;
+  }
+
+  .exchange-receive {
+    transform: translateY(-22px);
+  }
+
+  .exchange-receive__next {
+    min-height: 38px;
+    margin-top: 9px;
+    font-size: 12px;
+  }
+
+  .exchange-receive__visual {
+    height: 140px;
+    margin-top: 10px;
+  }
+
+  .exchange-receive__privacy {
+    margin-top: 10px;
+    font-size: 12.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__taste-next {
+    animation: none;
+    box-shadow:
+      0 12px 28px rgb(255 202 97 / 0.3),
+      0 0 0 2px rgb(255 255 255 / 0.76),
+      0 0 24px rgb(255 224 157 / 0.24);
+  }
+
+  .tichu-choice-panel__help-icon {
+    animation: none;
+    box-shadow:
+      0 0 0 4px rgb(255 202 97 / 0.2),
+      0 0 22px rgb(255 202 97 / 0.58);
+  }
+}
+
+/* Final shared rhythm for the two preparation table screens. */
+.deal-section .deal-table,
+.exchange-main .exchange-table {
+  margin-top: 48px;
+}
+
+@media (max-height: 720px) {
+  .deal-section .deal-table,
+  .exchange-main .exchange-table {
+    margin-top: 38px;
   }
 }

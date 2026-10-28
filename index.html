@@ -21,7 +21,7 @@
       crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
     />
-    <link rel="stylesheet" href="styles.css?v=20261028-reference-layout-1" />
+    <link rel="stylesheet" href="styles.css?v=20261029-table-layout-1" />
   </head>
   <body>
     <div class="splash-screen">
@@ -124,6 +124,9 @@
                         <li>게임은 개인으로 진행하지만<br />점수는 팀으로 계산해요</li>
                       </ul>
                     </div>
+                    <button class="hero__win-next" type="button" data-intro-card-next>
+                      카드 알아보기 <span aria-hidden="true">→</span>
+                    </button>
                   </section>
                 </div>
               </div>
@@ -158,65 +161,53 @@
             </div>
           </div>
 
-          <div class="cards" id="card-guide" aria-labelledby="cards-title">
-            <h2 class="cards__count" id="cards-title">
+          <div class="cards card-deck-guide" id="card-guide" aria-labelledby="cards-title">
+            <h2 class="cards__count" id="cards-title" tabindex="-1">
               카드는 모두 <span><strong>56</strong>장</span>
             </h2>
 
-            <div class="playing-card" aria-label="일반 카드 구성">
-              <div class="suit-intro-anchor">
-                <div class="suit-intro">
-                  <div class="cards__suits" aria-label="무늬 4종">
-                    <span class="cards__suit-box"><img class="cards__suit" src="옥.png" alt="옥" /></span>
-                    <span class="cards__suit-box"><img class="cards__suit" src="집.png" alt="집" /></span>
-                    <span class="cards__suit-box"><img class="cards__suit" src="별.png" alt="별" /></span>
-                    <span class="cards__suit-box"><img class="cards__suit" src="검.png" alt="검" /></span>
-                  </div>
+            <section class="card-deck-guide__panel card-deck-guide__panel--standard" aria-labelledby="standard-cards-title">
+              <h3 id="standard-cards-title">일반카드 <strong>52</strong></h3>
+              <p class="card-deck-guide__summary">
+                <span>4가지 무늬&nbsp; / &nbsp;2부터 A까지</span>
+                <span>작은 숫자 위를 더 큰 카드로 덮으며 진행해요</span>
+              </p>
 
-                  <p class="suit-intro__label">4가지 무늬</p>
+              <div class="card-deck-guide__suit-list">
+                <div class="card-rank-row card-rank-row--star" aria-label="별 무늬 카드: 2부터 A까지">
+                  <img class="card-rank-row__suit" src="별.png" alt="별 무늬" />
+                  <ol class="card-rank-row__track" aria-hidden="true"></ol>
+                </div>
+                <div class="card-rank-row card-rank-row--sword" aria-label="검 무늬 카드: 2부터 A까지">
+                  <img class="card-rank-row__suit" src="검.png" alt="검 무늬" />
+                  <ol class="card-rank-row__track" aria-hidden="true"></ol>
+                </div>
+                <div class="card-rank-row card-rank-row--jade" aria-label="옥 무늬 카드: 2부터 A까지">
+                  <img class="card-rank-row__suit" src="옥.png" alt="옥 무늬" />
+                  <ol class="card-rank-row__track" aria-hidden="true"></ol>
+                </div>
+                <div class="card-rank-row card-rank-row--house" aria-label="집 무늬 카드: 2부터 A까지">
+                  <img class="card-rank-row__suit" src="집.png" alt="집 무늬" />
+                  <ol class="card-rank-row__track" aria-hidden="true"></ol>
                 </div>
               </div>
+            </section>
 
-              <div class="rank-face">
-                <ol class="rank-line" aria-label="숫자 서열: 2부터 A까지">
-                  <li class="rank-item" style="--rank: 1"><span class="rank-number">2</span></li>
-                  <li class="rank-item" style="--rank: 2"><span class="rank-number">3</span></li>
-                  <li class="rank-item" style="--rank: 3"><span class="rank-number">4</span></li>
-                  <li class="rank-item" style="--rank: 4"><span class="rank-number">5</span></li>
-                  <li class="rank-item" style="--rank: 5"><span class="rank-number">6</span></li>
-                  <li class="rank-item" style="--rank: 6"><span class="rank-number">7</span></li>
-                  <li class="rank-item" style="--rank: 7"><span class="rank-number">8</span></li>
-                  <li class="rank-item" style="--rank: 8"><span class="rank-number">9</span></li>
-                  <li class="rank-item" style="--rank: 9"><span class="rank-number">10</span></li>
-                  <li class="rank-item" style="--rank: 10"><span class="rank-number">J</span></li>
-                  <li class="rank-item" style="--rank: 11"><span class="rank-number">Q</span></li>
-                  <li class="rank-item" style="--rank: 12"><span class="rank-number">K</span></li>
-                  <li class="rank-item" style="--rank: 13"><span class="rank-number">A</span></li>
-                </ol>
+            <div class="card-deck-guide__plus" aria-hidden="true">+</div>
 
-                <p class="rank-face__label">2 to A</p>
-
-                <div class="rank-rules">
-                  <p class="rank-rule rank-rule--main">큰 숫자가 작은 숫자를 덮습니다</p>
-                  <p class="rank-rule rank-rule--sub">더 높은 숫자만 이길 수 있어요</p>
-                </div>
+            <section class="card-deck-guide__panel card-deck-guide__panel--special" aria-labelledby="special-cards-title">
+              <h3 id="special-cards-title">특수카드 <strong>4</strong></h3>
+              <div class="card-deck-guide__specials" aria-label="참새, 개, 봉황, 용 특수카드 네 장">
+                <img src="참새.png" alt="참새 카드" />
+                <img src="개.png" alt="개 카드" />
+                <img src="봉황.png" alt="봉황 카드" />
+                <img src="용.png" alt="용 카드" />
               </div>
-            </div>
+            </section>
 
-            <div class="rank-reference-labels" aria-label="카드 참고 메뉴 안내">
-              <span class="rank-reference-label rank-reference-label--combo">카드로 만드는 조합</span>
-              <span class="rank-reference-label rank-reference-label--special">특별한 카드도 있어요</span>
-            </div>
-
-            <nav class="cards__page-nav" aria-label="카드 구성 화면 이동">
-              <button class="cards__page-button cards__page-button--previous" type="button" aria-label="이전 카드 구성 화면">
-                <span aria-hidden="true"></span>
-              </button>
-              <span class="cards__page-status" aria-live="polite">1 / 2</span>
-              <button class="cards__page-button cards__page-button--next" type="button" aria-label="다음 카드 구성 화면">
-                <span aria-hidden="true"></span>
-              </button>
-            </nav>
+            <button class="card-deck-guide__next" type="button" data-card-guide-next>
+              카드 자세히 알아보기 <span aria-hidden="true">→</span>
+            </button>
           </div>
         </div>
       </section>
@@ -266,10 +257,34 @@
         </div>
       </nav>
 
+      <section
+        class="card-reference-intro"
+        id="card-reference-intro"
+        aria-labelledby="card-reference-intro-title"
+      >
+        <div class="card-reference-intro__content">
+          <h2 id="card-reference-intro-title" tabindex="-1">헷갈릴 땐 언제든 위를 확인하세요</h2>
+          <p>
+            지금 다 외우지 않아도 괜찮아요.<br />
+            게임하다 막히면 그때 위 메뉴를 누르면 돼요.
+          </p>
+        </div>
+        <p class="card-reference-intro__bar-hint" aria-hidden="true">
+          <span class="card-reference-intro__bar-arrow">↑</span>
+          <span>필요할 때 여기</span>
+        </p>
+        <button class="card-reference-intro__next" type="button" data-reference-intro-next>
+          게임 준비 시작 <span aria-hidden="true">→</span>
+        </button>
+      </section>
+
       <section class="deal-section" id="game-setup" aria-labelledby="deal-title">
         <div class="deal-section__inner">
           <div class="deal-content">
-            <h2 id="deal-title">먼저 카드를 나눠요</h2>
+            <div class="prep-table-heading">
+              <h2 id="deal-title" tabindex="-1">먼저 카드를 나눠요</h2>
+              <p class="deal-subtitle">한 명당 8장씩 나눠요</p>
+            </div>
 
             <div class="deal-table" aria-label="네 사람에게 카드를 분배하는 자리">
               <div class="deal-seat deal-seat--top" data-seat="top">
@@ -347,8 +362,9 @@
                   aria-haspopup="dialog"
                   aria-controls="tichu-tip-modal"
                   aria-expanded="false"
+                  aria-label="라지 티츄 자세히 보기"
                 >
-                  <span>라지 티츄</span><span aria-hidden="true">↗</span>
+                  <span>라지 티츄</span><span class="tichu-choice-panel__help-icon" aria-hidden="true">?</span>
                 </button>
                 <span>를</span>
               </div>
@@ -409,11 +425,19 @@
             <p class="hand-privacy-note exchange-receive__privacy" role="note">
               ⚠️ 카드는 나만 볼 수 있어요.<br />파트너에게도 보여주면 안 돼요!
             </p>
+            <button class="exchange-receive__next" type="button" data-receive-six-next>
+              14장 다 받았어요, 이제 교환하러 <span aria-hidden="true">→</span>
+            </button>
           </div>
 
           <div class="exchange-main" id="prep-exchange">
-            <h3>이제 카드 3장을 나눠요</h3>
-            <p class="exchange-main__rule">왼쪽·파트너·오른쪽에게 각각 1장씩</p>
+            <div class="prep-table-heading">
+              <h3 tabindex="-1">이제 카드 3장을 나눠요</h3>
+              <p class="exchange-main__rule">
+                왼쪽·파트너·오른쪽에게 각 1장씩<br />
+                서로 안 보이게, 동시에 주고받아요
+              </p>
+            </div>
 
             <div class="exchange-table" aria-label="내 카드를 세 방향으로 교환하는 자리">
               <span class="exchange-seat exchange-seat--top">파트너</span>
@@ -431,9 +455,6 @@
               </div>
 
               <button class="exchange-button" type="button">카드 교환하기</button>
-              <p class="exchange-status" aria-live="polite" aria-hidden="true">
-                서로 3장씩<br />동시에<br />주고받아요
-              </p>
               <button
                 class="exchange-replay"
                 type="button"
@@ -441,6 +462,19 @@
                 hidden
               >
                 <span aria-hidden="true">↻</span>
+              </button>
+            </div>
+
+            <div class="exchange-completion" aria-live="polite" aria-hidden="true">
+              <p>서로 3장씩 주고받았어요</p>
+              <button
+                class="exchange-main__next"
+                type="button"
+                data-exchange-next
+                aria-label="다음으로, 스몰 티츄 단계로 이동"
+                disabled
+              >
+                다음으로 <span aria-hidden="true">→</span>
               </button>
             </div>
 
@@ -468,7 +502,7 @@
       <section class="large-tichu small-tichu" id="prep-small-tichu" aria-labelledby="small-tichu-title">
         <div class="large-tichu__stage">
           <article class="tichu-choice-panel">
-            <h2 class="tichu-choice-panel__intro" id="small-tichu-title">
+            <h2 class="tichu-choice-panel__intro" id="small-tichu-title" tabindex="-1">
               <span>카드 14장,</span>
               <span>교환까지 끝났어요</span>
             </h2>
@@ -482,8 +516,9 @@
                   aria-haspopup="dialog"
                   aria-controls="tichu-tip-modal"
                   aria-expanded="false"
+                  aria-label="스몰 티츄 자세히 보기"
                 >
-                  <span>스몰 티츄</span><span aria-hidden="true">↗</span>
+                  <span>스몰 티츄</span><span class="tichu-choice-panel__help-icon" aria-hidden="true">?</span>
                 </button>
                 <span>를</span>
               </div>
@@ -1138,7 +1173,7 @@
       >
         <button class="app-modal__close" type="button" data-close-modal aria-label="카드 조합 닫기">×</button>
 
-        <section class="combo-dictionary" aria-labelledby="combo-dictionary-title">
+        <section class="combo-dictionary" aria-labelledby="combo-dictionary-title" tabindex="0">
           <h2 class="combo-dictionary__title" id="combo-dictionary-title">카드 조합</h2>
 
           <div class="combo-dictionary__table" role="table" aria-label="기본 카드 조합">
@@ -1305,6 +1340,16 @@
                 <img src="검K.png" alt="검 K" />
               </div>
               <p class="bomb-modal__note">같은 무늬 2장 연속은 X, 5장 이상 모았다면 ! 폭탄 !</p>
+              <div
+                class="bomb-modal__invalid-example combo-dictionary__tip-visual"
+                aria-label="별 6과 별 7 두 장은 낼 수 없음"
+              >
+                <div class="combo-dictionary__cards" data-card-count="2">
+                  <img src="별6.png" alt="별 6" />
+                  <img src="별7.png" alt="별 7" />
+                </div>
+                <span class="combo-dictionary__tip-x" aria-hidden="true"></span>
+              </div>
             </article>
           </div>
         </section>
@@ -1323,18 +1368,17 @@
         <button class="app-modal__close" type="button" data-close-modal aria-label="카드위계 닫기">×</button>
         <section class="hierarchy-modal__content" aria-labelledby="hierarchy-modal-title">
           <h2 id="hierarchy-modal-title">카드위계</h2>
-          <div class="hierarchy-modal__visual" aria-label="낮은 숫자 카드부터 높은 숫자 카드, 용, 폭탄 순서">
-            <div class="hierarchy-card-group hierarchy-card-group--overlap">
+          <div class="hierarchy-modal__visual" aria-label="2부터 A까지의 숫자 카드, 용, 폭탄 순서">
+            <div class="hierarchy-card-group hierarchy-card-group--sequence">
               <img src="별2.png" alt="별 2" />
               <img src="별3.png" alt="별 3" />
-            </div>
-            <span class="hierarchy-modal__less" aria-hidden="true">&lt;</span>
-            <div class="hierarchy-card-group hierarchy-card-group--overlap">
+              <img src="별4.png" alt="별 4" />
+              <img src="별5.png" alt="별 5" />
+              <img src="별6.png" alt="별 6" />
+              <img src="별7.png" alt="별 7" />
+              <img src="별8.png" alt="별 8" />
               <img src="별9.png" alt="별 9" />
               <img src="별10.png" alt="별 10" />
-            </div>
-            <span class="hierarchy-modal__less" aria-hidden="true">&lt;</span>
-            <div class="hierarchy-card-group hierarchy-card-group--high">
               <img src="별J.png" alt="별 J" />
               <img src="별Q.png" alt="별 Q" />
               <img src="별K.png" alt="별 K" />
@@ -1578,6 +1622,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
-    <script src="main.js?v=20261028-reference-windows-2" charset="UTF-8"></script>
+    <script src="main.js?v=20261029-table-layout-1" charset="UTF-8"></script>
   </body>
 </html>

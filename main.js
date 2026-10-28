@@ -43,6 +43,189 @@
   );
 })();
 
+document.querySelector("[data-receive-six-next]")?.addEventListener("click", () => {
+  window.tichuPrepFlow?.jumpToPage?.(3);
+  window.requestAnimationFrame(() => {
+    document.querySelector("#prep-exchange h3")?.focus({ preventScroll: true });
+  });
+});
+
+(() => {
+  const guide = document.querySelector("#card-guide.card-deck-guide");
+  if (!guide) return;
+
+  const ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+  const rankLightnessSteps = [98, 95, 91, 87, 82, 76, 69, 62, 54, 47, 41, 35, 30];
+  const tracks = Array.from(guide.querySelectorAll(".card-rank-row__track"));
+  const nextButton = guide.querySelector("[data-card-guide-next]");
+  const referenceIntro = document.querySelector("#card-reference-intro");
+  const referenceIntroTitle = referenceIntro?.querySelector("h2");
+  const referenceIntroNext = referenceIntro?.querySelector("[data-reference-intro-next]");
+
+  tracks.forEach((track) => {
+    const fragment = document.createDocumentFragment();
+    ranks.forEach((rank, index) => {
+      const card = document.createElement("li");
+      card.className = "card-rank-row__card";
+      card.style.setProperty("--rank", String(index + 1));
+      const progress = index / (ranks.length - 1);
+      const lightness = rankLightnessSteps[index];
+      const usesLightText = lightness <= 69;
+      const fontSize = 9.5 + progress * 6.5;
+      card.style.setProperty("--rank-lightness", `${lightness}%`);
+      card.style.setProperty("--rank-border-lightness", `${Math.max(lightness - 12, 20)}%`);
+      card.style.setProperty("--rank-text-color", usesLightText ? "#ffffff" : "#211f1f");
+      card.style.setProperty(
+        "--rank-text-shadow",
+        usesLightText ? "0 1px 2px rgb(0 0 0 / 0.34)" : "0 1px 1px rgb(255 255 255 / 0.72)"
+      );
+      card.style.setProperty("--rank-font-size", `${fontSize.toFixed(2)}px`);
+      card.textContent = rank;
+      fragment.append(card);
+    });
+    track.append(fragment);
+  });
+
+  const cards = Array.from(guide.querySelectorAll(".card-rank-row__card"));
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let rankTimeline = null;
+
+  const showFinalState = () => {
+    if (window.gsap) {
+      window.gsap.set(cards, { x: 0, autoAlpha: 1 });
+    } else {
+      cards.forEach((card) => {
+        card.style.opacity = "1";
+      });
+    }
+  };
+
+  const reset = () => {
+    rankTimeline?.kill();
+    rankTimeline = null;
+    if (!window.gsap || reducedMotion) {
+      showFinalState();
+      return;
+    }
+    window.gsap.set(cards, { x: 34, autoAlpha: 0 });
+  };
+
+  const play = () => {
+    if (!window.gsap || reducedMotion) {
+      showFinalState();
+      return;
+    }
+
+    reset();
+    rankTimeline = window.gsap.timeline({ defaults: { ease: "power2.out" } });
+    tracks.forEach((track, rowIndex) => {
+      const rowCards = Array.from(track.children);
+      rankTimeline.fromTo(
+        rowCards,
+        { x: 34, autoAlpha: 0 },
+        {
+          x: 0,
+          autoAlpha: 1,
+          duration: 0.42,
+          stagger: 0.075,
+          immediateRender: false
+        },
+        rowIndex * 0.08
+      );
+    });
+  };
+
+  const sync = () => {
+    const isActive = document.body.dataset.activeStage === "#card-guide";
+    if (isActive && !rankTimeline) play();
+    if (!isActive && rankTimeline) reset();
+  };
+
+  reset();
+  new MutationObserver(sync).observe(document.body, {
+    attributes: true,
+    attributeFilter: ["data-active-stage"]
+  });
+  nextButton?.addEventListener("click", () => {
+    window.tichuStageNav?.goTo?.("#card-reference-intro");
+    window.requestAnimationFrame(() => referenceIntroTitle?.focus({ preventScroll: true }));
+  });
+  referenceIntroNext?.addEventListener("click", () => {
+    window.tichuStageNav?.goTo?.("#game-setup");
+    window.requestAnimationFrame(() => {
+      document.querySelector("#deal-title")?.focus?.({ preventScroll: true });
+    });
+  });
+  sync();
+})();
+
+(() => {
+  "use strict";
+
+  const intro = document.querySelector("#card-reference-intro");
+  const bar = document.querySelector(".quick-reference-bar");
+  const barInner = bar?.querySelector(".quick-reference-bar__inner");
+  const content = intro?.querySelector(".card-reference-intro__content");
+  const barHint = intro?.querySelector(".card-reference-intro__bar-hint");
+  if (!intro || !barInner || !content || !barHint) return;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let introTimeline = null;
+
+  const reset = () => {
+    introTimeline?.kill();
+    introTimeline = null;
+    intro.classList.remove("is-revealed");
+    window.gsap?.set(barInner, { clearProps: "transform" });
+    window.gsap?.set(content, { clearProps: "opacity,visibility,transform" });
+    window.gsap?.set(barHint, { clearProps: "opacity,visibility,transform" });
+  };
+
+  const play = () => {
+    reset();
+    if (reducedMotion.matches || !window.gsap) {
+      intro.classList.add("is-revealed");
+      return;
+    }
+
+    const rect = barInner.getBoundingClientRect();
+    const centerOffset = Math.max(0, (window.innerHeight - rect.height) / 2 - rect.top);
+    introTimeline = window.gsap.timeline();
+    introTimeline
+      .fromTo(
+        barInner,
+        { y: centerOffset },
+        { y: 0, duration: 0.72, ease: "power3.inOut" }
+      )
+      .fromTo(
+        barHint,
+        { autoAlpha: 0, y: -5 },
+        { autoAlpha: 1, y: 0, duration: 0.28, ease: "power2.out" }
+      )
+      .fromTo(
+        content,
+        { autoAlpha: 0, y: 14 },
+        { autoAlpha: 1, y: 0, duration: 0.38, ease: "power2.out" },
+        "-=0.12"
+      )
+      .add(() => {
+        intro.classList.add("is-revealed");
+      });
+  };
+
+  const sync = () => {
+    if (document.body.dataset.activeStage === "#card-reference-intro") play();
+    else reset();
+  };
+
+  new MutationObserver(sync).observe(document.body, {
+    attributes: true,
+    attributeFilter: ["data-active-stage"]
+  });
+  reducedMotion.addEventListener?.("change", sync);
+  sync();
+})();
+
 (() => {
   "use strict";
 
@@ -131,6 +314,7 @@
   const stageGroups = new Map([
     ["#game-intro", [document.querySelector(".hero")]],
     ["#card-guide", [document.querySelector(".hero")]],
+    ["#card-reference-intro", [document.querySelector("#card-reference-intro")]],
     [
       "#game-setup",
       [
@@ -184,7 +368,7 @@
   };
 
   const setActiveStage = (target) => {
-    const referencesAvailable = target !== "#game-intro";
+    const referencesAvailable = !["#game-intro", "#card-guide"].includes(target);
     document.body.dataset.activeStage = target;
     document.body.classList.toggle("quick-reference-visible", referencesAvailable);
     if (quickReferenceBar) {
@@ -198,7 +382,8 @@
     document.body.classList.toggle("score-scroll-active", target === "#score-victory");
     syncStageIsolation(target);
     stageTabs.forEach((tab) => {
-      const isActive = tab.dataset.stageTarget === target;
+      const tabTarget = target === "#card-reference-intro" ? "#card-guide" : target;
+      const isActive = tab.dataset.stageTarget === tabTarget;
       tab.classList.toggle("is-active", isActive);
       if (isActive) {
         tab.setAttribute("aria-current", "page");
@@ -1226,6 +1411,7 @@ const legacyPrepFlow = () => {
   const introTrack = document.querySelector(".hero__intro-track");
   const introDots = document.querySelectorAll("[data-intro-slide]");
   const introTasteNext = document.querySelector(".hero__taste-next");
+  const introCardNext = document.querySelector("[data-intro-card-next]");
   const introMenuLink = document.querySelector('.chapter-menu__links a[href="#game-intro"]');
   let introSlideIndex = 0;
   let swipeStart = null;
@@ -1288,6 +1474,10 @@ const legacyPrepFlow = () => {
   });
 
   introTasteNext?.addEventListener("click", () => showIntroSlide(1));
+  introCardNext?.addEventListener("click", () => {
+    window.tichuStageNav?.goTo?.("#card-guide");
+    window.requestAnimationFrame(() => document.querySelector("#cards-title")?.focus({ preventScroll: true }));
+  });
 
   introViewport?.addEventListener("pointerdown", (event) => {
     if (event.pointerType === "mouse" && event.button !== 0) return;
@@ -1353,18 +1543,6 @@ const legacyPrepFlow = () => {
   const copy = document.querySelector(".hero__copy");
   const cards = document.querySelector(".cards");
   const cardsCount = document.querySelector(".cards__count");
-  const cardPreviousButton = document.querySelector(".cards__page-button--previous");
-  const cardNextButton = document.querySelector(".cards__page-button--next");
-  const cardPageStatus = document.querySelector(".cards__page-status");
-  const playingCard = document.querySelector(".playing-card");
-  const suitIntro = document.querySelector(".suit-intro");
-  const cardSuits = gsap.utils.toArray(".cards__suit-box");
-  const suitIntroLabel = document.querySelector(".suit-intro__label");
-  const rankFace = document.querySelector(".rank-face");
-  const rankFaceLabel = document.querySelector(".rank-face__label");
-  const rankItems = gsap.utils.toArray(".rank-item");
-  const rankRules = gsap.utils.toArray(".rank-rule");
-  const rankReferenceLabels = gsap.utils.toArray(".rank-reference-label");
   const quickReferenceBar = document.querySelector(".quick-reference-bar");
 
   const timeline = gsap.timeline({
@@ -1428,27 +1606,6 @@ const legacyPrepFlow = () => {
       1.77
     )
     .to(
-      cardsCount,
-      {
-        y: () => -Math.max(window.innerHeight, 560) * 0.45,
-        opacity: 0,
-        duration: 0.46,
-        ease: "power2.inOut"
-      },
-      5.12
-    )
-    .to(
-      playingCard,
-      {
-        y: 0,
-        scale: 1,
-        opacity: 1,
-        duration: 0.52,
-        ease: "power2.out"
-      },
-      3.11
-    )
-    .to(
       quickReferenceBar,
       {
         autoAlpha: 1,
@@ -1456,114 +1613,11 @@ const legacyPrepFlow = () => {
         ease: "power1.out"
       },
       3.11
-    )
-    .to(
-      suitIntro,
-      {
-        y: 0,
-        duration: 0.72,
-        ease: "power1.out"
-      },
-      3.45
-    )
-    .to(
-      cardSuits,
-      {
-        y: 0,
-        scale: 1,
-        opacity: 1,
-        duration: 0.5,
-        stagger: 0.2,
-        ease: "power1.out"
-      },
-      3.53
-    )
-    .to(
-      suitIntroLabel,
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.4,
-        ease: "power1.out"
-      },
-      4.62
-    )
-    .to(
-      suitIntro,
-      {
-        y: () => -(playingCard.clientHeight * 0.32),
-        duration: 0.68,
-        ease: "power2.inOut"
-      },
-      5.12
-    )
-    .to(
-      rankFace,
-      {
-        y: 0,
-        duration: 0.8,
-        ease: "power2.inOut"
-      },
-      5.12
-    )
-    .to(
-      rankItems,
-      {
-        x: 0,
-        y: 0,
-        scale: 1,
-        visibility: "visible",
-        duration: 0.5,
-        stagger: 0.09,
-        ease: "power1.out"
-      },
-      5.95
-    )
-    .to(
-      rankFaceLabel,
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.45,
-        ease: "power1.out"
-      },
-      7.6
-    )
-    .to(
-      rankRules,
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.42,
-        stagger: 0.16,
-        ease: "power1.out"
-      },
-      8.1
-    )
-    .to(
-      rankReferenceLabels,
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.42,
-        stagger: 0.16,
-        ease: "power1.out"
-      },
-      8.7
-    )
-    .to(
-      playingCard,
-      {
-        opacity: 1,
-        duration: 0.55,
-        ease: "none"
-      },
-      8
     );
 
   timeline
     .to(shell, { backgroundColor: "#26150f", duration: 0.8, ease: "none" }, 1.25);
-  timeline.to({}, { duration: 0.3 }, 9.28);
+  timeline.to({}, { duration: 0.3 }, 5.1);
 
   const scrollToHeroTime = (targetTime, behavior = "smooth") => {
     const trigger = timeline.scrollTrigger;
@@ -1578,7 +1632,7 @@ const legacyPrepFlow = () => {
     ScrollTrigger.update();
   };
 
-  const CARD_PAGE_TIMES = Object.freeze([5.1, 9.28]);
+  const CARD_PAGE_TIMES = Object.freeze([5.1]);
   const cardPagePosition = (index) => {
     const trigger = timeline.scrollTrigger;
     if (!trigger) {
@@ -1633,6 +1687,8 @@ const legacyPrepFlow = () => {
       setDetailScrollLock(false);
       jumpToHeroTime(CARD_PAGE_TIMES[0]);
       syncCardPageNav();
+    } else if (target === "#card-reference-intro") {
+      setDetailScrollLock(false);
     } else if (target === "#game-setup") {
       window.tichuPrepFlow?.jumpToPage(0);
     } else if (target === "#game-play") {
@@ -1666,10 +1722,7 @@ const legacyPrepFlow = () => {
 
   const syncCardPageNav = () => {
     const visibleIndex = Math.max(0, cardPageIndex);
-    cards?.classList.toggle("is-rank-page", visibleIndex === 1);
-    if (cardPreviousButton) cardPreviousButton.disabled = visibleIndex === 0;
-    if (cardNextButton) cardNextButton.disabled = visibleIndex === CARD_PAGE_TIMES.length - 1;
-    if (cardPageStatus) cardPageStatus.textContent = `${visibleIndex + 1} / ${CARD_PAGE_TIMES.length}`;
+    cards?.classList.toggle("is-rank-page", false);
   };
 
   const moveToCardPage = (index) => {
@@ -1696,9 +1749,6 @@ const legacyPrepFlow = () => {
       moveToCardPage(nextIndex);
     }
   };
-
-  cardPreviousButton?.addEventListener("click", () => advanceCardPage(-1));
-  cardNextButton?.addEventListener("click", () => advanceCardPage(1));
 
   const isCardPageFlowActive = () => {
     return Boolean(
@@ -2355,33 +2405,57 @@ const legacyPrepFlow = () => {
   const outgoingCards = Array.from(section.querySelectorAll("[data-exchange-target]"));
   const incomingCards = Array.from(section.querySelectorAll("[data-exchange-source]"));
   const button = section.querySelector(".exchange-button");
-  const status = section.querySelector(".exchange-status");
   const replayButton = section.querySelector(".exchange-replay");
+  const nextButton = section.querySelector("[data-exchange-next]");
+  const completion = section.querySelector(".exchange-completion");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const progressGate = window.createTichuProgressGate?.(section);
   let receiveTimeline = null;
   let exchangeTimeline = null;
 
+  const setNextAvailable = (available, { animate = false } = {}) => {
+    if (!nextButton || !completion) return;
+    nextButton.disabled = !available;
+    completion.setAttribute("aria-hidden", String(!available));
+    completion.classList.toggle("is-visible", available);
+    if (!available || !window.gsap) return;
+    if (animate && !reducedMotion) {
+      gsap.fromTo(
+        completion,
+        { autoAlpha: 0, y: 8 },
+        { autoAlpha: 1, y: 0, duration: 0.28, ease: "power2.out", overwrite: true }
+      );
+    } else {
+      gsap.set(completion, { autoAlpha: 1, y: 0 });
+    }
+  };
+
   const showStaticExchange = () => {
     progressGate?.unlock();
     section.classList.add("is-complete");
-    status.removeAttribute("aria-hidden");
     button.hidden = true;
     replayButton.hidden = false;
+    setNextAvailable(true);
   };
 
   const resetStaticExchange = () => {
     section.classList.remove("is-complete");
-    status.setAttribute("aria-hidden", "true");
     button.hidden = false;
     replayButton.hidden = true;
+    setNextAvailable(false);
   };
 
   if (reducedMotion || !window.gsap) {
-    button.addEventListener("click", showStaticExchange);
+    showStaticExchange();
     replayButton.addEventListener("click", () => {
       resetStaticExchange();
       showStaticExchange();
+    });
+    nextButton?.addEventListener("click", () => {
+      window.tichuPrepFlow?.next?.();
+      window.requestAnimationFrame(() => {
+        document.querySelector("#small-tichu-title")?.focus?.({ preventScroll: true });
+      });
     });
     return;
   }
@@ -2469,11 +2543,11 @@ const legacyPrepFlow = () => {
   const resetExchange = () => {
     exchangeTimeline?.kill();
     section.classList.remove("is-complete");
-    status.setAttribute("aria-hidden", "true");
     button.hidden = false;
     button.disabled = false;
     replayButton.hidden = true;
-    gsap.set([button, replayButton, status], { transform: "none" });
+    setNextAvailable(false);
+    gsap.set([button, replayButton], { transform: "none" });
     gsap.set(button, { opacity: 1, scale: 1, xPercent: -50, yPercent: -50 });
     gsap.set(replayButton, { opacity: 0, scale: 0.82, xPercent: -50, yPercent: 0 });
     gsap.set(outgoingCards, { transform: "none" });
@@ -2497,7 +2571,6 @@ const legacyPrepFlow = () => {
         autoAlpha: 0
       });
     });
-    gsap.set(status, { opacity: 0, xPercent: -50, yPercent: -50 });
   };
 
   const playExchange = () => {
@@ -2554,31 +2627,28 @@ const legacyPrepFlow = () => {
         );
     });
 
-    exchangeTimeline
-      .to(
-        status,
-        {
-          opacity: 1,
-          duration: 0,
-          onStart: () => status.removeAttribute("aria-hidden")
-        },
-        1.98
-      )
-      .call(() => {
+    exchangeTimeline.call(() => {
         section.classList.add("is-complete");
         button.disabled = false;
         replayButton.hidden = false;
+        setNextAvailable(true, { animate: true });
         gsap.to(replayButton, {
           opacity: 1,
           scale: 1,
           duration: 0.22,
           ease: "power2.out"
         });
-      });
+      }, null, 1.98);
   };
 
   button.addEventListener("click", playExchange);
   replayButton.addEventListener("click", playExchange);
+  nextButton?.addEventListener("click", () => {
+    window.tichuPrepFlow?.next?.();
+    window.requestAnimationFrame(() => {
+      document.querySelector("#small-tichu-title")?.focus?.({ preventScroll: true });
+    });
+  });
 
   window.addEventListener("tichu:prep-step-leave", (event) => {
     if (event.detail?.index === 3) {
@@ -3521,6 +3591,11 @@ const legacyPrepFlow = () => {
     });
   };
 
+  const topReferenceState = () =>
+    Array.from(openReferences.values()).sort(
+      (a, b) => Number(a.modal.style.zIndex) - Number(b.modal.style.zIndex)
+    ).at(-1) || null;
+
   const finishReferenceClose = (name, modal, trigger, restoreFocus) => {
     referenceCloseTimers.delete(name);
     modal.hidden = true;
@@ -3546,9 +3621,7 @@ const legacyPrepFlow = () => {
     );
     referenceCloseTimers.set(name, timer);
 
-    const topState = Array.from(openReferences.values()).sort(
-      (a, b) => Number(a.modal.style.zIndex) - Number(b.modal.style.zIndex)
-    ).at(-1);
+    const topState = topReferenceState();
     if (topState) bringReferenceToFront(topState.modal);
   };
 
@@ -3558,8 +3631,12 @@ const legacyPrepFlow = () => {
 
     const existing = openReferences.get(name);
     if (existing) {
-      bringReferenceToFront(modal);
-      modal.querySelector("[data-close-modal]")?.focus({ preventScroll: true });
+      if (topReferenceState()?.modal === modal) {
+        closeReference(name);
+      } else {
+        bringReferenceToFront(modal);
+        modal.querySelector("[data-close-modal]")?.focus({ preventScroll: true });
+      }
       return;
     }
 
