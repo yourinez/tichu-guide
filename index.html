@@ -21,7 +21,7 @@
       crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
     />
-    <link rel="stylesheet" href="styles.css?v=20261030-exchange-center-2" />
+    <link rel="stylesheet" href="styles.css?v=20261030-tichu-tip-split-1" />
   </head>
   <body>
     <div class="splash-screen">
@@ -358,9 +358,9 @@
                 <button
                   class="tichu-choice-panel__term"
                   type="button"
-                  data-open="tichu-tip"
+                  data-open="large-tichu-tip"
                   aria-haspopup="dialog"
-                  aria-controls="tichu-tip-modal"
+                  aria-controls="large-tichu-tip-modal"
                   aria-expanded="false"
                   aria-label="라지 티츄 자세히 보기"
                 >
@@ -512,9 +512,9 @@
                 <button
                   class="tichu-choice-panel__term"
                   type="button"
-                  data-open="tichu-tip"
+                  data-open="small-tichu-tip"
                   aria-haspopup="dialog"
-                  aria-controls="tichu-tip-modal"
+                  aria-controls="small-tichu-tip-modal"
                   aria-expanded="false"
                   aria-label="스몰 티츄 자세히 보기"
                 >
@@ -1491,18 +1491,37 @@
       </div>
     </div>
 
-    <div class="app-modal" id="tichu-tip-modal" data-modal="tichu-tip" hidden>
+    <div class="app-modal" id="large-tichu-tip-modal" data-modal="large-tichu-tip" hidden>
       <div class="app-modal__backdrop" data-close-modal aria-hidden="true"></div>
       <div
         class="app-modal__dialog tichu-tip-modal__dialog"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="tichu-tip-title"
+        aria-labelledby="large-tichu-tip-title"
         tabindex="-1"
       >
-        <button class="app-modal__close" type="button" data-close-modal aria-label="티츄 판단 팁 닫기">×</button>
-        <section class="tichu-tip" aria-labelledby="tichu-tip-title">
-          <h2 id="tichu-tip-title">티츄, 외쳐도 될까?</h2>
+        <button class="app-modal__close" type="button" data-close-modal aria-label="라지 티츄 설명 닫기">×</button>
+        <section class="tichu-tip" aria-labelledby="large-tichu-tip-title">
+          <h2 id="large-tichu-tip-title">라지 티츄란?</h2>
+
+          <p class="tichu-tip__lead">
+            “이번 판, 내가 <strong>1등으로 카드를 다 낼 수 있다!</strong>”고<br />미리 거는 가장 과감한 선언이에요.
+          </p>
+
+          <dl class="tichu-tip__facts">
+            <div>
+              <dt>언제 선언?</dt>
+              <dd>카드 <strong>처음 8장만 본 상태</strong>에서 (나머지 6장 받기 전)</dd>
+            </div>
+            <div>
+              <dt>성공 조건</dt>
+              <dd>그 판에서 <strong>가장 먼저(1등)</strong> 손패를 다 비우면 성공</dd>
+            </div>
+            <div>
+              <dt>점수</dt>
+              <dd>성공 <strong class="tichu-tip__plus">+200</strong> / 실패 <strong class="tichu-tip__minus">−200</strong><br /><small>보너스가 큰 만큼 위험도 커요</small></dd>
+            </div>
+          </dl>
 
           <div class="tichu-tip__group tichu-tip__group--challenge">
             <h3>이런 패면 도전!</h3>
@@ -1523,6 +1542,57 @@
           </div>
 
           <p class="tichu-tip__beginner"><strong>처음이라면?</strong> 처음 몇 판은 패스하며 감 익히기!</p>
+        </section>
+      </div>
+    </div>
+
+    <div class="app-modal" id="small-tichu-tip-modal" data-modal="small-tichu-tip" hidden>
+      <div class="app-modal__backdrop" data-close-modal aria-hidden="true"></div>
+      <div
+        class="app-modal__dialog tichu-tip-modal__dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="small-tichu-tip-title"
+        tabindex="-1"
+      >
+        <button class="app-modal__close" type="button" data-close-modal aria-label="스몰 티츄 설명 닫기">×</button>
+        <section class="tichu-tip" aria-labelledby="small-tichu-tip-title">
+          <h2 id="small-tichu-tip-title">스몰 티츄란?</h2>
+
+          <p class="tichu-tip__lead">
+            라지 티츄보다 <strong>덜 위험한</strong> 티츄 선언이에요.<br />성공하면 <strong>1등</strong>으로 카드를 다 비우면 돼요.
+          </p>
+
+          <dl class="tichu-tip__facts">
+            <div>
+              <dt>언제 선언?</dt>
+              <dd><strong>14장을 다 받고, 카드 교환까지 끝난 뒤</strong><br />단, <strong>내 첫 카드를 내기 전에만</strong> (한 장이라도 내면 선언 불가)</dd>
+            </div>
+            <div>
+              <dt>성공 조건</dt>
+              <dd>그 판에서 <strong>가장 먼저(1등)</strong> 손패를 다 비우면 성공</dd>
+            </div>
+            <div>
+              <dt>점수</dt>
+              <dd>성공 <strong class="tichu-tip__plus">+100</strong> / 실패 <strong class="tichu-tip__minus">−100</strong></dd>
+            </div>
+          </dl>
+
+          <div class="tichu-tip__compare" aria-label="라지 티츄와 스몰 티츄 비교">
+            <h3>라지 티츄와 뭐가 달라요?</h3>
+            <table class="tichu-tip__compare-table">
+              <thead>
+                <tr><th scope="col"></th><th scope="col">라지</th><th scope="col">스몰</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">선언 시점</th><td>8장만 봤을 때</td><td>교환 후, 첫 장 내기 전</td></tr>
+                <tr><th scope="row">점수</th><td>±200</td><td>±100</td></tr>
+                <tr><th scope="row">위험</th><td>큼</td><td>작음</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="tichu-tip__beginner"><strong>처음이라면?</strong> 스몰 티츄부터 가볍게 도전해 보세요!</p>
         </section>
       </div>
     </div>
