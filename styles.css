@@ -3240,7 +3240,7 @@ body.modal-open .quick-reference-bar {
 
 .deal-table,
 .exchange-table {
-  margin-top: 48px;
+  margin-top: 62px;
 }
 
 .exchange-table {
@@ -3248,7 +3248,7 @@ body.modal-open .quick-reference-bar {
   width: min(100%, 308px, calc(100svh - var(--prep-safe-top) - var(--prep-safe-bottom) - 210px));
   height: auto;
   aspect-ratio: 1;
-  margin-top: 36px;
+  margin-top: 62px;
   border: 7px solid transparent;
   border-radius: 38px;
   background:
@@ -3446,16 +3446,22 @@ body.modal-open .quick-reference-bar {
 }
 
 .exchange-completion {
+  position: absolute;
+  z-index: 6;
+  top: calc(50% - 16px);
+  left: 50%;
   display: flex;
-  min-height: 68px;
-  margin-top: 10px;
+  width: max-content;
+  max-width: 88%;
+  margin: 0;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  gap: 7px;
+  justify-content: center;
+  gap: 10px;
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
+  transform: translate3d(-50%, -50%, 0);
 }
 
 .exchange-completion.is-visible {
@@ -3466,11 +3472,16 @@ body.modal-open .quick-reference-bar {
 
 .exchange-completion p {
   margin: 0;
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.92);
+  box-shadow: 0 6px 16px rgb(56 44 45 / 0.16);
   color: #3c3030;
   font-size: clamp(14px, 3.8vw, 16px);
   font-weight: 800;
   line-height: 1.2;
   letter-spacing: -0.035em;
+  white-space: nowrap;
 }
 
 .exchange-main__next {
@@ -3506,13 +3517,11 @@ body.modal-open .quick-reference-bar {
 
   .deal-table,
   .exchange-table {
-    margin-top: 38px;
+    margin-top: 46px;
   }
 
   .exchange-completion {
-    min-height: 57px;
-    margin-top: 6px;
-    gap: 5px;
+    gap: 8px;
   }
 
   .exchange-main__next {

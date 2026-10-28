@@ -2422,11 +2422,19 @@ const legacyPrepFlow = () => {
     if (animate && !reducedMotion) {
       gsap.fromTo(
         completion,
-        { autoAlpha: 0, y: 8 },
-        { autoAlpha: 1, y: 0, duration: 0.28, ease: "power2.out", overwrite: true }
+        { autoAlpha: 0, xPercent: -50, yPercent: -50, y: 8 },
+        {
+          autoAlpha: 1,
+          xPercent: -50,
+          yPercent: -50,
+          y: 0,
+          duration: 0.28,
+          ease: "power2.out",
+          overwrite: true
+        }
       );
     } else {
-      gsap.set(completion, { autoAlpha: 1, y: 0 });
+      gsap.set(completion, { autoAlpha: 1, xPercent: -50, yPercent: -50, y: 0 });
     }
   };
 
