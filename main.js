@@ -3277,17 +3277,17 @@ const legacyPrepFlow = () => {
         if (nextCard) {
           coverTimeline.fromTo(
             nextCard,
-            { autoAlpha: 0, xPercent: -50, yPercent: -50, x: -150, y: 0, scale: 0.9, rotation: -6 },
+            { autoAlpha: 0, xPercent: -50, yPercent: -50, x: -150, y: 0, scale: 0.94, rotation: -6 },
             {
               autoAlpha: 1,
               x: 0,
               y: 0,
               scale: 1,
               rotation: -2,
-              duration: 0.55,
-              ease: "power2.out"
+              duration: 1.02,
+              ease: "power2.inOut"
             },
-            collectAt + 1.55
+            collectAt + 1.7
           );
         } else {
           coverTimeline.to({}, { duration: 0.4 }, collectAt + 1.25);
