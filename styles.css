@@ -8211,7 +8211,7 @@ body.game-start-active .gameplay-carousel__nav--next {
 
 /* ── "내 차례! 셋 중 하나" choice buttons ── */
 .play-card-sequence__choice-lead {
-  margin: 44px 0 10px;
+  margin: 72px 0 10px;
   color: rgb(255 255 255 / 0.92);
   font-size: clamp(12.5px, 3.4vw, 15px);
   font-weight: 780;
