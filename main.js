@@ -3320,7 +3320,10 @@ const legacyPrepFlow = () => {
       comboGuide.hidden = false;
       comboGuideClose?.removeAttribute("hidden");
       comboInertBackground = Array.from(main?.children || [])
-        .filter((element) => element !== comboGuide)
+        .filter(
+          (element) =>
+            element !== comboGuide && !element.matches(".quick-reference-bar")
+        )
         .map((element) => ({ element, wasInert: element.inert }));
       comboInertBackground.forEach(({ element }) => {
         element.inert = true;

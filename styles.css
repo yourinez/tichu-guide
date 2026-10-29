@@ -1828,6 +1828,14 @@ body.modal-open .quick-reference-bar {
   visibility: visible !important;
 }
 
+html.combo-guide-open .quick-reference-bar,
+body.combo-guide-open .quick-reference-bar {
+  z-index: 1001;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
 .animation-unavailable .rank-reference-label {
   opacity: 1;
   transform: none;
@@ -7369,7 +7377,7 @@ body.modal-open {
   z-index: 1;
   margin-inline: auto;
   min-height: 100%;
-  padding: 58px clamp(10px, 3vw, 14px) 96px;
+  padding: 92px clamp(10px, 3vw, 14px) 96px;
   background-color: #373233;
 }
 
