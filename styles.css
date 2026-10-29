@@ -4145,8 +4145,9 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 }
 
 .play-card-sequence__rules {
-  display: grid;
-  gap: 17px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: min(100%, 350px);
   margin-top: clamp(30px, 5dvh, 44px);
 }
@@ -8210,8 +8211,8 @@ body.game-start-active .gameplay-carousel__nav--next {
 }
 
 /* ── "내 차례! 셋 중 하나" choice buttons ── */
-.play-card-sequence__choice-lead {
-  margin: 72px 0 10px;
+.play-card-sequence__rules .play-card-sequence__choice-lead {
+  margin: 64px 0 12px;
   color: rgb(255 255 255 / 0.92);
   font-size: clamp(12.5px, 3.4vw, 15px);
   font-weight: 780;
