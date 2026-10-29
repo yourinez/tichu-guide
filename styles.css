@@ -6693,6 +6693,39 @@ body.modal-open {
   font-weight: 900;
 }
 
+.tichu-tip__inline-help {
+  display: inline-grid;
+  width: 1.05em;
+  height: 1.05em;
+  margin: 0 0.12em;
+  padding: 0;
+  place-items: center;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  border-radius: 999px;
+  background: #bd0058;
+  color: #fff;
+  cursor: pointer;
+  vertical-align: middle;
+  transform: translateY(-0.06em);
+}
+
+.tichu-tip__inline-help span {
+  font-size: 0.68em;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.tichu-tip__inline-help:hover {
+  background: #a3004c;
+}
+
+.tichu-tip__inline-help:focus-visible {
+  outline: 3px solid rgb(189 0 88 / 0.4);
+  outline-offset: 2px;
+}
+
 .tichu-tip__facts {
   display: grid;
   gap: 9px;
