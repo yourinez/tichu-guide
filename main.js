@@ -1,17 +1,18 @@
 (() => {
   "use strict";
 
-  const scoreScrollIsActive = () =>
-    document.documentElement.classList.contains("score-scroll-active") &&
-    !document.documentElement.classList.contains("modal-open");
   const isScrollableOverlayTarget = (target) =>
     target instanceof Element &&
-    Boolean(target.closest(".app-modal__dialog, .combo-guide.is-opened-from-game"));
+    Boolean(
+      target.closest(
+        ".app-modal__dialog, .combo-guide.is-opened-from-game, .play-card-sequence"
+      )
+    );
 
   window.addEventListener(
     "wheel",
     (event) => {
-      if (event.ctrlKey || scoreScrollIsActive() || isScrollableOverlayTarget(event.target)) return;
+      if (event.ctrlKey || isScrollableOverlayTarget(event.target)) return;
       event.preventDefault();
       event.stopImmediatePropagation();
     },
@@ -20,7 +21,7 @@
   window.addEventListener(
     "touchmove",
     (event) => {
-      if (scoreScrollIsActive() || isScrollableOverlayTarget(event.target)) return;
+      if (isScrollableOverlayTarget(event.target)) return;
       event.preventDefault();
       event.stopImmediatePropagation();
     },
@@ -35,7 +36,7 @@
       const isEditable =
         event.target instanceof Element &&
         event.target.closest("button, a, input, select, textarea, [contenteditable='true']");
-      if (!verticalKey || scoreScrollIsActive() || isEditable || isScrollableOverlayTarget(event.target)) return;
+      if (!verticalKey || isEditable || isScrollableOverlayTarget(event.target)) return;
       event.preventDefault();
       event.stopImmediatePropagation();
     },
@@ -325,10 +326,7 @@ document.querySelector("[data-receive-six-next]")?.addEventListener("click", () 
       ]
     ],
     ["#game-play", [document.querySelector(".gameplay-carousel")]],
-    [
-      "#score-victory",
-      [document.querySelector("#score-victory"), document.querySelector(".round-finale")]
-    ]
+    ["#score-victory", [document.querySelector("#score-victory")]]
   ]);
   const stageContainers = Array.from(
     new Set(Array.from(stageGroups.values()).flat().filter(Boolean))
@@ -342,10 +340,19 @@ document.querySelector("[data-receive-six-next]")?.addEventListener("click", () 
     const activeContainers = new Set(stageGroups.get(target) || []);
     const isolated = activeContainers.size > 0;
 
+    // 상단 바(참조/일반) 모달이 열려 페이지 잠금이 걸린 동안에는 lockPage()가
+    // <main> 하위 요소의 inert/aria-hidden을 전적으로 소유한다. 이때 스크롤·리사이즈로
+    // 발동하는 stage isolation이 같은 속성을 덮어쓰면 모달 뒤 영역이 살아나거나(상호작용 누수),
+    // 잠금 해제 시 복원되는 스냅샷이 어긋나 빈 화면이 된다. 따라서 잠금 중에는 시각용 클래스만
+    // 갱신하고 inert/aria-hidden 기록은 건드리지 않는다. 올바른 값은 unlockPage()가
+    // 잠금 해제 직후 이 함수를 다시 호출해 복원한다.
+    const pageLocked = document.documentElement.classList.contains("modal-open");
+
     document.body.classList.toggle("stage-isolated", isolated);
     stageContainers.forEach((container) => {
       const inactive = isolated && !activeContainers.has(container);
       container.classList.toggle("is-stage-inactive", inactive);
+      if (pageLocked) return;
       container.inert = inactive;
       if (inactive) {
         container.setAttribute("aria-hidden", "true");
@@ -361,6 +368,7 @@ document.querySelector("[data-receive-six-next]")?.addEventListener("click", () 
       if (!view) return;
       const inactive = isolated && inactiveForTarget;
       view.classList.toggle("is-stage-subview-inactive", inactive);
+      if (pageLocked) return;
       view.inert = inactive;
       if (inactive) view.setAttribute("aria-hidden", "true");
       else view.removeAttribute("aria-hidden");
@@ -378,8 +386,6 @@ document.querySelector("[data-receive-six-next]")?.addEventListener("click", () 
       quickReferenceBar.inert = !referencesAvailable;
       quickReferenceBar.setAttribute("aria-hidden", String(!referencesAvailable));
     }
-    document.documentElement.classList.toggle("score-scroll-active", target === "#score-victory");
-    document.body.classList.toggle("score-scroll-active", target === "#score-victory");
     syncStageIsolation(target);
     stageTabs.forEach((tab) => {
       const tabTarget = target === "#card-reference-intro" ? "#card-guide" : target;
@@ -426,8 +432,6 @@ document.querySelector("[data-receive-six-next]")?.addEventListener("click", () 
   };
 
   const setMenuScrollLock = (locked) => {
-    document.documentElement.classList.remove("score-scroll-active");
-    document.body.classList.remove("score-scroll-active");
     if (!locked) {
       chapterMenuOnScreen = false;
       document.body.classList.remove("chapter-menu-visible");
@@ -504,37 +508,6 @@ document.querySelector("[data-receive-six-next]")?.addEventListener("click", () 
   window.addEventListener("scroll", updateStageFromScroll, { passive: true });
   window.addEventListener("resize", updateStageFromScroll, { passive: true });
   updateStageFromScroll();
-
-  let correctingScoreBoundary = false;
-  window.addEventListener(
-    "scroll",
-    () => {
-      if (requestedStageTarget !== "#score-victory" || correctingScoreBoundary) {
-        return;
-      }
-      const scoreSections = stageGroups.get("#score-victory") || [];
-      const first = scoreSections[0];
-      const last = scoreSections.at(-1);
-      if (!first || !last) {
-        return;
-      }
-      const min = first.getBoundingClientRect().top + window.scrollY;
-      const max = Math.max(
-        min,
-        last.getBoundingClientRect().bottom + window.scrollY - window.innerHeight
-      );
-      const target = Math.max(min, Math.min(max, window.scrollY));
-      if (Math.abs(target - window.scrollY) <= 1) {
-        return;
-      }
-      correctingScoreBoundary = true;
-      document.scrollingElement.scrollTop = target;
-      window.requestAnimationFrame(() => {
-        correctingScoreBoundary = false;
-      });
-    },
-    { passive: true }
-  );
 
   window.requestAnimationFrame(() => {
     window.tichuStageNav?.goTo?.(initialStage);
@@ -1699,6 +1672,7 @@ const legacyPrepFlow = () => {
       if (section) {
         jumpToDocumentPosition(section.getBoundingClientRect().top + window.scrollY);
       }
+      window.tichuScoreSlides?.goToSlide(0);
     }
   };
 
@@ -2422,11 +2396,20 @@ const legacyPrepFlow = () => {
     if (animate && !reducedMotion) {
       gsap.fromTo(
         completion,
-        { autoAlpha: 0, y: 8 },
-        { autoAlpha: 1, y: 0, duration: 0.28, ease: "power2.out", overwrite: true }
+        { autoAlpha: 0, xPercent: -50, yPercent: -50, x: 0, y: 8 },
+        {
+          autoAlpha: 1,
+          xPercent: -50,
+          yPercent: -50,
+          x: 0,
+          y: 0,
+          duration: 0.28,
+          ease: "power2.out",
+          overwrite: true
+        }
       );
     } else {
-      gsap.set(completion, { autoAlpha: 1, y: 0 });
+      gsap.set(completion, { autoAlpha: 1, xPercent: -50, yPercent: -50, x: 0, y: 0 });
     }
   };
 
@@ -2516,15 +2499,15 @@ const legacyPrepFlow = () => {
   });
 
   const targets = {
-    left: { top: "50%", left: "14%", rotation: -90, opacity: 0.72 },
-    top: { top: "20%", left: "50%", rotation: 0, opacity: 1 },
-    right: { top: "50%", left: "86%", rotation: 90, opacity: 0.72 }
+    left: { top: "50%", left: "7%", rotation: -90, opacity: 0.72 },
+    top: { top: "12%", left: "50%", rotation: 0, opacity: 1 },
+    right: { top: "50%", left: "93%", rotation: 90, opacity: 0.72 }
   };
 
   const receivedPositions = {
-    left: { top: "80%", left: "46%", rotation: -7 },
-    top: { top: "79%", left: "50%", rotation: 0 },
-    right: { top: "80%", left: "54%", rotation: 7 }
+    left: { top: "87%", left: "46%", rotation: -7 },
+    top: { top: "86%", left: "50%", rotation: 0 },
+    right: { top: "87%", left: "54%", rotation: 7 }
   };
 
   incomingCards.forEach((card) => {
@@ -3021,6 +3004,10 @@ const legacyPrepFlow = () => {
   if (cardSequence) {
     const pairs = Array.from(cardSequence.querySelectorAll(".play-card-sequence__pair"));
     const replayButton = cardSequence.querySelector(".play-card-sequence__replay");
+    const board = cardSequence.querySelector(".play-card-sequence__board");
+    const seatFor = (entry) =>
+      cardSequence.querySelector(`.pcs-seat[data-seat="${entry}"]`);
+    const passLabels = Array.from(cardSequence.querySelectorAll(".pcs-pass"));
     let coverTimeline = null;
 
     const entryPositions = {
@@ -3035,6 +3022,27 @@ const legacyPrepFlow = () => {
       y: Number(pair.dataset.finalY || 0),
       rotation: Number(pair.dataset.finalRotation || 0)
     });
+
+    const clearSeatHighlights = () => {
+      cardSequence
+        .querySelectorAll(".pcs-seat.is-active")
+        .forEach((seat) => seat.classList.remove("is-active"));
+    };
+
+    // Remember each pair image's original (front) src so we can flip to the
+    // card back during the "collect" step and restore it when the loop resets.
+    const pairImages = Array.from(cardSequence.querySelectorAll(".play-card-sequence__pair img"));
+    pairImages.forEach((img) => {
+      if (!img.dataset.frontSrc) img.dataset.frontSrc = img.getAttribute("src");
+    });
+    const nextLead = cardSequence
+      .closest(".play-card-sequence")
+      ?.querySelector(".play-card-sequence__next-lead");
+    const nextCard = cardSequence.querySelector(".pcs-next-card");
+    const BACK_SRC = "뒷면.png";
+    const showCardBacks = () => pairImages.forEach((img) => img.setAttribute("src", BACK_SRC));
+    const showCardFronts = () =>
+      pairImages.forEach((img) => img.setAttribute("src", img.dataset.frontSrc));
 
     if (reducedMotion || !window.gsap) {
       pairs.forEach((pair) => {
@@ -3063,6 +3071,24 @@ const legacyPrepFlow = () => {
       const resetSequence = () => {
         coverTimeline?.kill();
         coverTimeline = null;
+        clearSeatHighlights();
+        showCardFronts();
+        nextLead?.classList.remove("is-visible");
+        if (nextCard) {
+          window.gsap.set(nextCard, {
+            autoAlpha: 0,
+            xPercent: -50,
+            yPercent: -50,
+            x: -150,
+            y: 0,
+            scale: 0.9,
+            rotation: -6
+          });
+        }
+        if (passLabels.length) {
+          window.gsap.set(passLabels, { autoAlpha: 0, scale: 0.9 });
+        }
+        window.gsap.set(pairs, { rotationY: 0 });
         setSequenceStart();
       };
 
@@ -3070,7 +3096,27 @@ const legacyPrepFlow = () => {
         resetSequence();
         coverTimeline = window.gsap.timeline({
           repeat: -1,
-          repeatDelay: 0.2
+          repeatDelay: 10,
+          onRepeat: () => {
+            clearSeatHighlights();
+            showCardFronts();
+            nextLead?.classList.remove("is-visible");
+            if (nextCard) {
+              window.gsap.set(nextCard, {
+                autoAlpha: 0,
+                xPercent: -50,
+                yPercent: -50,
+                x: -150,
+                y: 0,
+                scale: 0.9,
+                rotation: -6
+              });
+            }
+            if (passLabels.length) {
+              window.gsap.set(passLabels, { autoAlpha: 0, scale: 0.9 });
+            }
+            window.gsap.set(pairs, { rotationY: 0 });
+          }
         });
 
         pairs.forEach((pair) => {
@@ -3080,6 +3126,17 @@ const legacyPrepFlow = () => {
         pairs.forEach((pair, index) => {
           const finalState = getFinalState(pair);
           const startAt = 0.25 + index * 1.2;
+          const entry = pair.dataset.entry;
+
+          // Highlight the seat that is playing this pair.
+          coverTimeline.call(
+            () => {
+              clearSeatHighlights();
+              seatFor(entry)?.classList.add("is-active");
+            },
+            null,
+            startAt
+          );
 
           coverTimeline.fromTo(
             pair,
@@ -3096,11 +3153,119 @@ const legacyPrepFlow = () => {
           );
         });
 
+        // After KK, the three non-left seats (bottom, right, top) pass — in
+        // counter-clockwise order — while the left seat (who played KK) does not.
+        const afterKk = 0.25 + pairs.length * 1.2 + 0.2;
+        coverTimeline.call(() => clearSeatHighlights(), null, afterKk);
+
+        const passOrder = ["bottom", "right", "top"];
+        passOrder.forEach((seat, index) => {
+          const label = passLabels.find((el) => el.dataset.pass === seat);
+          if (!label) return;
+          coverTimeline.fromTo(
+            label,
+            { autoAlpha: 0, scale: 0.9 },
+            {
+              autoAlpha: 1,
+              scale: 1,
+              duration: 0.26,
+              ease: "back.out(1.7)"
+            },
+            afterKk + 0.1 + index * 0.34
+          );
+        });
+
+        // The left seat (last to play) scoops up the whole trick:
+        // 1) the whole pile flips over to show card backs,
+        // 2) then slides off toward the left seat and clears.
+        const collectAt = afterKk + 0.1 + passOrder.length * 0.34 + 0.6;
+
+        // Flip the pile over. At the half-way point (edge-on) swap the images
+        // to the card back so it reads as "turned face-down".
         coverTimeline.to(
           pairs,
-          { autoAlpha: 0, duration: 0.4, ease: "power1.out" },
-          ">+=1"
+          {
+            rotationY: 90,
+            duration: 0.22,
+            ease: "power1.in"
+          },
+          collectAt
         );
+        coverTimeline.call(() => showCardBacks(), null, collectAt + 0.22);
+        coverTimeline.to(
+          pairs,
+          {
+            rotationY: 0,
+            duration: 0.22,
+            ease: "power1.out"
+          },
+          collectAt + 0.22
+        );
+
+        // Highlight the left seat (the winner who collects the trick).
+        coverTimeline.call(
+          () => {
+            clearSeatHighlights();
+            seatFor("left")?.classList.add("is-active");
+          },
+          null,
+          collectAt + 0.22
+        );
+
+        // Fade the pass tags out as the trick gets collected.
+        if (passLabels.length) {
+          coverTimeline.to(
+            passLabels,
+            { autoAlpha: 0, duration: 0.3, ease: "power1.out" },
+            collectAt + 0.5
+          );
+        }
+
+        // Slide the whole face-down pile off toward the left seat, then clear.
+        coverTimeline.to(
+          pairs,
+          {
+            x: -230,
+            y: 0,
+            rotation: -10,
+            autoAlpha: 0,
+            duration: 0.56,
+            ease: "power2.in",
+            stagger: 0.035
+          },
+          collectAt + 0.62
+        );
+
+        // Card pile is gone — show the "whoever wins starts next" note in the
+        // The left seat stays highlighted from the moment it collects the
+        // trick, through the note, until it plays the next single card — no
+        // flicker. Just show the note here (keep the existing highlight).
+        coverTimeline.call(
+          () => {
+            nextLead?.classList.add("is-visible");
+          },
+          null,
+          collectAt + 1.25
+        );
+
+        if (nextCard) {
+          coverTimeline.fromTo(
+            nextCard,
+            { autoAlpha: 0, xPercent: -50, yPercent: -50, x: -150, y: 0, scale: 0.94, rotation: -6 },
+            {
+              autoAlpha: 1,
+              x: 0,
+              y: 0,
+              scale: 1,
+              rotation: -2,
+              duration: 1.02,
+              ease: "power2.inOut"
+            },
+            collectAt + 1.7
+          );
+        } else {
+          coverTimeline.to({}, { duration: 0.4 }, collectAt + 1.25);
+        }
       };
 
       resetSequence();
@@ -3120,7 +3285,10 @@ const legacyPrepFlow = () => {
       comboGuide.hidden = false;
       comboGuideClose?.removeAttribute("hidden");
       comboInertBackground = Array.from(main?.children || [])
-        .filter((element) => element !== comboGuide)
+        .filter(
+          (element) =>
+            element !== comboGuide && !element.matches(".quick-reference-bar")
+        )
         .map((element) => ({ element, wasInert: element.inert }));
       comboInertBackground.forEach(({ element }) => {
         element.inert = true;
@@ -3334,6 +3502,91 @@ const legacyPrepFlow = () => {
     },
     { passive: false, capture: true }
   );
+
+  goToSlide(0);
+})();
+
+(() => {
+  "use strict";
+
+  // 점수 화면 전용 가로 캐러셀 컨트롤러. 게임 진행 캐러셀 컨트롤러에서 일반화했다.
+  // 게임 진행 전용 결합(gameStart 체크, setScrollLock/gameplay-slides-active/game-start-active,
+  // IntersectionObserver 스크롤 잠금, gameplay:slide-enter/exit 이벤트, 추가 wheel preventDefault)은
+  // 모두 제거했다. 점수 화면은 더 이상 스크롤에 의존하지 않고 다른 스테이지처럼 뷰포트에 맞으므로,
+  // 캐러셀은 슬라이드 전환만 담당한다.
+  const carousel = document.querySelector(".score-carousel");
+  const viewport = carousel?.querySelector(".score-carousel__viewport");
+  const track = carousel?.querySelector(".score-carousel__track");
+  const slides = Array.from(carousel?.querySelectorAll(".score-carousel__slide") || []);
+  const previousButton = carousel?.querySelector(".score-carousel__nav--previous");
+  const nextButton = carousel?.querySelector(".score-carousel__nav--next");
+  const dots = Array.from(carousel?.querySelectorAll(".score-carousel__dots button") || []);
+
+  if (
+    !carousel ||
+    !viewport ||
+    !track ||
+    slides.length === 0 ||
+    dots.length !== slides.length ||
+    !previousButton ||
+    !nextButton
+  ) {
+    return;
+  }
+
+  let currentIndex = 0;
+
+  const goToSlide = (nextIndex) => {
+    const lastIndex = slides.length - 1;
+    const boundedIndex = Math.max(0, Math.min(lastIndex, nextIndex));
+
+    const moveFocusToViewport = slides[currentIndex]?.contains(document.activeElement);
+    if (moveFocusToViewport) {
+      viewport.focus({ preventScroll: true });
+    }
+    currentIndex = boundedIndex;
+    carousel.dataset.activeSlide = String(currentIndex);
+    track.style.transform = `translate3d(-${currentIndex * 100}%, 0, 0)`;
+
+    const slideLabelId = slides[currentIndex].getAttribute("aria-labelledby");
+    const slideLabel = slides[currentIndex].getAttribute("aria-label") ||
+      document.getElementById(slideLabelId)?.textContent.trim().replace(/\s+/g, " ") ||
+      "점수 안내";
+    viewport.setAttribute(
+      "aria-label",
+      `점수 안내 ${currentIndex + 1}/${slides.length}: ${slideLabel}`
+    );
+
+    slides.forEach((slide, index) => {
+      const isCurrent = index === currentIndex;
+      slide.setAttribute("aria-hidden", String(!isCurrent));
+      slide.inert = !isCurrent;
+      // 가로 캐러셀 안에서는 스크롤이 없으므로, 현재 보이는 슬라이드에
+      // is-visible 진입 애니메이션 클래스를 직접 붙여 준다(.round-end/.round-finale 관찰자 보완).
+      if (isCurrent) {
+        slide.classList.add("is-visible");
+      }
+    });
+    previousButton.disabled = currentIndex === 0;
+    nextButton.disabled = currentIndex === lastIndex;
+    dots.forEach((dot, index) => {
+      const isCurrent = index === currentIndex;
+      dot.classList.toggle("is-active", isCurrent);
+      if (isCurrent) {
+        dot.setAttribute("aria-current", "page");
+      } else {
+        dot.removeAttribute("aria-current");
+      }
+    });
+  };
+
+  window.tichuScoreSlides = { goToSlide, current: () => currentIndex };
+  previousButton.addEventListener("click", () => goToSlide(currentIndex - 1));
+  nextButton.addEventListener("click", () => goToSlide(currentIndex + 1));
+
+  dots.forEach((dot, index) => {
+    dot.addEventListener("click", () => goToSlide(index));
+  });
 
   goToSlide(0);
 })();
@@ -3569,6 +3822,7 @@ const legacyPrepFlow = () => {
   let lockedScrollY = 0;
   let closeTimer = null;
   let inertBackground = [];
+  let pageLockCount = 0;
 
   const modalFor = (name) =>
     Array.from(document.querySelectorAll("[data-modal]")).find(
@@ -3612,6 +3866,7 @@ const legacyPrepFlow = () => {
     if (!state) return;
 
     openReferences.delete(name);
+    unlockPage();
     state.modal.classList.remove("is-open", "is-front");
     setReferenceActive();
     window.clearTimeout(referenceCloseTimers.get(name));
@@ -3642,6 +3897,7 @@ const legacyPrepFlow = () => {
 
     window.clearTimeout(referenceCloseTimers.get(name));
     referenceCloseTimers.delete(name);
+    lockPage();
     const opener = trigger instanceof HTMLElement
       ? trigger
       : referenceButtons.find((button) => button.dataset.open === name) || null;
@@ -3664,6 +3920,10 @@ const legacyPrepFlow = () => {
   };
 
   const lockPage = () => {
+    pageLockCount += 1;
+    if (pageLockCount > 1) {
+      return;
+    }
     lockedScrollY = window.scrollY;
     document.documentElement.classList.add("modal-open");
     document.body.classList.add("modal-open");
@@ -3678,6 +3938,13 @@ const legacyPrepFlow = () => {
   };
 
   const unlockPage = () => {
+    if (pageLockCount === 0) {
+      return;
+    }
+    pageLockCount -= 1;
+    if (pageLockCount > 0) {
+      return;
+    }
     const restoreScrollY = lockedScrollY;
     document.documentElement.classList.remove("modal-open");
     document.body.classList.remove("modal-open");
@@ -3685,6 +3952,11 @@ const legacyPrepFlow = () => {
       element.inert = wasInert;
     });
     inertBackground = [];
+
+    // 잠금 중에는 stage isolation이 inert/aria-hidden을 건드리지 않았으므로, 위에서 복원한
+    // 스냅샷은 잠금 시점의 값이다. 그 사이 스크롤/리사이즈/단계 이동으로 단계 의도가 바뀌었을 수
+    // 있으니, 현재 단계 상태를 다시 계산해 배경의 inert/aria-hidden을 올바른 값으로 맞춘다.
+    window.tichuStageNav?.setActive?.(document.body.dataset.activeStage);
 
     if (Math.abs(window.scrollY - restoreScrollY) > 1) {
       window.scrollTo({ top: restoreScrollY, left: 0, behavior: "auto" });
@@ -3884,103 +4156,4 @@ const legacyPrepFlow = () => {
   window.addEventListener("scroll", update, { passive: true });
   window.addEventListener("resize", update);
   update();
-})();
-
-(() => {
-  "use strict";
-
-  const scoreStart = document.querySelector("#score-victory");
-  const scoreEnd = document.querySelector(".round-finale");
-
-  if (!scoreStart || !scoreEnd) {
-    return;
-  }
-
-  let touchStartY = null;
-  let correcting = false;
-
-  const isScoreActive = () =>
-    document.body.dataset.activeStage === "#score-victory" &&
-    document.body.classList.contains("stage-tabs-visible") &&
-    !document.documentElement.classList.contains("modal-open");
-
-  const documentTop = (element) => element.getBoundingClientRect().top + window.scrollY;
-  const bounds = () => ({
-    min: documentTop(scoreStart),
-    max: Math.max(
-      documentTop(scoreStart),
-      documentTop(scoreEnd) + scoreEnd.offsetHeight - window.innerHeight
-    )
-  });
-
-  const atBoundary = (direction) => {
-    const { min, max } = bounds();
-    return (direction < 0 && window.scrollY <= min + 1) ||
-      (direction > 0 && window.scrollY >= max - 1);
-  };
-
-  window.addEventListener(
-    "wheel",
-    (event) => {
-      if (!isScoreActive() || !event.deltaY || !atBoundary(Math.sign(event.deltaY))) {
-        return;
-      }
-      event.preventDefault();
-      event.stopImmediatePropagation();
-    },
-    { passive: false, capture: true }
-  );
-
-  window.addEventListener(
-    "touchstart",
-    (event) => {
-      touchStartY = isScoreActive() ? event.touches[0]?.clientY ?? null : null;
-    },
-    { passive: true, capture: true }
-  );
-
-  window.addEventListener(
-    "touchmove",
-    (event) => {
-      if (!isScoreActive() || touchStartY === null) {
-        return;
-      }
-      const currentY = event.touches[0]?.clientY;
-      if (currentY === undefined) {
-        return;
-      }
-      const direction = Math.sign(touchStartY - currentY);
-      if (direction && atBoundary(direction)) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-      }
-    },
-    { passive: false, capture: true }
-  );
-
-  const clearTouch = () => {
-    touchStartY = null;
-  };
-  window.addEventListener("touchend", clearTouch, { passive: true, capture: true });
-  window.addEventListener("touchcancel", clearTouch, { passive: true, capture: true });
-
-  window.addEventListener(
-    "scroll",
-    () => {
-      if (!isScoreActive() || correcting) {
-        return;
-      }
-      const { min, max } = bounds();
-      const target = Math.max(min, Math.min(max, window.scrollY));
-      if (Math.abs(target - window.scrollY) <= 1) {
-        return;
-      }
-      correcting = true;
-      window.scrollTo({ top: target, left: 0, behavior: "auto" });
-      window.requestAnimationFrame(() => {
-        correcting = false;
-      });
-    },
-    { passive: true }
-  );
 })();

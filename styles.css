@@ -535,7 +535,12 @@ body:not(.stage-tabs-visible) .prep-stepper {
 }
 
 body[data-active-stage="#game-play"] .floating-tip-button {
-  bottom: max(82px, calc(env(safe-area-inset-bottom) + 80px));
+  top: max(202px, calc(env(safe-area-inset-top) + 192px));
+  bottom: auto;
+  min-width: 0;
+  min-height: 32px;
+  padding: 5px 12px;
+  font-size: 13px;
 }
 
 .floating-tip-button.is-visible {
@@ -1731,7 +1736,7 @@ body[data-active-stage="#game-play"] .floating-tip-button {
   bottom: max(10px, calc(env(safe-area-inset-bottom) + 8px));
   width: min(calc(100% - 24px), 416px);
   margin: 0;
-  padding: 5px;
+  padding: 3px;
   border: 1px solid rgb(255 255 255 / 0.24);
   border-radius: 999px;
   background: rgb(88 75 74 / 0.8);
@@ -1756,7 +1761,7 @@ body[data-active-stage="#game-play"] .floating-tip-button {
   position: relative;
   display: grid;
   min-width: 0;
-  min-height: 48px;
+  min-height: 36px;
   padding: 0 8px;
   flex: 1 1 0;
   place-items: center;
@@ -1765,7 +1770,7 @@ body[data-active-stage="#game-play"] .floating-tip-button {
   background: transparent;
   color: #f5f5f7;
   font: inherit;
-  font-size: clamp(13px, 3.6vw, 15px);
+  font-size: clamp(12px, 3.3vw, 14px);
   font-weight: 740;
   line-height: 1;
   letter-spacing: -0.025em;
@@ -1817,6 +1822,14 @@ body[data-active-stage="#game-intro"] .quick-reference-bar {
 
 html.modal-open .quick-reference-bar,
 body.modal-open .quick-reference-bar {
+  z-index: 1001;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+html.combo-guide-open .quick-reference-bar,
+body.combo-guide-open .quick-reference-bar {
   z-index: 1001;
   opacity: 1 !important;
   pointer-events: auto !important;
@@ -1893,16 +1906,119 @@ body.modal-open .quick-reference-bar {
 
 .trick-end {
   display: grid;
-  min-height: 70svh;
-  padding: 64px clamp(18px, 5vw, 24px);
-  place-items: center;
+  min-height: 100svh;
+  padding: clamp(32px, 7dvh, 64px) clamp(18px, 5vw, 24px)
+    max(clamp(88px, 12dvh, 108px), calc(env(safe-area-inset-bottom) + 84px));
+  justify-items: center;
+  align-items: start;
   background: linear-gradient(to bottom, #faefe4 0%, #fdf6ec 100%);
   color: #29231f;
   text-align: center;
+  overflow-y: auto;
 }
 
 .trick-end__inner {
   width: min(100%, 360px);
+}
+
+.trick-end__score-link {
+  display: flex;
+  width: 100%;
+  max-width: 340px;
+  margin: clamp(24px, 4dvh, 34px) auto 0;
+  padding: 11px 18px 13px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border: 1px solid rgb(113 76 50 / 0.22);
+  border-radius: 24px;
+  background: #ffca61;
+  box-shadow: 0 6px 14px rgb(88 54 36 / 0.18);
+  color: #241915;
+  cursor: pointer;
+  font: inherit;
+  text-align: center;
+}
+
+.trick-end__score-link-sub {
+  color: rgb(36 25 21 / 0.72);
+  font-size: clamp(11.5px, 3vw, 13px);
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+.trick-end__score-link-main {
+  font-size: clamp(14px, 3.8vw, 16px);
+  font-weight: 850;
+  line-height: 1.25;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+}
+
+.trick-end__score-link-arrow {
+  margin-left: 2px;
+  font-size: 1.05em;
+}
+
+.trick-end__score-link:focus-visible {
+  outline: 3px solid #b0873f;
+  outline-offset: 3px;
+}
+
+.trick-end__repeat {
+  position: relative;
+  margin-top: clamp(22px, 4dvh, 32px);
+  padding-top: clamp(22px, 4dvh, 30px);
+  border-top: 1px solid rgb(98 70 51 / 0.14);
+}
+
+.trick-end__repeat::before {
+  content: "↓";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -55%);
+  color: #b0a097;
+  font-size: clamp(16px, 4vw, 20px);
+  line-height: 1;
+}
+
+.trick-end__repeat-kicker {
+  margin: 0 0 4px;
+  color: #8a7d76;
+  font-size: clamp(12px, 3.2vw, 13px);
+  font-weight: 640;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+
+.trick-end__repeat > h3 {
+  margin: 0;
+  color: #342a25;
+  font-size: clamp(16px, 4.6vw, 20px);
+  font-weight: 820;
+  line-height: 1.4;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.trick-end__repeat-copy {
+  margin: clamp(10px, 2dvh, 14px) 0 0;
+  color: #5f554f;
+  font-size: clamp(14px, 4vw, 16px);
+  font-weight: 640;
+  line-height: 1.5;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+  word-break: keep-all;
+}
+
+.trick-end__repeat-copy strong {
+  color: #a82e39;
+  font-weight: 840;
 }
 
 .trick-end h2 {
@@ -1937,6 +2053,10 @@ body.modal-open .quick-reference-bar {
 .trick-end p strong {
   color: #a82e39;
   font-weight: 820;
+}
+
+.trick-end__collection-copy p + p {
+  margin-top: 4px;
 }
 
 .trick-end__pile {
@@ -2290,21 +2410,21 @@ body.modal-open .quick-reference-bar {
   left: 50%;
   display: inline-flex;
   width: auto;
-  min-width: min(78%, 240px);
-  min-height: 50px;
+  min-width: auto;
+  min-height: 40px;
   margin: 0;
-  padding: 0 20px;
+  padding: 0 18px;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  border: 1px solid rgb(255 255 255 / 0.72);
+  gap: 6px;
+  border: 1px solid rgb(113 76 50 / 0.22);
   border-radius: 999px;
-  background: #382c2d;
-  box-shadow: 0 10px 24px rgb(56 44 45 / 0.22);
-  color: #fff;
+  background: #ffca61;
+  box-shadow: 0 6px 14px rgb(88 54 36 / 0.18);
+  color: #241915;
   cursor: pointer;
   font: inherit;
-  font-size: clamp(17px, 4.8vw, 20px);
+  font-size: clamp(14px, 4vw, 16px);
   font-weight: 790;
   line-height: 1.2;
   letter-spacing: -0.045em;
@@ -2320,17 +2440,23 @@ body.modal-open .quick-reference-bar {
   display: none;
 }
 
+.deal-status,
+.deal-status span,
+.deal-status__arrow {
+  color: #241915;
+}
+
 .deal-status__arrow {
   font-size: 1.25em;
   line-height: 1;
 }
 
 .deal-status:hover {
-  background: #4a383a;
+  background: #ffd277;
 }
 
 .deal-status:focus-visible {
-  outline: 3px solid #a91462;
+  outline: 3px solid #b0873f;
   outline-offset: 4px;
 }
 
@@ -2752,9 +2878,9 @@ body.modal-open .quick-reference-bar {
 }
 
 .quick-reference-bar__button {
-  min-height: 44px;
+  min-height: 34px;
   padding-inline: 3px;
-  font-size: clamp(11px, 3.25vw, 14px);
+  font-size: clamp(11px, 3.1vw, 13px);
   letter-spacing: -0.045em;
   white-space: nowrap;
 }
@@ -2787,6 +2913,8 @@ body.modal-open .quick-reference-bar {
   color: #161313;
   opacity: 0;
   pointer-events: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   transform: translate(-50%, 12px) scale(0.98);
 }
 
@@ -3240,7 +3368,7 @@ body.modal-open .quick-reference-bar {
 
 .deal-table,
 .exchange-table {
-  margin-top: 48px;
+  margin-top: 62px;
 }
 
 .exchange-table {
@@ -3248,7 +3376,7 @@ body.modal-open .quick-reference-bar {
   width: min(100%, 308px, calc(100svh - var(--prep-safe-top) - var(--prep-safe-bottom) - 210px));
   height: auto;
   aspect-ratio: 1;
-  margin-top: 36px;
+  margin-top: 62px;
   border: 7px solid transparent;
   border-radius: 38px;
   background:
@@ -3285,7 +3413,7 @@ body.modal-open .quick-reference-bar {
 }
 
 .exchange-seat--top {
-  top: -34px;
+  top: -26px;
   left: 50%;
   color: #147847;
   transform: translateX(-50%);
@@ -3293,7 +3421,7 @@ body.modal-open .quick-reference-bar {
 
 .exchange-seat--left {
   top: 50%;
-  left: -28px;
+  left: -20px;
   min-width: 22px;
   min-height: 0;
   padding: 5px 0;
@@ -3304,7 +3432,7 @@ body.modal-open .quick-reference-bar {
 
 .exchange-seat--right {
   top: 50%;
-  right: -28px;
+  right: -20px;
   min-width: 22px;
   min-height: 0;
   padding: 5px 0;
@@ -3314,7 +3442,7 @@ body.modal-open .quick-reference-bar {
 }
 
 .exchange-seat--bottom {
-  bottom: -34px;
+  bottom: -26px;
   left: 50%;
   transform: translateX(-50%);
 }
@@ -3446,16 +3574,23 @@ body.modal-open .quick-reference-bar {
 }
 
 .exchange-completion {
+  position: absolute;
+  z-index: 6;
+  top: calc(50% - 16px);
+  left: 50%;
   display: flex;
-  min-height: 68px;
-  margin-top: 10px;
+  width: min(88%, 300px);
+  max-width: calc(100% - 24px);
+  margin: 0;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  gap: 7px;
+  justify-content: center;
+  gap: 10px;
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
+  text-align: center;
+  transform: translate3d(-50%, -50%, 0);
 }
 
 .exchange-completion.is-visible {
@@ -3465,12 +3600,18 @@ body.modal-open .quick-reference-bar {
 }
 
 .exchange-completion p {
-  margin: 0;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  background: transparent;
   color: #3c3030;
   font-size: clamp(14px, 3.8vw, 16px);
   font-weight: 800;
   line-height: 1.2;
   letter-spacing: -0.035em;
+  text-align: center;
+  white-space: normal;
+  word-break: keep-all;
 }
 
 .exchange-main__next {
@@ -3506,13 +3647,11 @@ body.modal-open .quick-reference-bar {
 
   .deal-table,
   .exchange-table {
-    margin-top: 38px;
+    margin-top: 46px;
   }
 
   .exchange-completion {
-    min-height: 57px;
-    margin-top: 6px;
-    gap: 5px;
+    gap: 8px;
   }
 
   .exchange-main__next {
@@ -3743,10 +3882,75 @@ body.modal-open .quick-reference-bar {
   font-weight: 900;
 }
 
+.game-start__holder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.14em;
+  margin-bottom: 0.18em;
+  font-size: 0.84em;
+}
+
+.game-start__launch {
+  display: block;
+}
+
+.game-start__help {
+  display: inline-grid;
+  width: 0.82em;
+  height: 0.82em;
+  padding: 0;
+  flex: 0 0 auto;
+  place-items: center;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0.08em solid currentColor;
+  border-radius: 999px;
+  background: rgb(39 26 28 / 0.06);
+  color: inherit;
+  font-size: inherit;
+  line-height: 1;
+  cursor: pointer;
+  transform: translateY(-0.13em);
+  box-shadow: 0 0 0 0 rgb(39 26 28 / 0.3);
+  animation: game-start-help-pulse 2.1s ease-in-out infinite;
+}
+
+.game-start__help span {
+  font-size: 0.52em;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.game-start__help:hover {
+  background: rgb(39 26 28 / 0.14);
+}
+
+@keyframes game-start-help-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(39 26 28 / 0.26);
+  }
+  50% {
+    box-shadow: 0 0 0 0.28em rgb(39 26 28 / 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-start__help {
+    animation: none;
+  }
+}
+
+.game-start__help:focus-visible {
+  outline: 3px solid #b6005b;
+  outline-offset: 3px;
+}
+
 .game-start__play {
   display: flex;
-  width: clamp(84px, 24vw, 94px);
-  height: clamp(84px, 24vw, 94px);
+  width: clamp(64px, 18vw, 72px);
+  height: clamp(64px, 18vw, 72px);
   margin: clamp(17px, 2.7dvh, 24px) 0 0;
   padding: 0;
   flex: 0 0 auto;
@@ -3766,10 +3970,10 @@ body.modal-open .quick-reference-bar {
   display: block;
   width: 0;
   height: 0;
-  margin-left: 7px;
-  border-top: 18px solid transparent;
-  border-bottom: 18px solid transparent;
-  border-left: 29px solid #fff;
+  margin-left: 6px;
+  border-top: 14px solid transparent;
+  border-bottom: 14px solid transparent;
+  border-left: 22px solid #fff;
   font-size: 0;
   line-height: 0;
 }
@@ -3827,9 +4031,16 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
     max(94px, calc(env(safe-area-inset-bottom) + 82px));
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   justify-items: center;
-  overflow: hidden;
+  /* Safety net: if content ever still exceeds height on an extreme viewport,
+     scroll vertically instead of clipping the ③ button. The global wheel/
+     touchmove guard in main.js allow-lists .play-card-sequence so this scroll
+     is actually usable on touch and wheel. Horizontal stays clipped so it
+     never interferes with the carousel's horizontal track transform (the
+     gameplay carousel navigates via nav buttons/dots, not touch-swipe). */
+  overflow-x: hidden;
+  overflow-y: auto;
   background: #fff;
   color: #29231f;
   text-align: center;
@@ -3861,7 +4072,7 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   position: relative;
   z-index: 1;
   display: grid;
-  width: min(78vw, 306px);
+  width: min(64vw, 250px);
   aspect-ratio: 1;
   margin-inline: auto;
   place-items: center;
@@ -3870,6 +4081,10 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   box-shadow: 0 18px 38px rgb(54 38 40 / 0.2);
   overflow: hidden;
   isolation: isolate;
+}
+
+.play-card-sequence__board {
+  perspective: 900px;
 }
 
 .play-card-sequence__pair {
@@ -3881,6 +4096,7 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   gap: 8px;
   align-items: center;
   justify-content: center;
+  transform-style: preserve-3d;
   transform:
     translate(calc(-50% + var(--pair-x, 0px)), calc(-50% + var(--pair-y, 0px)))
     rotate(var(--pair-rotation, 0deg));
@@ -3917,10 +4133,129 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 }
 
 .play-card-sequence__pair img {
-  width: clamp(58px, 17.5vw, 72px);
+  width: clamp(42px, 12.5vw, 52px);
   height: auto;
   border-radius: 5px;
   box-shadow: 0 8px 16px rgb(0 0 0 / 0.26);
+}
+
+/* Seat labels around the inner edges of the board (board has overflow:hidden). */
+.pcs-seat {
+  position: absolute;
+  z-index: 7;
+  color: rgb(255 255 255 / 0.5);
+  font-size: clamp(11px, 3vw, 13px);
+  font-weight: 760;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: color 0.28s ease, text-shadow 0.28s ease, transform 0.28s ease;
+}
+
+.pcs-seat--bottom {
+  bottom: 12px;
+  left: 50%;
+  color: rgb(255 210 102 / 0.82);
+  transform: translateX(-50%);
+}
+
+.pcs-seat--top {
+  top: 12px;
+  left: 50%;
+  color: rgb(129 227 170 / 0.72);
+  transform: translateX(-50%);
+}
+
+.pcs-seat--left {
+  top: 50%;
+  left: 11px;
+  writing-mode: vertical-rl;
+  transform: translateY(-50%);
+}
+
+.pcs-seat--right {
+  top: 50%;
+  right: 11px;
+  writing-mode: vertical-rl;
+  transform: translateY(-50%);
+}
+
+/* Active highlight when that seat plays its pair. */
+.pcs-seat.is-active {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.95);
+  color: #2a2324;
+  text-shadow: none;
+  box-shadow:
+    0 0 0 3px rgb(255 255 255 / 0.3),
+    0 0 18px rgb(255 255 255 / 0.65);
+}
+
+.pcs-seat--bottom.is-active {
+  background: #ffd266;
+  color: #4a3410;
+  box-shadow:
+    0 0 0 3px rgb(255 210 102 / 0.35),
+    0 0 18px rgb(255 210 102 / 0.7);
+  transform: translateX(-50%) scale(1.22);
+}
+
+.pcs-seat--top.is-active {
+  background: #a6f0c6;
+  color: #0f3d26;
+  box-shadow:
+    0 0 0 3px rgb(166 240 198 / 0.35),
+    0 0 18px rgb(129 227 170 / 0.75);
+  transform: translateX(-50%) scale(1.22);
+}
+
+.pcs-seat--left.is-active,
+.pcs-seat--right.is-active {
+  padding: 10px 3px;
+  transform: translateY(-50%) scale(1.22);
+}
+
+/* "패스" tags that appear after KK, near each passing seat. */
+/* "패스" shown as a bold red circle, placed over each seat's label. */
+.pcs-pass {
+  position: absolute;
+  z-index: 9;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid rgb(255 255 255 / 0.85);
+  background: #d23340;
+  color: #fff;
+  font-size: clamp(11px, 2.9vw, 13px);
+  font-weight: 860;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 14px rgb(181 39 52 / 0.55);
+  opacity: 0;
+}
+
+.pcs-pass--bottom {
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.pcs-pass--top {
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.pcs-pass--right {
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
 }
 
 .play-card-sequence__direction {
@@ -3934,10 +4269,11 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 }
 
 .play-card-sequence__rules {
-  display: grid;
-  gap: 17px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: min(100%, 350px);
-  margin-top: clamp(25px, 4dvh, 34px);
+  margin-top: clamp(30px, 5dvh, 44px);
 }
 
 .play-card-sequence__rules p {
@@ -4122,7 +4458,7 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 }
 
 .combo-results {
-  height: 540px;
+  min-height: 540px;
   margin-top: 20px;
 }
 
@@ -4132,7 +4468,8 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 
 .combo-panel {
   width: 100%;
-  height: 520px;
+  height: auto;
+  min-height: 520px;
   padding: 28px 12px 30px;
   border-radius: 24px;
   background: #f5f2ed;
@@ -4153,6 +4490,25 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   margin-top: 34px;
 }
 
+/* 5장 패널: 풀하우스/스트레이트 그룹 구분 + 카드 축소·밀집 */
+#combo-panel-5 .combo-group + .combo-group {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e2dcd3;
+}
+
+#combo-panel-5 .combo-example + .combo-example {
+  margin-top: 18px;
+}
+
+#combo-panel-5 .combo-card-row {
+  gap: 3px;
+}
+
+#combo-panel-5 .combo-card-row img {
+  width: clamp(34px, 9vw, 44px);
+}
+
 .combo-results .combo-example p {
   margin-bottom: 4px;
 }
@@ -4165,6 +4521,14 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   font-weight: 720;
   line-height: 1.35;
   letter-spacing: -0.03em;
+}
+
+.combo-example--wrong {
+  margin-top: 18px;
+  padding: 11px 12px 13px;
+  border: 1px solid #f0d9da;
+  border-radius: 16px;
+  background: #fdf0f1;
 }
 
 .combo-example--wrong > p {
@@ -4272,6 +4636,19 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 .combo-wrong-grid--single {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
+}
+
+.combo-wrong-grid--triple {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.combo-wrong-grid--triple .combo-card-row {
+  gap: 2px;
+}
+
+.combo-wrong-grid--triple .combo-card-row img {
+  width: clamp(24px, 7.4vw, 34px);
 }
 
 .combo-wrong-case {
@@ -5100,19 +5477,26 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 
 .round-end {
   display: grid;
-  min-height: 100svh;
-  padding: 56px clamp(18px, 5vw, 24px);
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  padding: max(104px, calc(env(safe-area-inset-top) + 94px)) clamp(18px, 5vw, 24px)
+    max(118px, calc(env(safe-area-inset-bottom) + 104px));
   place-items: center;
   border-top: 0;
   background: #fdf6ec;
   color: #29231f;
   text-align: center;
+  overflow: hidden;
 }
 
 .round-finale {
   display: grid;
-  min-height: 82svh;
-  padding: 64px clamp(18px, 5vw, 24px) 72px;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  padding: max(104px, calc(env(safe-area-inset-top) + 94px)) clamp(18px, 5vw, 24px)
+    max(118px, calc(env(safe-area-inset-bottom) + 104px));
   place-items: center;
   background:
     radial-gradient(circle at 50% 63%, rgb(231 178 75 / 0.16), transparent 34%),
@@ -5200,6 +5584,17 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   font-size: clamp(14px, 4vw, 17px);
 }
 
+.round-finale__note {
+  margin: 10px auto 0;
+  max-width: 320px;
+  color: #6c5848;
+  font-size: clamp(12px, 3.4vw, 14px);
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
 .round-finale h2 {
   margin: 16px 0 0;
   color: #2f2722;
@@ -5219,6 +5614,7 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 .round-finale__lead,
 .round-finale__cycle,
 .round-finale__repeat,
+.round-finale__note,
 .round-finale h2 {
   opacity: 0;
   transform: translate3d(0, 24px, 0);
@@ -5227,6 +5623,7 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 .round-finale.is-visible .round-finale__lead,
 .round-finale.is-visible .round-finale__cycle,
 .round-finale.is-visible .round-finale__repeat,
+.round-finale.is-visible .round-finale__note,
 .round-finale.is-visible h2 {
   animation: round-finale-rise 650ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
@@ -5239,8 +5636,12 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   animation-delay: 330ms;
 }
 
+.round-finale.is-visible .round-finale__note {
+  animation-delay: 420ms;
+}
+
 .round-finale.is-visible h2 {
-  animation-delay: 480ms;
+  animation-delay: 520ms;
 }
 
 .round-finale.is-visible .round-finale__loop {
@@ -5321,11 +5722,11 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 .round-end__player,
 .round-end__recipient {
   display: flex;
-  min-height: 56px;
+  min-height: 64px;
   flex-direction: column;
   align-items: center;
-  align-self: center;
-  justify-content: center;
+  align-self: stretch;
+  justify-content: flex-end;
   gap: 3px;
   color: #51443c;
   font-size: 13px;
@@ -5333,8 +5734,14 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   line-height: 1.25;
 }
 
+/* 받는 쪽은 라벨을 하단에 두고, 위쪽은 날아온 카드가 놓일 공간으로 비워 둔다. */
+.round-end__recipient {
+  position: relative;
+}
+
 .round-end__cards {
   position: relative;
+  z-index: 2;
   display: flex;
   height: 27px;
   align-items: center;
@@ -5369,25 +5776,6 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   line-height: 1;
 }
 
-.round-end__team-mark {
-  display: grid;
-  width: 27px;
-  height: 27px;
-  place-items: center;
-  border: 1px solid rgb(168 46 57 / 0.22);
-  border-radius: 50%;
-  background: #fff1e6;
-  color: #a82e39;
-  font-size: 15px;
-  font-weight: 900;
-}
-
-.round-end__team-mark--first {
-  border-color: rgb(185 139 85 / 0.38);
-  background: #fff2cb;
-  color: #8b651f;
-}
-
 .round-end.is-visible .round-end__transfer--hand .round-end__cards {
   animation: round-end-pass 1.1s ease-in-out both;
 }
@@ -5397,8 +5785,15 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 }
 
 @keyframes round-end-pass {
-  0%, 12% { transform: translateX(0); }
-  100% { transform: translateX(160px); }
+  0%, 12% { transform: translate(0, 0); }
+  100% { transform: translate(168px, -14px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .round-end.is-visible .round-end__transfer--hand .round-end__cards,
+  .round-end.is-visible .round-end__transfer--tricks .round-end__cards {
+    animation: none;
+  }
 }
 
 .round-end__double {
@@ -5469,12 +5864,13 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 }
 
 .trick-repeat__warning {
-  margin-top: 28px;
-  padding: 18px 16px;
+  margin-top: clamp(16px, 3dvh, 24px);
+  padding: clamp(14px, 2.4dvh, 18px) 16px;
   border: 1px solid rgb(174 52 47 / 0.28);
   border-radius: 18px;
   background: #fff9f1;
   box-shadow: 0 8px 22px rgb(106 72 50 / 0.1);
+  text-align: center;
 }
 
 .trick-repeat__warning h3 {
@@ -5601,6 +5997,22 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   font-weight: 720;
   line-height: 1.45;
   text-wrap: balance;
+}
+
+.bomb-modal__reward {
+  margin: 10px auto 0;
+  max-width: 340px;
+  color: #5a4a46;
+  font-size: clamp(13px, 3.6vw, 15px);
+  font-weight: 700;
+  line-height: 1.5;
+  text-wrap: balance;
+  word-break: keep-all;
+}
+
+.bomb-modal__reward strong {
+  color: #971f27;
+  font-weight: 850;
 }
 
 .bomb-modal__rules {
@@ -5991,6 +6403,111 @@ body.modal-open {
   outline-offset: 4px;
 }
 
+/* 짧은 뷰포트(~700px 이하)에서 두 점수 슬라이드가 세로 스크롤 없이
+   한 화면에 들어오도록 간격·크기를 압축한다. 상단 단계 바(top fixed)와
+   하단 참조 바/도트(bottom fixed)에 가려지지 않도록 슬라이드 패딩도 줄인다.
+   슬라이드 1(.round-end: eyebrow+h2+lead+전달 2행+더블승+버튼)이 가장 빡빡하다. */
+@media (max-height: 700px) {
+  .round-end,
+  .round-finale {
+    padding-top: max(76px, calc(env(safe-area-inset-top) + 68px));
+    padding-bottom: max(100px, calc(env(safe-area-inset-bottom) + 90px));
+  }
+
+  .round-end h2 {
+    font-size: clamp(20px, 5.4vw, 25px);
+  }
+
+  .round-end h2 strong {
+    font-size: clamp(27px, 7.4vw, 34px);
+  }
+
+  .round-end__transfers {
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .round-end__transfer {
+    min-height: 68px;
+    padding: 8px 12px;
+  }
+
+  .round-end__player,
+  .round-end__recipient {
+    min-height: 48px;
+  }
+
+  .round-end__double {
+    margin-top: 12px;
+    padding: 11px 13px;
+  }
+
+  .round-end__double > p {
+    margin-top: 6px;
+  }
+
+  .round-end__score-button {
+    margin-top: 12px;
+  }
+
+  .round-finale__cycle {
+    margin: 16px auto;
+    padding: 14px 12px 12px;
+  }
+
+  .round-finale h2 {
+    margin-top: 12px;
+    font-size: clamp(26px, 7vw, 33px);
+  }
+}
+
+@media (max-height: 640px) {
+  .round-end,
+  .round-finale {
+    padding-top: max(70px, calc(env(safe-area-inset-top) + 62px));
+    padding-bottom: max(92px, calc(env(safe-area-inset-bottom) + 84px));
+  }
+
+  .round-end__lead {
+    margin-top: 4px;
+  }
+
+  .round-end__transfers {
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .round-end__transfer {
+    min-height: 60px;
+  }
+
+  .round-end__transfer-intro {
+    margin-bottom: 0;
+  }
+
+  .round-end__double {
+    margin-top: 10px;
+    padding: 9px 12px;
+  }
+
+  .round-end__double small {
+    display: none;
+  }
+
+  .round-end__score-button {
+    margin-top: 10px;
+    min-height: 40px;
+  }
+
+  .round-finale__cycle {
+    margin: 12px auto;
+  }
+
+  .round-finale__note {
+    margin-top: 8px;
+  }
+}
+
 .score-modal__dialog {
   border-color: rgb(17 24 39 / 0.12);
   background: #fff;
@@ -6013,7 +6530,7 @@ body.modal-open {
 
 .tichu-tip {
   width: 100%;
-  padding: max(27px, env(safe-area-inset-top)) clamp(18px, 5vw, 25px)
+  padding: clamp(20px, 4vw, 26px) clamp(18px, 5vw, 25px)
     max(25px, env(safe-area-inset-bottom));
   color: #342a25;
   text-align: left;
@@ -6028,6 +6545,143 @@ body.modal-open {
   letter-spacing: -0.055em;
   text-align: center;
   text-wrap: balance;
+}
+
+.tichu-tip__lead {
+  margin: 0 0 16px;
+  color: #3d322c;
+  font-size: clamp(14px, 4vw, 16px);
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.03em;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.tichu-tip__lead strong {
+  color: #a52b35;
+  font-weight: 900;
+}
+
+.tichu-tip__facts {
+  display: grid;
+  gap: 9px;
+  margin: 0 0 14px;
+  padding: 15px 16px;
+  border: 1px solid rgb(98 70 51 / 0.12);
+  border-radius: 15px;
+  background: #fff;
+}
+
+.tichu-tip__facts > div {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.tichu-tip__facts dt {
+  margin: 0;
+  color: #8a6f5e;
+  font-size: clamp(12px, 3.4vw, 13px);
+  font-weight: 850;
+  line-height: 1.4;
+  letter-spacing: -0.03em;
+}
+
+.tichu-tip__facts dd {
+  margin: 0;
+  color: #43372f;
+  font-size: clamp(13px, 3.7vw, 15px);
+  font-weight: 650;
+  line-height: 1.45;
+  letter-spacing: -0.025em;
+}
+
+.tichu-tip__facts dd strong {
+  font-weight: 880;
+}
+
+.tichu-tip__facts dd small {
+  display: inline-block;
+  margin-top: 2px;
+  color: #8a7363;
+  font-size: 0.86em;
+  font-weight: 600;
+}
+
+.tichu-tip__mark {
+  display: inline-block;
+  margin: 3px 0 1px;
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: linear-gradient(transparent 40%, #ffe588 40%);
+  color: #2d2521;
+  font-size: inherit;
+  font-weight: 880;
+  letter-spacing: -0.03em;
+}
+
+.tichu-tip__plus {
+  color: #157447;
+}
+
+.tichu-tip__minus {
+  color: #a52b35;
+}
+
+.tichu-tip__compare {
+  margin: 0 0 14px;
+  padding: 15px 16px;
+  border: 1px solid rgb(98 70 51 / 0.12);
+  border-radius: 15px;
+  background: #fff;
+}
+
+.tichu-tip__compare h3 {
+  margin: 0 0 10px;
+  color: #2d2521;
+  font-size: clamp(15px, 4.3vw, 18px);
+  font-weight: 880;
+  line-height: 1.25;
+  letter-spacing: -0.04em;
+}
+
+.tichu-tip__compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: clamp(12px, 3.5vw, 14px);
+  letter-spacing: -0.025em;
+}
+
+.tichu-tip__compare-table th,
+.tichu-tip__compare-table td {
+  padding: 7px 6px;
+  border-bottom: 1px solid rgb(98 70 51 / 0.1);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.tichu-tip__compare-table thead th {
+  color: #8a6f5e;
+  font-weight: 850;
+}
+
+.tichu-tip__compare-table tbody th {
+  color: #8a6f5e;
+  font-weight: 800;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tichu-tip__compare-table tbody td {
+  color: #43372f;
+  font-weight: 700;
+}
+
+.tichu-tip__compare-table tr:last-child th,
+.tichu-tip__compare-table tr:last-child td {
+  border-bottom: 0;
 }
 
 .tichu-tip__group {
@@ -6232,12 +6886,17 @@ body.modal-open {
 
 .score-sheet__note {
   margin: 11px 0 0;
-  color: #625c5e;
+  color: #554d4f;
   font-size: clamp(11px, 3.1vw, 13px);
-  font-weight: 600;
+  font-weight: 680;
   line-height: 1.45;
   letter-spacing: -0.025em;
   text-wrap: balance;
+}
+
+.score-sheet__note strong {
+  color: #a82e39;
+  font-weight: 850;
 }
 
 .score-sheet__total {
@@ -6248,19 +6907,19 @@ body.modal-open {
 .score-sheet__total summary {
   position: relative;
   display: flex;
-  min-height: 52px;
-  padding: 11px 38px 11px 14px;
+  min-height: 40px;
+  padding: 9px 34px 9px 13px;
   align-items: center;
   justify-content: center;
-  border-radius: 13px;
-  background: #a82e39;
-  box-shadow: 0 8px 20px rgb(168 46 57 / 0.24);
-  color: #fff;
+  border: 1px solid #e5d9d3;
+  border-radius: 11px;
+  background: #faf6f1;
+  color: #7a6f68;
   cursor: pointer;
-  font-size: clamp(15px, 4.2vw, 18px);
-  font-weight: 880;
-  line-height: 1.3;
-  letter-spacing: -0.04em;
+  font-size: clamp(12px, 3.3vw, 14px);
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: -0.03em;
   list-style: none;
   text-wrap: balance;
 }
@@ -6271,15 +6930,12 @@ body.modal-open {
 
 .score-sheet__total summary::after {
   position: absolute;
-  right: 14px;
-  content: "+";
-  font-size: 21px;
-  font-weight: 500;
+  right: 13px;
+  content: "?";
+  color: #a0948c;
+  font-size: 16px;
+  font-weight: 700;
   line-height: 1;
-}
-
-.score-sheet__total[open] summary::after {
-  content: "\2212";
 }
 
 .score-sheet__total summary:focus-visible {
@@ -6406,6 +7062,17 @@ body.modal-open {
   letter-spacing: -0.035em;
 }
 
+.score-sheet__memo {
+  margin: -8px 0 20px;
+  color: #837771;
+  font-size: clamp(11px, 3.1vw, 13px);
+  font-weight: 650;
+  line-height: 1.5;
+  letter-spacing: -0.025em;
+  text-align: center;
+  text-wrap: balance;
+}
+
 .combo-dictionary__title {
   margin: 0 46px 20px;
   color: #17181a;
@@ -6473,6 +7140,15 @@ body.modal-open {
   line-height: 1.3;
   letter-spacing: -0.025em;
   word-break: keep-all;
+}
+
+.combo-dictionary__count {
+  padding: 0 2px;
+  border-radius: 2px;
+  background-color: rgb(255 235 120 / 0.35);
+  color: #4a4c50;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 .combo-dictionary__cards {
@@ -6998,6 +7674,7 @@ body.modal-open {
   padding: 0;
   overflow-x: hidden;
   overflow-y: auto;
+  scrollbar-gutter: stable both-edges;
   background: transparent;
   scroll-margin-top: 0;
   overscroll-behavior: contain;
@@ -7020,7 +7697,7 @@ body.modal-open {
   z-index: 1;
   margin-inline: auto;
   min-height: 100%;
-  padding: 58px clamp(10px, 3vw, 14px) 96px;
+  padding: 92px clamp(10px, 3vw, 14px) 96px;
   background-color: #373233;
 }
 
@@ -7093,6 +7770,16 @@ body.gameplay-slides-active {
   gap: clamp(5px, 1.7vw, 8px);
 }
 
+.combo-guide .combo-count-mark {
+  display: inline;
+  padding: 0 0.08em;
+  background: linear-gradient(transparent 38%, #ffe16c 38%, #ffe16c 91%, transparent 91%);
+  box-decoration-break: clone;
+  color: inherit;
+  font: inherit;
+  -webkit-box-decoration-break: clone;
+}
+
 .combo-guide .combo-tab {
   min-height: 78px;
   border: 2px solid transparent;
@@ -7157,37 +7844,79 @@ body.gameplay-slides-active {
 
 /* Game play: compact guidance and in-board controls. */
 .play-card-sequence {
-  padding-bottom: max(130px, calc(env(safe-area-inset-bottom) + 118px));
+  padding-bottom: max(80px, calc(env(safe-area-inset-bottom) + 68px));
 }
 
 .play-card-sequence__board-wrap {
-  margin-top: clamp(24px, 3.6dvh, 32px);
+  margin-top: clamp(22px, 3.5dvh, 34px);
   padding: 12px 20px 10px;
 }
 
 .play-card-sequence__direction {
-  position: absolute;
-  z-index: 8;
-  top: 15px;
-  left: 50%;
-  margin: 0;
-  color: rgb(255 255 255 / 0.48);
-  font-size: clamp(10px, 2.8vw, 12px);
-  font-weight: 430;
+  position: static;
+  z-index: auto;
+  margin: 0 0 10px;
+  color: #817d7d;
+  font-size: clamp(11px, 3vw, 13px);
+  font-weight: 500;
   line-height: 1;
   letter-spacing: -0.015em;
+  text-align: center;
   pointer-events: none;
-  transform: translateX(-50%);
+  transform: none;
+}
+
+.play-card-sequence__next-lead {
+  position: absolute;
+  z-index: 10;
+  top: 24%;
+  left: 50%;
+  width: max-content;
+  max-width: 84%;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(13px, 3.6vw, 15px);
+  font-weight: 760;
+  line-height: 1.4;
+  letter-spacing: -0.025em;
+  text-align: center;
+  text-wrap: balance;
+  text-shadow: 0 2px 10px rgb(0 0 0 / 0.55);
+  opacity: 0;
+  transform: translate(-50%, calc(-50% + 10px));
+  transition: opacity 0.65s ease, transform 0.65s ease;
+  pointer-events: none;
+}
+
+.play-card-sequence__next-lead.is-visible {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+
+/* Single card the winning player plays to open the next trick. */
+.pcs-next-card {
+  position: absolute;
+  z-index: 9;
+  top: 50%;
+  left: 50%;
+  width: clamp(40px, 12vw, 50px);
+  height: auto;
+  border-radius: 5px;
+  box-shadow: 0 8px 18px rgb(0 0 0 / 0.32);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .play-card-sequence__replay {
   position: absolute;
-  z-index: 8;
-  bottom: 14px;
-  left: 50%;
+  z-index: 9;
+  top: 12px;
+  right: 12px;
+  left: auto;
+  bottom: auto;
   display: grid;
-  width: 35px;
-  height: 35px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   place-items: center;
   border: 1px solid rgb(255 255 255 / 0.28);
@@ -7196,9 +7925,9 @@ body.gameplay-slides-active {
   color: rgb(255 255 255 / 0.78);
   cursor: pointer;
   font: inherit;
-  font-size: 19px;
+  font-size: 17px;
   line-height: 1;
-  transform: translateX(-50%);
+  transform: none;
 }
 
 .play-card-sequence__replay:hover {
@@ -7252,8 +7981,8 @@ body.gameplay-slides-active {
 }
 
 .pass-tip {
-  padding-top: 34px;
-  padding-bottom: 34px;
+  padding-top: 24px;
+  padding-bottom: 24px;
 }
 
 .pass-tip h2 {
@@ -7261,24 +7990,12 @@ body.gameplay-slides-active {
   color: #b00050;
 }
 
-.pass-tip p {
-  margin: 0;
-  padding: 21px 18px;
-  border: 1px solid rgb(108 76 60 / 0.15);
-  border-radius: 18px;
-  background: #fff;
-  color: #4b4140;
-  font-size: clamp(14px, 4vw, 17px);
-  font-weight: 620;
-  line-height: 1.75;
-  letter-spacing: -0.035em;
-  text-align: center;
-  word-break: keep-all;
+.pass-tip .tichu-tip__lead strong {
+  color: #b00050;
 }
 
-.pass-tip p strong {
-  color: #b00050;
-  font-weight: 850;
+.pass-tip .tichu-tip__facts > div {
+  grid-template-columns: 92px 1fr;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -7307,7 +8024,7 @@ body.gameplay-slides-active {
   }
 
   .gameplay-carousel .play-card-sequence__pair img {
-    width: clamp(48px, 14.5vw, 61px);
+    width: clamp(38px, 11vw, 48px);
   }
 
   .gameplay-carousel .play-card-sequence__rules {
@@ -7329,6 +8046,62 @@ body.gameplay-slides-active {
   .gameplay-carousel .play-card-sequence__actions .combo-guide-jump {
     min-height: 38px;
     font-size: 13px;
+  }
+
+  /* Collapse the A/B gap further so the ③ button clears the dots bar. */
+  .gameplay-carousel
+    .play-card-sequence__rules
+    .play-card-sequence__choice-lead {
+    margin: clamp(10px, 3dvh, 28px) 0 8px;
+  }
+
+  .gameplay-carousel .play-card-sequence__actions--choices {
+    gap: 7px;
+    margin-top: 2px;
+  }
+
+  .gameplay-carousel .play-card-sequence__actions--choices .choice-jump {
+    min-height: 38px;
+  }
+}
+
+/* Very short viewports (~640-680px): collapse gaps to the minimum and keep
+   every choice button >= 36px tall so the ③ button is never clipped. */
+@media (max-height: 680px) {
+  .gameplay-carousel .play-card-sequence {
+    padding-top: max(70px, calc(env(safe-area-inset-top) + 62px));
+  }
+
+  .gameplay-carousel .play-card-sequence__caption {
+    font-size: clamp(18px, 5vw, 22px);
+  }
+
+  .gameplay-carousel .play-card-sequence__board-wrap {
+    margin-top: 6px;
+    padding-block: 4px;
+  }
+
+  .gameplay-carousel .play-card-sequence__board {
+    width: min(52vw, 180px);
+  }
+
+  .gameplay-carousel .play-card-sequence__rules {
+    margin-top: 4px;
+  }
+
+  .gameplay-carousel
+    .play-card-sequence__rules
+    .play-card-sequence__choice-lead {
+    margin: 8px 0 6px;
+  }
+
+  .gameplay-carousel .play-card-sequence__actions--choices {
+    gap: 6px;
+    margin-top: 2px;
+  }
+
+  .gameplay-carousel .play-card-sequence__actions--choices .choice-jump {
+    min-height: 36px;
   }
 }
 
@@ -7565,6 +8338,13 @@ body.gameplay-slides-active {
   pointer-events: none;
 }
 
+/* On the first "게임 시작" slide, the ▶ play button handles advancing,
+   so the right nav arrow would be a redundant duplicate — hide it here. */
+body.game-start-active .gameplay-carousel__nav--next {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .gameplay-carousel__nav:focus-visible {
   outline: 3px solid rgb(68 57 58 / 0.42);
   outline-offset: -4px;
@@ -7573,7 +8353,7 @@ body.gameplay-slides-active {
 .gameplay-carousel__dots {
   position: absolute;
   z-index: 12;
-  bottom: max(88px, calc(env(safe-area-inset-bottom) + 78px));
+  bottom: max(58px, calc(env(safe-area-inset-bottom) + 48px));
   left: 50%;
   display: flex;
   gap: 4px;
@@ -7604,6 +8384,130 @@ body.gameplay-slides-active {
 }
 
 .gameplay-carousel__dots button.is-active::after {
+  background: #44393a;
+  transform: translate(-50%, -50%) scale(1.35);
+}
+
+/* Score stage mirrors the gameplay carousel: one horizontal, viewport-sized slide deck. */
+.score-carousel {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  overflow: hidden;
+  background: #fdf6ec;
+}
+
+.score-carousel__viewport {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.score-carousel__track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 620ms cubic-bezier(0.65, 0, 0.35, 1);
+  will-change: transform;
+}
+
+.score-carousel__slide {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 100%;
+  flex: 0 0 100%;
+  overflow: hidden;
+}
+
+.score-carousel__nav {
+  position: absolute;
+  z-index: 12;
+  top: 50%;
+  display: grid;
+  width: 46px;
+  height: 58px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: #44393a;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.score-carousel__nav span {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-top: 3px solid currentColor;
+  border-right: 3px solid currentColor;
+}
+
+.score-carousel__nav--previous {
+  left: 0;
+}
+
+.score-carousel__nav--previous span {
+  margin-left: 7px;
+  transform: rotate(-135deg);
+}
+
+.score-carousel__nav--next {
+  right: 0;
+}
+
+.score-carousel__nav--next span {
+  margin-right: 7px;
+  transform: rotate(45deg);
+}
+
+.score-carousel__nav:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.score-carousel__nav:focus-visible {
+  outline: 3px solid rgb(68 57 58 / 0.42);
+  outline-offset: -4px;
+}
+
+.score-carousel__dots {
+  position: absolute;
+  z-index: 12;
+  bottom: max(58px, calc(env(safe-area-inset-bottom) + 48px));
+  left: 50%;
+  display: flex;
+  gap: 4px;
+  transform: translateX(-50%);
+}
+
+.score-carousel__dots button {
+  position: relative;
+  width: 30px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.score-carousel__dots button::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgb(68 57 58 / 0.25);
+  content: "";
+  transform: translate(-50%, -50%);
+  transition: background-color 220ms ease, transform 220ms ease;
+}
+
+.score-carousel__dots button.is-active::after {
   background: #44393a;
   transform: translate(-50%, -50%) scale(1.35);
 }
@@ -7731,14 +8635,14 @@ body.gameplay-slides-active {
 
 /* Game play main slide: keep the controls clear of the page dots. */
 .gameplay-carousel .play-card-sequence {
-  padding-top: max(82px, calc(env(safe-area-inset-top) + 72px));
-  padding-bottom: max(194px, calc(env(safe-area-inset-bottom) + 182px));
+  padding-top: max(84px, calc(env(safe-area-inset-top) + 74px));
+  padding-bottom: max(140px, calc(env(safe-area-inset-bottom) + 128px));
 }
 
 .gameplay-carousel .play-card-sequence__caption,
 .gameplay-carousel .play-card-sequence__board-wrap,
 .gameplay-carousel .play-card-sequence__rules {
-  transform: translateY(20px);
+  transform: translateY(6px);
 }
 
 .play-card-sequence__actions .combo-guide-jump:not(.pass-guide-trigger) {
@@ -7756,6 +8660,7 @@ body.gameplay-slides-active {
   background: #827c7e;
   border-color: rgb(255 255 255 / 0.38);
   box-shadow: 0 5px 12px rgb(45 39 40 / 0.14);
+  animation: none;
 }
 
 .play-card-sequence__actions .combo-guide-jump:not(.pass-guide-trigger):focus-visible {
@@ -7763,16 +8668,138 @@ body.gameplay-slides-active {
   outline-offset: 3px;
 }
 
+/* ── "내 차례! 셋 중 하나" choice buttons ── */
+.play-card-sequence__rules .play-card-sequence__choice-lead {
+  /* Collapsible A/B gap: grows on tall viewports, shrinks on short ones.
+     dvh-based so it tracks the live viewport height and can never force the
+     ③ button past 100svh (no rigid px gap). */
+  margin: clamp(16px, 6dvh, 60px) 0 12px;
+  color: #494345;
+  font-size: clamp(12.5px, 3.4vw, 15px);
+  font-weight: 780;
+  line-height: 1.3;
+  letter-spacing: -0.03em;
+  text-align: center;
+  white-space: normal;
+}
+
+.play-card-sequence__choice-lead strong {
+  display: inline;
+  color: #bd0058;
+  font-weight: 860;
+}
+
+.play-card-sequence__actions--choices {
+  display: grid;
+  gap: 9px;
+  width: min(100%, 300px);
+  margin: 4px auto 0;
+}
+
+.choice-jump {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  padding: 7px 13px;
+  border: 1px solid rgb(255 255 255 / 0.3);
+  border-radius: 11px;
+  background: #3a3031;
+  box-shadow: 0 6px 14px rgb(61 36 38 / 0.18);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.choice-jump__num {
+  display: inline-block;
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent !important;
+  font-size: clamp(18px, 5vw, 21px);
+  font-weight: 450;
+  line-height: 1;
+}
+
+.choice-jump__label {
+  font-size: clamp(13.5px, 3.8vw, 15.5px);
+  font-weight: 620;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.choice-jump__help {
+  display: inline-block;
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
+  font-size: clamp(18px, 5vw, 21px);
+  font-weight: 450;
+  line-height: 1;
+  opacity: 0.88;
+}
+
+.choice-jump:focus-visible {
+  outline: 3px solid rgb(255 255 255 / 0.5);
+  outline-offset: 3px;
+}
+
+/* ① primary — 조합: emphasized + gentle float to invite the tap. */
+.choice-jump--primary {
+  background: linear-gradient(135deg, #d00063 0%, #a9004f 100%);
+  border-color: rgb(255 255 255 / 0.62);
+  box-shadow:
+    0 0 0 2px rgb(208 0 99 / 0.16),
+    0 0 20px rgb(208 0 99 / 0.34),
+    0 9px 20px rgb(64 21 40 / 0.2);
+  animation: combo-guide-jump-float 2.2s ease-in-out infinite;
+}
+
+.choice-jump--primary .choice-jump__num {
+  background: transparent;
+}
+
+/* ② pass — calm, static. */
+.choice-jump--pass {
+  background: #6f696b;
+  border-color: rgb(255 255 255 / 0.3);
+}
+
+/* ③ bomb — red, special. */
+.choice-jump--bomb {
+  background: linear-gradient(135deg, #c0243a 0%, #8f1020 100%);
+  border-color: rgb(255 180 180 / 0.6);
+  box-shadow: 0 8px 18px rgb(120 16 32 / 0.3);
+}
+
+.choice-jump--bomb .choice-jump__num {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .choice-jump--primary {
+    animation: none;
+  }
+}
+
 @media (max-height: 780px) {
   .gameplay-carousel .play-card-sequence {
-    padding-top: max(70px, calc(env(safe-area-inset-top) + 62px));
-    padding-bottom: max(194px, calc(env(safe-area-inset-bottom) + 182px));
+    padding-top: max(74px, calc(env(safe-area-inset-top) + 64px));
+    padding-bottom: max(140px, calc(env(safe-area-inset-bottom) + 128px));
   }
 
   .gameplay-carousel .play-card-sequence__caption,
   .gameplay-carousel .play-card-sequence__board-wrap,
   .gameplay-carousel .play-card-sequence__rules {
-    transform: translateY(16px);
+    transform: translateY(2px);
   }
 }
 
@@ -7820,24 +8847,12 @@ body.gameplay-slides-active {
   transition-duration: 0s !important;
 }
 
-/* Page changes are button-driven. Only the score stage keeps document scrolling. */
-html:not(.score-scroll-active),
-html:not(.score-scroll-active) body {
+/* Page changes are button-driven; every stage (incl. 점수) now fits the viewport,
+   so vertical document scrolling stays disabled everywhere. */
+html,
+body {
   overflow-y: hidden;
   overscroll-behavior-y: none;
-}
-
-html.score-scroll-active,
-html.score-scroll-active body {
-  height: auto;
-  min-height: 100%;
-  overflow-y: auto;
-  overscroll-behavior-y: contain;
-}
-
-body.score-scroll-active .chapter-menu,
-body.score-scroll-active .is-stage-inactive {
-  display: none !important;
 }
 
 body.stage-isolated .chapter-menu {
@@ -7871,7 +8886,7 @@ body:is([data-active-stage="#game-intro"], [data-active-stage="#card-guide"]) .h
   transform: none !important;
 }
 
-body:not(.score-scroll-active) {
+body {
   touch-action: pan-x;
 }
 
@@ -8514,6 +9529,22 @@ body.modal-open .tichu-tip {
 
 .tichu-choice-panel__score-fail {
   color: #c8c3c5;
+}
+
+.tichu-choice-panel__start-cue {
+  margin: 16px 0 4px;
+  color: rgb(255 255 255 / 0.82);
+  font-size: clamp(13px, 3.7vw, 15px);
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: -0.03em;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.tichu-choice-panel__start-cue strong {
+  color: #ffd000;
+  font-weight: 850;
 }
 
 .tichu-choice-panel__actions {
@@ -9508,8 +10539,9 @@ body[data-active-stage="#card-guide"] .card-deck-guide {
 }
 
 /* Match the first deal composition to the vertically centered exchange screen. */
+/* Slightly raised so the bottom privacy note isn't cramped against the timeline. */
 body[data-active-stage="#game-setup"] .deal-section .deal-content {
-  transform: translateY(62px);
+  transform: translateY(48px);
 }
 
 .tichu-choice-panel__help-icon {
