@@ -6007,6 +6007,7 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   font-weight: 700;
   line-height: 1.5;
   text-wrap: balance;
+  word-break: keep-all;
 }
 
 .bomb-modal__reward strong {
