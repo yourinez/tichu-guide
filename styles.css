@@ -4367,7 +4367,9 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 
 /* 5장 패널: 풀하우스/스트레이트 그룹 구분 + 카드 축소·밀집 */
 #combo-panel-5 .combo-group + .combo-group {
-  margin-top: 40px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e2dcd3;
 }
 
 #combo-panel-5 .combo-example + .combo-example {
