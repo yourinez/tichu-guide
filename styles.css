@@ -6304,8 +6304,9 @@ body.modal-open {
   color: #fff;
   font-size: clamp(19px, 5.4vw, 24px);
   font-weight: 820;
-  line-height: 1.18;
+  line-height: 1.3;
   letter-spacing: -0.05em;
+  text-align: center;
   text-wrap: balance;
 }
 
@@ -6357,13 +6358,14 @@ body.modal-open {
 .special-description ul {
   display: grid;
   gap: 15px;
-  width: fit-content;
+  width: 100%;
+  max-width: 420px;
   margin: clamp(40px, 12dvh, 120px) auto 0;
-  padding: 0;
+  padding: 0 4px;
   color: #555052;
-  font-size: clamp(12px, 3.25vw, 14px);
+  font-size: clamp(13px, 3.7vw, 15px);
   font-weight: 560;
-  line-height: 1.45;
+  line-height: 1.5;
   letter-spacing: -0.025em;
   list-style: none;
   text-align: left;
