@@ -1906,16 +1906,49 @@ body.combo-guide-open .quick-reference-bar {
 
 .trick-end {
   display: grid;
-  min-height: 70svh;
-  padding: 64px clamp(18px, 5vw, 24px);
+  min-height: 100svh;
+  padding: clamp(32px, 7dvh, 64px) clamp(18px, 5vw, 24px)
+    max(clamp(32px, 7dvh, 64px), env(safe-area-inset-bottom));
   place-items: center;
   background: linear-gradient(to bottom, #faefe4 0%, #fdf6ec 100%);
   color: #29231f;
   text-align: center;
+  overflow-y: auto;
 }
 
 .trick-end__inner {
   width: min(100%, 360px);
+}
+
+.trick-end__repeat {
+  margin-top: clamp(22px, 4dvh, 32px);
+  padding-top: clamp(18px, 3dvh, 24px);
+  border-top: 1px solid rgb(98 70 51 / 0.14);
+}
+
+.trick-end__repeat > h3 {
+  margin: 0;
+  color: #342a25;
+  font-size: clamp(16px, 4.6vw, 20px);
+  font-weight: 820;
+  line-height: 1.4;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.trick-end__repeat-copy {
+  margin: clamp(10px, 2dvh, 14px) 0 0;
+  color: #5f554f;
+  font-size: clamp(14px, 4vw, 16px);
+  font-weight: 640;
+  line-height: 1.5;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.trick-end__repeat-copy strong {
+  color: #a82e39;
+  font-weight: 840;
 }
 
 .trick-end h2 {
@@ -5729,12 +5762,13 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 }
 
 .trick-repeat__warning {
-  margin-top: 28px;
-  padding: 18px 16px;
+  margin-top: clamp(16px, 3dvh, 24px);
+  padding: clamp(14px, 2.4dvh, 18px) 16px;
   border: 1px solid rgb(174 52 47 / 0.28);
   border-radius: 18px;
   background: #fff9f1;
   box-shadow: 0 8px 22px rgb(106 72 50 / 0.1);
+  text-align: center;
 }
 
 .trick-repeat__warning h3 {

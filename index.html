@@ -21,7 +21,7 @@
       crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
     />
-    <link rel="stylesheet" href="styles.css?v=20261103-pair-card-smaller-1" />
+    <link rel="stylesheet" href="styles.css?v=20261104-trick-merge-1" />
   </head>
   <body>
     <div class="splash-screen">
@@ -734,46 +734,15 @@
                   <p>마지막에 낸 사람이 전부 가져가요 <strong>'트릭을 딴다'</strong></p>
                   <p>가져간 카드는 플레이어 앞에 뒷면으로 쌓아둡니다.</p>
                 </div>
-              </div>
-            </section>
-
-            <section class="bomb-guide gameplay-carousel__slide" aria-labelledby="bomb-guide-title">
-              <div class="bomb-guide__inner">
-                <h2 id="bomb-guide-title">단, 폭탄은 예외!</h2>
-                <p class="bomb-guide__lead">장수·종류 상관없이 아무 때나, 다 이겨요.</p>
-
-                <div class="bomb-examples">
-                  <article>
-                    <h3>포카드</h3>
-                    <button class="bomb-example-button" type="button" data-open="bomb" aria-haspopup="dialog" aria-controls="bomb-modal" aria-expanded="false" aria-label="폭탄 규칙 자세히 보기: 같은 숫자 4장">
-                      <span class="combo-card-row"><img src="옥7.png" alt="" /><img src="집7.png" alt="" /><img src="별7.png" alt="" /><img src="검7.png" alt="" /></span>
-                    </button>
-                  </article>
-                  <article>
-                    <h3>같은 무늬 연속</h3>
-                    <button class="bomb-example-button" type="button" data-open="bomb" aria-haspopup="dialog" aria-controls="bomb-modal" aria-expanded="false" aria-label="폭탄 규칙 자세히 보기: 같은 무늬 연속">
-                      <span class="combo-card-row"><img src="별6.png" alt="" /><img src="별7.png" alt="" /><img src="별8.png" alt="" /><img src="별9.png" alt="" /><img src="별10.png" alt="" /></span>
-                    </button>
-                  </article>
+                <div class="trick-end__repeat" aria-labelledby="trick-repeat-title">
+                  <h3 id="trick-repeat-title">트릭을 딴 사람이 다음 트릭을 새로 시작해요</h3>
+                  <p class="trick-end__repeat-copy">이렇게 트릭을 하나씩 따 가며 <strong>내 손패가 모두 없어질 때까지</strong> 계속 반복해요.</p>
+                  <aside class="trick-repeat__warning" aria-labelledby="trick-repeat-warning-title">
+                    <h3 id="trick-repeat-warning-title">⚠️ 딴 카드는 다시 못 내요!</h3>
+                    <p>트릭으로 가져간 카드는 점수용으로 앞에 쌓아둘 뿐, 다시 손에 들고 낼 수 없어요.</p>
+                    <p>카드를 낼 때는 내 손패만 사용해요. 딴 트릭은 라운드가 끝날 때까지 뒷면으로 모아둬요.</p>
+                  </aside>
                 </div>
-              </div>
-            </section>
-
-            <section class="trick-repeat gameplay-carousel__slide" aria-labelledby="trick-repeat-title">
-              <div class="trick-repeat__inner">
-                <h2 id="trick-repeat-title">트릭을 딴 사람이 다음 트릭을 새로 시작해요</h2>
-                <div class="trick-repeat__loop" aria-hidden="true">
-                  <span class="trick-repeat__arrow">↻</span>
-                  <img class="trick-repeat__card trick-repeat__card--left" src="별7.png" alt="" />
-                  <img class="trick-repeat__card trick-repeat__card--center" src="옥9.png" alt="" />
-                  <img class="trick-repeat__card trick-repeat__card--right" src="별10.png" alt="" />
-                </div>
-                <p>이렇게 트릭을 계속 반복합니다</p>
-                <aside class="trick-repeat__warning" aria-labelledby="trick-repeat-warning-title">
-                  <h3 id="trick-repeat-warning-title">⚠️ 딴 카드는 다시 못 내요!</h3>
-                  <p>트릭으로 가져간 카드는 점수용으로 쌓아둘 뿐, 다시 손에 넣어 내는 게 아니에요.</p>
-                  <p>플레이는 내 손패로만. 딴 트릭은 라운드 끝까지 뒷면으로 쌓아둬요.</p>
-                </aside>
               </div>
             </section>
           </div>
@@ -783,12 +752,10 @@
           <span aria-hidden="true"></span>
         </button>
         <nav class="gameplay-carousel__dots" aria-label="게임 진행 슬라이드 선택">
-          <button type="button" aria-label="1 / 6: 참새 보유자" aria-current="true"></button>
-          <button type="button" aria-label="2 / 6: 카드 덮기"></button>
-          <button type="button" aria-label="3 / 6: 딴 카드와 내 손패"></button>
-          <button type="button" aria-label="4 / 6: 트릭 종료"></button>
-          <button type="button" aria-label="5 / 6: 폭탄"></button>
-          <button type="button" aria-label="6 / 6: 다음 트릭"></button>
+          <button type="button" aria-label="1 / 4: 참새 보유자" aria-current="true"></button>
+          <button type="button" aria-label="2 / 4: 카드 덮기"></button>
+          <button type="button" aria-label="3 / 4: 딴 카드와 내 손패"></button>
+          <button type="button" aria-label="4 / 4: 트릭 종료 · 반복"></button>
         </nav>
         <button class="gameplay-carousel__nav gameplay-carousel__nav--next" type="button" aria-label="다음 게임 진행 화면으로 이동">
           <span aria-hidden="true"></span>
