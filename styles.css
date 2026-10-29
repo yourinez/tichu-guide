@@ -3910,11 +3910,11 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 .play-card-sequence {
   display: flex;
   min-height: 100svh;
-  padding: max(84px, calc(env(safe-area-inset-top) + 74px)) 18px
+  padding: max(102px, calc(env(safe-area-inset-top) + 92px)) 18px
     max(94px, calc(env(safe-area-inset-bottom) + 82px));
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   justify-items: center;
   overflow: hidden;
   background: #fff;
@@ -7569,7 +7569,7 @@ body.gameplay-slides-active {
 }
 
 .play-card-sequence__board-wrap {
-  margin-top: clamp(24px, 3.6dvh, 32px);
+  margin-top: clamp(12px, 2dvh, 18px);
   padding: 12px 20px 10px;
 }
 
@@ -7577,7 +7577,7 @@ body.gameplay-slides-active {
   position: static;
   z-index: auto;
   margin: 0 0 10px;
-  color: rgb(255 255 255 / 0.55);
+  color: #817d7d;
   font-size: clamp(11px, 3vw, 13px);
   font-weight: 500;
   line-height: 1;
@@ -8223,7 +8223,7 @@ body.game-start-active .gameplay-carousel__nav--next {
 
 /* ── "내 차례! 셋 중 하나" choice buttons ── */
 .play-card-sequence__choice-lead {
-  margin: 28px 0 10px;
+  margin: 44px 0 10px;
   color: rgb(255 255 255 / 0.92);
   font-size: clamp(12.5px, 3.4vw, 15px);
   font-weight: 780;
