@@ -6423,11 +6423,11 @@ body.modal-open {
   content: "•";
 }
 
-/* '예:' 같은 부연 예시 줄 — 불릿 없이 살짝 들여쓰고 연하게 */
+/* '예:' 같은 부연 예시 줄 — 불릿 없이, 앞 항목에 가깝게 붙여 그룹처럼 보이게.
+   목록 gap(15px)을 음수 margin으로 상쇄해 앞 항목과 ~4px 간격으로 일정하게 둔다. */
 .special-description li.special-note {
-  margin-top: 6px;
+  margin-top: -11px;
   padding-left: 18px;
-  padding-bottom: 4px;
   color: #8a8486;
   font-size: clamp(11px, 3vw, 13px);
   font-weight: 520;
