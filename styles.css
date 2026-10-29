@@ -3924,35 +3924,37 @@ body.combo-guide-open .quick-reference-bar {
   place-items: center;
   appearance: none;
   -webkit-appearance: none;
-  border: 0.08em solid currentColor;
+  border: 0;
   border-radius: 999px;
-  background: rgb(39 26 28 / 0.06);
-  color: inherit;
+  background: #bd0058;
+  color: #fff;
   font-size: inherit;
   line-height: 1;
   cursor: pointer;
   transform: translateY(-0.13em);
-  box-shadow: 0 0 0 0 rgb(39 26 28 / 0.3);
-  animation: game-start-help-pulse 2.1s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgb(189 0 88 / 0.5);
+  animation: game-start-help-pulse 1.5s ease-in-out infinite;
 }
 
 .game-start__help span {
-  font-size: 0.52em;
+  font-size: 0.56em;
   font-weight: 900;
   line-height: 1;
 }
 
 .game-start__help:hover {
-  background: rgb(39 26 28 / 0.14);
+  background: #a3004c;
 }
 
 @keyframes game-start-help-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgb(39 26 28 / 0.26);
+    box-shadow: 0 0 0 0 rgb(189 0 88 / 0.55);
+    transform: translateY(-0.13em) scale(1);
   }
   50% {
-    box-shadow: 0 0 0 0.28em rgb(39 26 28 / 0);
+    box-shadow: 0 0 0 0.5em rgb(189 0 88 / 0);
+    transform: translateY(-0.13em) scale(1.12);
   }
 }
 
