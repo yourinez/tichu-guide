@@ -3109,7 +3109,7 @@ const legacyPrepFlow = () => {
         resetSequence();
         coverTimeline = window.gsap.timeline({
           repeat: -1,
-          repeatDelay: 0.3,
+          repeatDelay: 5,
           onRepeat: () => {
             clearSeatHighlights();
             showCardFronts();
@@ -3238,16 +3238,19 @@ const legacyPrepFlow = () => {
           collectAt + 0.62
         );
 
-        // Card pile is gone — announce that the collector (left seat) starts next.
+        // Card pile is gone — show the "whoever wins starts next" note in the
+        // center of the board. (No seat highlight here.)
         coverTimeline.call(
           () => {
             clearSeatHighlights();
-            seatFor("left")?.classList.add("is-active");
             nextLead?.classList.add("is-visible");
           },
           null,
           collectAt + 1.25
         );
+        // Keep the timeline alive briefly so the note is reliably shown before
+        // the repeatDelay hold begins.
+        coverTimeline.to({}, { duration: 0.4 }, collectAt + 1.25);
       };
 
       resetSequence();
