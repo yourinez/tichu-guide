@@ -6514,7 +6514,7 @@ body.modal-open {
 
 .tichu-tip {
   width: 100%;
-  padding: max(27px, env(safe-area-inset-top)) clamp(18px, 5vw, 25px)
+  padding: clamp(20px, 4vw, 26px) clamp(18px, 5vw, 25px)
     max(25px, env(safe-area-inset-bottom));
   color: #342a25;
   text-align: left;
@@ -7658,6 +7658,7 @@ body.modal-open {
   padding: 0;
   overflow-x: hidden;
   overflow-y: auto;
+  scrollbar-gutter: stable both-edges;
   background: transparent;
   scroll-margin-top: 0;
   overscroll-behavior: contain;
@@ -7964,8 +7965,8 @@ body.gameplay-slides-active {
 }
 
 .pass-tip {
-  padding-top: 34px;
-  padding-bottom: 34px;
+  padding-top: 24px;
+  padding-bottom: 24px;
 }
 
 .pass-tip h2 {
