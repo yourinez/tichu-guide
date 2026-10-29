@@ -3104,9 +3104,10 @@ const legacyPrepFlow = () => {
             autoAlpha: 0,
             xPercent: -50,
             yPercent: -50,
-            y: 36,
+            x: -150,
+            y: 0,
             scale: 0.9,
-            rotation: -4
+            rotation: -6
           });
         }
         if (passLabels.length) {
@@ -3130,9 +3131,10 @@ const legacyPrepFlow = () => {
                 autoAlpha: 0,
                 xPercent: -50,
                 yPercent: -50,
-                y: 36,
+                x: -150,
+                y: 0,
                 scale: 0.9,
-                rotation: -4
+                rotation: -6
               });
             }
             if (passLabels.length) {
@@ -3261,12 +3263,11 @@ const legacyPrepFlow = () => {
 
         // Card pile is gone — show the "whoever wins starts next" note in the
         // center of the board. (No seat highlight here.)
-        // The winning 상대 (left seat) opens the next trick: highlight the
-        // left seat, show the note, and play a single card into the center.
+        // The winning player opens the next trick: show the note, and the
+        // left seat plays a single card that flies in from the left to center.
         coverTimeline.call(
           () => {
             clearSeatHighlights();
-            seatFor("left")?.classList.add("is-active");
             nextLead?.classList.add("is-visible");
           },
           null,
@@ -3276,14 +3277,15 @@ const legacyPrepFlow = () => {
         if (nextCard) {
           coverTimeline.fromTo(
             nextCard,
-            { autoAlpha: 0, xPercent: -50, yPercent: -50, y: 36, scale: 0.9, rotation: -4 },
+            { autoAlpha: 0, xPercent: -50, yPercent: -50, x: -150, y: 0, scale: 0.9, rotation: -6 },
             {
               autoAlpha: 1,
-              y: 44,
+              x: 0,
+              y: 0,
               scale: 1,
               rotation: -2,
-              duration: 0.5,
-              ease: "back.out(1.5)"
+              duration: 0.55,
+              ease: "power2.out"
             },
             collectAt + 1.55
           );
