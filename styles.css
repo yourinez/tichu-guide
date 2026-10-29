@@ -6310,6 +6310,27 @@ body.modal-open {
   text-wrap: balance;
 }
 
+.special-score {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.72em;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  vertical-align: middle;
+}
+
+.special-score--plus {
+  background: #ffd27a;
+  color: #7a3b00;
+}
+
+.special-score--minus {
+  background: #d9d4d2;
+  color: #3d3330;
+}
+
 .special-description__lead {
   margin: 8px 0 0;
   color: #e7dedd;
