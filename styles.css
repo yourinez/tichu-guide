@@ -5999,6 +5999,21 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   text-wrap: balance;
 }
 
+.bomb-modal__reward {
+  margin: 10px auto 0;
+  max-width: 340px;
+  color: #ffe8dd;
+  font-size: clamp(13px, 3.6vw, 15px);
+  font-weight: 650;
+  line-height: 1.5;
+  text-wrap: balance;
+}
+
+.bomb-modal__reward strong {
+  color: #ffd27a;
+  font-weight: 850;
+}
+
 .bomb-modal__rules {
   display: grid;
   gap: 13px;
