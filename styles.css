@@ -3914,7 +3914,7 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
     max(94px, calc(env(safe-area-inset-bottom) + 82px));
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   justify-items: center;
   overflow: hidden;
   background: #fff;
@@ -4148,7 +4148,7 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   display: grid;
   gap: 17px;
   width: min(100%, 350px);
-  margin-top: clamp(25px, 4dvh, 34px);
+  margin-top: clamp(30px, 5dvh, 44px);
 }
 
 .play-card-sequence__rules p {
@@ -7565,11 +7565,11 @@ body.gameplay-slides-active {
 
 /* Game play: compact guidance and in-board controls. */
 .play-card-sequence {
-  padding-bottom: max(130px, calc(env(safe-area-inset-bottom) + 118px));
+  padding-bottom: max(80px, calc(env(safe-area-inset-bottom) + 68px));
 }
 
 .play-card-sequence__board-wrap {
-  margin-top: clamp(12px, 2dvh, 18px);
+  margin-top: clamp(22px, 3.5dvh, 34px);
   padding: 12px 20px 10px;
 }
 
