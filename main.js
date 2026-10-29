@@ -2726,7 +2726,21 @@ const legacyPrepFlow = () => {
     currentIndex = Math.max(0, Math.min(lastIndex, nextIndex));
     section.classList.toggle("is-complete", currentIndex === lastIndex);
     if (currentName) {
-      currentName.textContent = slides[currentIndex].dataset.cardName ?? "";
+      const slide = slides[currentIndex];
+      const name = slide.dataset.cardName ?? "";
+      const score = slide.dataset.cardScore ?? "";
+      currentName.textContent = name;
+      if (score) {
+        const badge = document.createElement("span");
+        badge.className =
+          "special-cards__score " +
+          (score.trim().startsWith("+")
+            ? "special-cards__score--plus"
+            : "special-cards__score--minus");
+        badge.textContent = score;
+        currentName.appendChild(document.createTextNode(" "));
+        currentName.appendChild(badge);
+      }
     }
 
     if (immediate || reducedMotion) {
