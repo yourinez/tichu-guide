@@ -2316,7 +2316,7 @@ body.combo-guide-open .quick-reference-bar {
 .hand-privacy-note {
   margin: 2px 0 0;
   color: #a72b36;
-  font-size: 12px;
+  font-size: clamp(13px, 3.7vw, 15px);
   font-weight: 760;
   line-height: 1.35;
   letter-spacing: -0.025em;
@@ -8115,7 +8115,7 @@ body.gameplay-slides-active {
 /* 준비 1단계: 타임라인 아래에서 제목과 네 방향 분배 구도가 온전히 보이도록 정렬. */
 .deal-section .deal-content {
   /* 타임라인 바로 아래에서 시작하도록 분배 묶음을 화면 중심보다 위에 둔다. */
-  transform: translateY(-40px);
+  transform: translateY(-56px);
 }
 
 .deal-section .deal-seat--top,
@@ -8230,7 +8230,7 @@ body.gameplay-slides-active {
 
 @media (max-height: 720px) {
   .deal-section .deal-content {
-    transform: translateY(-55px);
+    transform: translateY(-68px);
   }
 
   .deal-section .deal-table {
