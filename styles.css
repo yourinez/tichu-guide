@@ -6388,8 +6388,7 @@ body.modal-open {
 }
 
 .special-description ul {
-  display: grid;
-  gap: 22px;
+  display: block;
   width: 100%;
   max-width: 420px;
   margin: clamp(40px, 12dvh, 120px) auto 0;
@@ -6405,9 +6404,13 @@ body.modal-open {
 
 .special-description li {
   position: relative;
-  margin: 0;
+  margin: 20px 0 0;
   padding-left: 14px;
   text-wrap: pretty;
+}
+
+.special-description li:first-child {
+  margin-top: 0;
 }
 
 .special-description li strong {
@@ -6423,10 +6426,9 @@ body.modal-open {
   content: "•";
 }
 
-/* '예:' 같은 부연 예시 줄 — 불릿 없이, 앞 항목에 가깝게 붙여 그룹처럼 보이게.
-   목록 gap(15px)을 음수 margin으로 상쇄해 앞 항목과 ~4px 간격으로 일정하게 둔다. */
+/* '예:' 같은 부연 예시 줄 — 불릿 없이, 앞 항목에 가깝게(작은 간격) 붙여 그룹처럼 보이게. */
 .special-description li.special-note {
-  margin-top: -11px;
+  margin-top: 3px;
   padding-left: 18px;
   color: #8a8486;
   font-size: clamp(11px, 3vw, 13px);
