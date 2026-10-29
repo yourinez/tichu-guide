@@ -6310,6 +6310,27 @@ body.modal-open {
   text-wrap: balance;
 }
 
+.special-cards__score {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.5em;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  vertical-align: middle;
+}
+
+.special-cards__score--plus {
+  background: #ffd27a;
+  color: #7a3b00;
+}
+
+.special-cards__score--minus {
+  background: #d9d4d2;
+  color: #3d3330;
+}
+
 .special-description__lead {
   margin: 8px 0 0;
   color: #e7dedd;
@@ -6393,12 +6414,20 @@ body.modal-open {
 
 /* '예:' 같은 부연 예시 줄 — 불릿 없이 살짝 들여쓰고 연하게 */
 .special-description li.special-note {
-  margin-top: -6px;
+  margin-top: 6px;
   padding-left: 18px;
+  padding-bottom: 4px;
   color: #8a8486;
   font-size: clamp(11px, 3vw, 13px);
   font-weight: 520;
   line-height: 1.4;
+}
+
+.special-description li.special-note--tip {
+  text-decoration: underline;
+  text-decoration-color: #d14b4b;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
 }
 
 .special-description li.special-note::before {
