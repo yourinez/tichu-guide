@@ -4016,7 +4016,7 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 }
 
 .play-card-sequence__pair img {
-  width: clamp(58px, 17.5vw, 72px);
+  width: clamp(42px, 12.5vw, 52px);
   height: auto;
   border-radius: 5px;
   box-shadow: 0 8px 16px rgb(0 0 0 / 0.26);
@@ -7753,7 +7753,7 @@ body.gameplay-slides-active {
   }
 
   .gameplay-carousel .play-card-sequence__pair img {
-    width: clamp(48px, 14.5vw, 61px);
+    width: clamp(38px, 11vw, 48px);
   }
 
   .gameplay-carousel .play-card-sequence__rules {
