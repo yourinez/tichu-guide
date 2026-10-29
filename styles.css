@@ -1908,8 +1908,9 @@ body.combo-guide-open .quick-reference-bar {
   display: grid;
   min-height: 100svh;
   padding: clamp(32px, 7dvh, 64px) clamp(18px, 5vw, 24px)
-    max(clamp(32px, 7dvh, 64px), env(safe-area-inset-bottom));
-  place-items: center;
+    max(clamp(88px, 12dvh, 108px), calc(env(safe-area-inset-bottom) + 84px));
+  justify-items: center;
+  align-items: start;
   background: linear-gradient(to bottom, #faefe4 0%, #fdf6ec 100%);
   color: #29231f;
   text-align: center;
@@ -1918,6 +1919,40 @@ body.combo-guide-open .quick-reference-bar {
 
 .trick-end__inner {
   width: min(100%, 360px);
+}
+
+.trick-end__score-link {
+  display: inline-flex;
+  width: 100%;
+  max-width: 320px;
+  min-height: 52px;
+  margin: clamp(24px, 4dvh, 34px) auto 0;
+  padding: 12px 24px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgb(255 255 255 / 0.72);
+  border-radius: 24px;
+  background: #ffcd70;
+  box-shadow: 0 10px 24px rgb(68 42 39 / 0.22);
+  color: #140d0b;
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(14px, 3.8vw, 16px);
+  font-weight: 850;
+  line-height: 1.4;
+  text-align: center;
+  white-space: normal;
+  word-break: keep-all;
+}
+
+.trick-end__score-link span {
+  font-size: 1.1em;
+}
+
+.trick-end__score-link:focus-visible {
+  outline: 3px solid #b0873f;
+  outline-offset: 3px;
 }
 
 .trick-end__repeat {
