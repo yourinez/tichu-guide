@@ -3574,6 +3574,7 @@ body.combo-guide-open .quick-reference-bar {
   left: 50%;
   display: flex;
   width: min(88%, 300px);
+  max-width: calc(100% - 24px);
   margin: 0;
   flex-direction: column;
   align-items: center;
@@ -3594,7 +3595,7 @@ body.combo-guide-open .quick-reference-bar {
 
 .exchange-completion p {
   width: 100%;
-  margin: 0;
+  margin: 0 auto;
   padding: 0;
   background: transparent;
   color: #3c3030;
@@ -3603,7 +3604,8 @@ body.combo-guide-open .quick-reference-bar {
   line-height: 1.2;
   letter-spacing: -0.035em;
   text-align: center;
-  white-space: nowrap;
+  white-space: normal;
+  word-break: keep-all;
 }
 
 .exchange-main__next {
