@@ -3916,7 +3916,14 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   align-items: center;
   justify-content: flex-start;
   justify-items: center;
-  overflow: hidden;
+  /* Safety net: if content ever still exceeds height on an extreme viewport,
+     scroll vertically instead of clipping the ③ button. The global wheel/
+     touchmove guard in main.js allow-lists .play-card-sequence so this scroll
+     is actually usable on touch and wheel. Horizontal stays clipped so it
+     never interferes with the carousel's horizontal track transform (the
+     gameplay carousel navigates via nav buttons/dots, not touch-swipe). */
+  overflow-x: hidden;
+  overflow-y: auto;
   background: #fff;
   color: #29231f;
   text-align: center;
@@ -7769,6 +7776,62 @@ body.gameplay-slides-active {
     min-height: 38px;
     font-size: 13px;
   }
+
+  /* Collapse the A/B gap further so the ③ button clears the dots bar. */
+  .gameplay-carousel
+    .play-card-sequence__rules
+    .play-card-sequence__choice-lead {
+    margin: clamp(10px, 3dvh, 28px) 0 8px;
+  }
+
+  .gameplay-carousel .play-card-sequence__actions--choices {
+    gap: 7px;
+    margin-top: 2px;
+  }
+
+  .gameplay-carousel .play-card-sequence__actions--choices .choice-jump {
+    min-height: 38px;
+  }
+}
+
+/* Very short viewports (~640-680px): collapse gaps to the minimum and keep
+   every choice button >= 36px tall so the ③ button is never clipped. */
+@media (max-height: 680px) {
+  .gameplay-carousel .play-card-sequence {
+    padding-top: max(70px, calc(env(safe-area-inset-top) + 62px));
+  }
+
+  .gameplay-carousel .play-card-sequence__caption {
+    font-size: clamp(18px, 5vw, 22px);
+  }
+
+  .gameplay-carousel .play-card-sequence__board-wrap {
+    margin-top: 6px;
+    padding-block: 4px;
+  }
+
+  .gameplay-carousel .play-card-sequence__board {
+    width: min(52vw, 180px);
+  }
+
+  .gameplay-carousel .play-card-sequence__rules {
+    margin-top: 4px;
+  }
+
+  .gameplay-carousel
+    .play-card-sequence__rules
+    .play-card-sequence__choice-lead {
+    margin: 8px 0 6px;
+  }
+
+  .gameplay-carousel .play-card-sequence__actions--choices {
+    gap: 6px;
+    margin-top: 2px;
+  }
+
+  .gameplay-carousel .play-card-sequence__actions--choices .choice-jump {
+    min-height: 36px;
+  }
 }
 
 /* 준비 1단계: 타임라인 아래에서 제목과 네 방향 분배 구도가 온전히 보이도록 정렬. */
@@ -8212,8 +8275,11 @@ body.game-start-active .gameplay-carousel__nav--next {
 
 /* ── "내 차례! 셋 중 하나" choice buttons ── */
 .play-card-sequence__rules .play-card-sequence__choice-lead {
-  margin: 64px 0 12px;
-  color: rgb(255 255 255 / 0.92);
+  /* Collapsible A/B gap: grows on tall viewports, shrinks on short ones.
+     dvh-based so it tracks the live viewport height and can never force the
+     ③ button past 100svh (no rigid px gap). */
+  margin: clamp(16px, 6dvh, 60px) 0 12px;
+  color: #494345;
   font-size: clamp(12.5px, 3.4vw, 15px);
   font-weight: 780;
   line-height: 1.3;
@@ -8224,7 +8290,7 @@ body.game-start-active .gameplay-carousel__nav--next {
 
 .play-card-sequence__choice-lead strong {
   display: inline;
-  color: #ff9abc;
+  color: #bd0058;
   font-weight: 860;
 }
 

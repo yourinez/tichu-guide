@@ -6,7 +6,11 @@
     !document.documentElement.classList.contains("modal-open");
   const isScrollableOverlayTarget = (target) =>
     target instanceof Element &&
-    Boolean(target.closest(".app-modal__dialog, .combo-guide.is-opened-from-game"));
+    Boolean(
+      target.closest(
+        ".app-modal__dialog, .combo-guide.is-opened-from-game, .play-card-sequence"
+      )
+    );
 
   window.addEventListener(
     "wheel",
