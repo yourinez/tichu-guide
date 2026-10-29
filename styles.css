@@ -8205,7 +8205,7 @@ body.gameplay-slides-active {
 }
 
 .deal-section .deal-seat--bottom .deal-seat__label {
-  top: 45px;
+  top: 12px;
   right: auto;
   bottom: auto;
   left: 0;
@@ -8221,7 +8221,7 @@ body.gameplay-slides-active {
 
 .deal-section .deal-seat--bottom .hand-privacy-note {
   position: absolute;
-  top: 78px;
+  top: 40px;
   left: 0;
   width: max-content;
   margin: 0;
@@ -8238,7 +8238,7 @@ body.gameplay-slides-active {
   }
 
   .deal-section .deal-seat--bottom .hand-privacy-note {
-    top: 72px;
+    top: 38px;
   }
 
 }
