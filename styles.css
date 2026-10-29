@@ -6320,14 +6320,14 @@ body.modal-open {
 
 .special-description ul {
   display: grid;
-  gap: 11px;
+  gap: 9px;
   width: fit-content;
-  margin: clamp(18px, 3vh, 26px) auto 0;
+  margin: clamp(28px, 4.5vh, 40px) auto 0;
   padding: 0;
-  color: #c9c5c6;
+  color: #555052;
   font-size: clamp(12px, 3.25vw, 14px);
-  font-weight: 540;
-  line-height: 1.5;
+  font-weight: 560;
+  line-height: 1.45;
   letter-spacing: -0.025em;
   list-style: none;
   text-align: left;
@@ -6341,7 +6341,7 @@ body.modal-open {
 }
 
 .special-description li strong {
-  color: #fff;
+  color: #2d2521;
   font-weight: 820;
 }
 
