@@ -6356,7 +6356,7 @@ body.modal-open {
 
 .special-description ul {
   display: grid;
-  gap: 9px;
+  gap: 15px;
   width: fit-content;
   margin: clamp(40px, 12dvh, 120px) auto 0;
   padding: 0;
@@ -6391,7 +6391,7 @@ body.modal-open {
 
 /* '예:' 같은 부연 예시 줄 — 불릿 없이 살짝 들여쓰고 연하게 */
 .special-description li.special-note {
-  margin-top: -3px;
+  margin-top: -10px;
   padding-left: 18px;
   color: #8a8486;
   font-size: clamp(11px, 3vw, 13px);
