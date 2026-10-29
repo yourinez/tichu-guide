@@ -6322,7 +6322,7 @@ body.modal-open {
   display: grid;
   gap: 9px;
   width: fit-content;
-  margin: clamp(48px, 8vh, 72px) auto 0;
+  margin: clamp(88px, 15vh, 128px) auto 0;
   padding: 0;
   color: #555052;
   font-size: clamp(12px, 3.25vw, 14px);
