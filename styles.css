@@ -7047,7 +7047,7 @@ body.modal-open {
 }
 
 .score-sheet__memo {
-  margin: 18px 0 0;
+  margin: -8px 0 20px;
   color: #837771;
   font-size: clamp(11px, 3.1vw, 13px);
   font-weight: 650;
