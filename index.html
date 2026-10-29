@@ -21,7 +21,7 @@
       crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
     />
-    <link rel="stylesheet" href="styles.css?v=20261031-choice-buttons-3" />
+    <link rel="stylesheet" href="styles.css?v=20261031-combo-count-mark-1" />
   </head>
   <body>
     <div class="splash-screen">
@@ -640,9 +640,9 @@
                     data-scroll-to-combo
                     aria-label="어떤 조합으로 덮을까? 자세히 보기"
                   >
-                    <span class="choice-jump__num" aria-hidden="true">1</span>
+                    <span class="choice-jump__num" aria-hidden="true">①</span>
                     <span class="choice-jump__label">어떤 조합으로 덮을까?</span>
-                    <span class="choice-jump__help" aria-hidden="true">?</span>
+                    <span class="choice-jump__help" aria-hidden="true">?⃝</span>
                   </button>
 
                   <button
@@ -654,9 +654,9 @@
                     aria-expanded="false"
                     aria-label="패스 자세히 보기"
                   >
-                    <span class="choice-jump__num" aria-hidden="true">2</span>
+                    <span class="choice-jump__num" aria-hidden="true">②</span>
                     <span class="choice-jump__label">낼 게 없다면? 패스!</span>
-                    <span class="choice-jump__help" aria-hidden="true">?</span>
+                    <span class="choice-jump__help" aria-hidden="true">?⃝</span>
                   </button>
 
                   <button
@@ -668,9 +668,9 @@
                     aria-expanded="false"
                     aria-label="폭탄 투척 자세히 보기"
                   >
-                    <span class="choice-jump__num" aria-hidden="true">3</span>
+                    <span class="choice-jump__num" aria-hidden="true">③</span>
                     <span class="choice-jump__label">폭탄 투척하기 💣</span>
-                    <span class="choice-jump__help" aria-hidden="true">?</span>
+                    <span class="choice-jump__help" aria-hidden="true">?⃝</span>
                   </button>
                 </div>
               </div>
@@ -816,25 +816,25 @@
 
           <div class="combo-tabs" role="tablist" aria-label="카드 장수 선택">
             <button class="combo-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="combo-panel-1" data-combo="1">
-              <strong>1장</strong><span>싱글</span>
+              <strong><mark class="combo-count-mark">1장</mark></strong><span>싱글</span>
             </button>
             <button class="combo-tab" type="button" role="tab" aria-selected="false" aria-controls="combo-panel-2" data-combo="2">
-              <strong>2장</strong><span>페어</span>
+              <strong><mark class="combo-count-mark">2장</mark></strong><span>페어</span>
             </button>
             <button class="combo-tab" type="button" role="tab" aria-selected="false" aria-controls="combo-panel-3" data-combo="3">
-              <strong>3장</strong><span>트리플</span>
+              <strong><mark class="combo-count-mark">3장</mark></strong><span>트리플</span>
             </button>
             <button class="combo-tab" type="button" role="tab" aria-selected="false" aria-controls="combo-panel-4" data-combo="4">
-              <strong>4장+</strong><span>연속 페어</span>
+              <strong><mark class="combo-count-mark">4장+</mark></strong><span>연속 페어</span>
             </button>
             <button class="combo-tab" type="button" role="tab" aria-selected="false" aria-controls="combo-panel-5" data-combo="5">
-              <strong>5장</strong><span>풀하우스<br />스트레이트</span>
+              <strong><mark class="combo-count-mark">5장</mark></strong><span>풀하우스<br />스트레이트</span>
             </button>
           </div>
 
           <div class="combo-results">
             <article class="combo-panel" id="combo-panel-1" role="tabpanel" data-panel="1">
-              <h3>1장 = 싱글</h3>
+              <h3><mark class="combo-count-mark">1장</mark> = 싱글</h3>
               <div class="combo-example">
                 <p>앞에 이게 깔렸다면</p>
                 <div class="combo-card-row"><img src="별7.png" alt="별 7" /></div>
@@ -860,7 +860,7 @@
             </article>
 
             <article class="combo-panel" id="combo-panel-2" role="tabpanel" data-panel="2" hidden>
-              <h3>2장 = 페어</h3>
+              <h3><mark class="combo-count-mark">2장</mark> = 페어</h3>
               <div class="combo-example">
                 <p>앞에 이게 깔렸다면</p>
                 <div class="combo-card-row"><img src="옥7.png" alt="옥 7" /><img src="집7.png" alt="집 7" /></div>
@@ -879,7 +879,7 @@
             </article>
 
             <article class="combo-panel" id="combo-panel-3" role="tabpanel" data-panel="3" hidden>
-              <h3>3장 = 트리플</h3>
+              <h3><mark class="combo-count-mark">3장</mark> = 트리플</h3>
               <div class="combo-example">
                 <p>앞에 이게 깔렸다면</p>
                 <div class="combo-card-row"><img src="옥7.png" alt="옥 7" /><img src="집7.png" alt="집 7" /><img src="별7.png" alt="별 7" /></div>
@@ -898,7 +898,7 @@
             </article>
 
             <article class="combo-panel" id="combo-panel-4" role="tabpanel" data-panel="4" hidden>
-              <h3>4장+ = 연속 페어</h3>
+              <h3><mark class="combo-count-mark">4장 이상</mark> = 연속 페어</h3>
               <div class="combo-example">
                 <p>앞에 이게 깔렸다면</p>
                 <div class="combo-card-row combo-card-row--grouped" role="group" aria-label="옥 3, 집 3 · 별 4, 옥 4">
@@ -927,7 +927,7 @@
             </article>
 
             <article class="combo-panel" id="combo-panel-5" role="tabpanel" data-panel="5" hidden>
-              <h3>5장 = 풀하우스·스트레이트</h3>
+              <h3><mark class="combo-count-mark">5장</mark> = 풀하우스·스트레이트</h3>
               <div class="combo-example">
                 <p>앞에 이게 깔렸다면 (풀하우스)</p>
                 <div class="combo-card-row"><img src="옥7.png" alt="옥 7" /><img src="집7.png" alt="집 7" /><img src="별7.png" alt="별 7" /><img src="옥3.png" alt="옥 3" /><img src="집3.png" alt="집 3" /></div>

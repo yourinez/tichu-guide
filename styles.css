@@ -535,7 +535,7 @@ body:not(.stage-tabs-visible) .prep-stepper {
 }
 
 body[data-active-stage="#game-play"] .floating-tip-button {
-  top: max(56px, calc(env(safe-area-inset-top) + 50px));
+  top: max(202px, calc(env(safe-area-inset-top) + 192px));
   bottom: auto;
   min-width: 0;
   min-height: 32px;
@@ -7440,6 +7440,16 @@ body.gameplay-slides-active {
   gap: clamp(5px, 1.7vw, 8px);
 }
 
+.combo-guide .combo-count-mark {
+  display: inline;
+  padding: 0 0.08em;
+  background: linear-gradient(transparent 38%, #ffe16c 38%, #ffe16c 91%, transparent 91%);
+  box-decoration-break: clone;
+  color: inherit;
+  font: inherit;
+  -webkit-box-decoration-break: clone;
+}
+
 .combo-guide .combo-tab {
   min-height: 78px;
   border: 2px solid transparent;
@@ -8164,15 +8174,17 @@ body.game-start-active .gameplay-carousel__nav--next {
 .play-card-sequence__choice-lead {
   margin: 18px 0 10px;
   color: rgb(255 255 255 / 0.92);
-  font-size: clamp(14px, 3.9vw, 16px);
+  font-size: clamp(12.5px, 3.4vw, 15px);
   font-weight: 780;
   line-height: 1.3;
   letter-spacing: -0.03em;
   text-align: center;
+  white-space: nowrap;
 }
 
 .play-card-sequence__choice-lead strong {
-  color: #ffd266;
+  display: inline;
+  color: #ff9abc;
   font-weight: 860;
 }
 
@@ -8202,14 +8214,14 @@ body.game-start-active .gameplay-carousel__nav--next {
 }
 
 .choice-jump__num {
-  display: grid;
-  width: 22px;
-  height: 22px;
-  place-items: center;
-  border: 1.5px solid rgb(255 255 255 / 0.85);
-  border-radius: 50%;
-  font-size: clamp(13px, 3.6vw, 15px);
-  font-weight: 600;
+  display: inline-block;
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent !important;
+  font-size: clamp(18px, 5vw, 21px);
+  font-weight: 450;
   line-height: 1;
 }
 
@@ -8221,16 +8233,17 @@ body.game-start-active .gameplay-carousel__nav--next {
 }
 
 .choice-jump__help {
-  display: grid;
-  width: 19px;
-  height: 19px;
-  place-items: center;
-  border: 1.5px solid currentColor;
-  border-radius: 50%;
-  font-size: 12px;
-  font-weight: 600;
+  display: inline-block;
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
+  font-size: clamp(18px, 5vw, 21px);
+  font-weight: 450;
   line-height: 1;
-  opacity: 0.8;
+  opacity: 0.88;
 }
 
 .choice-jump:focus-visible {
@@ -8250,7 +8263,7 @@ body.game-start-active .gameplay-carousel__nav--next {
 }
 
 .choice-jump--primary .choice-jump__num {
-  background: rgb(255 255 255 / 0.28);
+  background: transparent;
 }
 
 /* ② pass — calm, static. */
@@ -8267,7 +8280,7 @@ body.game-start-active .gameplay-carousel__nav--next {
 }
 
 .choice-jump--bomb .choice-jump__num {
-  background: rgb(255 255 255 / 0.24);
+  background: transparent;
 }
 
 @media (prefers-reduced-motion: reduce) {
