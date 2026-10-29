@@ -4378,6 +4378,14 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   letter-spacing: -0.03em;
 }
 
+.combo-example--wrong {
+  margin-top: 18px;
+  padding: 11px 12px 13px;
+  border: 1px solid #f0d9da;
+  border-radius: 16px;
+  background: #fdf0f1;
+}
+
 .combo-example--wrong > p {
   color: #b31d2b;
 }
@@ -4483,6 +4491,19 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 .combo-wrong-grid--single {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
+}
+
+.combo-wrong-grid--triple {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.combo-wrong-grid--triple .combo-card-row {
+  gap: 2px;
+}
+
+.combo-wrong-grid--triple .combo-card-row img {
+  width: clamp(24px, 7.4vw, 34px);
 }
 
 .combo-wrong-case {
