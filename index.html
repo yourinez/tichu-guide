@@ -21,7 +21,7 @@
       crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
     />
-    <link rel="stylesheet" href="styles.css?v=20261031-cover-seats-2" />
+    <link rel="stylesheet" href="styles.css?v=20261031-cover-seats-3" />
   </head>
   <body>
     <div class="splash-screen">
@@ -590,9 +590,8 @@
                 <strong>더 높은 카드로</strong> 판 위의 카드 위에<br />카드를 덮으세요!
               </h2>
               <div class="play-card-sequence__board-wrap">
+                <p class="play-card-sequence__direction">↺ 시계반대방향</p>
                 <div class="play-card-sequence__board" aria-label="참새 보유자(아래)부터 시계반대방향으로 오른쪽 상대, 파트너(위), 왼쪽 상대가 3·6·9·K 페어를 차례로 덮고, 나머지는 패스한 뒤 마지막에 낸 왼쪽 상대가 바닥 카드를 모두 가져갑니다">
-                  <p class="play-card-sequence__direction">시계반대방향</p>
-
                   <span class="pcs-seat pcs-seat--bottom" data-seat="bottom" aria-hidden="true">참새 보유자</span>
                   <span class="pcs-seat pcs-seat--right" data-seat="right" aria-hidden="true">상대</span>
                   <span class="pcs-seat pcs-seat--top" data-seat="top" aria-hidden="true">파트너</span>
@@ -622,6 +621,7 @@
                     <span aria-hidden="true">↻</span>
                   </button>
                 </div>
+                <p class="play-card-sequence__next-lead" aria-hidden="true">트릭을 가져간 <strong>상대</strong>가 다음 트릭을 시작해요</p>
               </div>
 
               <div class="play-card-sequence__rules">
@@ -1754,6 +1754,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
-    <script src="main.js?v=20261031-cover-seats-2" charset="UTF-8"></script>
+    <script src="main.js?v=20261031-cover-seats-3" charset="UTF-8"></script>
   </body>
 </html>

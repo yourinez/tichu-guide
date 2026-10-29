@@ -3060,6 +3060,9 @@ const legacyPrepFlow = () => {
     pairImages.forEach((img) => {
       if (!img.dataset.frontSrc) img.dataset.frontSrc = img.getAttribute("src");
     });
+    const nextLead = cardSequence
+      .closest(".play-card-sequence")
+      ?.querySelector(".play-card-sequence__next-lead");
     const BACK_SRC = "뒷면.png";
     const showCardBacks = () => pairImages.forEach((img) => img.setAttribute("src", BACK_SRC));
     const showCardFronts = () =>
@@ -3094,6 +3097,7 @@ const legacyPrepFlow = () => {
         coverTimeline = null;
         clearSeatHighlights();
         showCardFronts();
+        nextLead?.classList.remove("is-visible");
         if (passLabels.length) {
           window.gsap.set(passLabels, { autoAlpha: 0, scale: 0.9 });
         }
@@ -3109,6 +3113,7 @@ const legacyPrepFlow = () => {
           onRepeat: () => {
             clearSeatHighlights();
             showCardFronts();
+            nextLead?.classList.remove("is-visible");
             if (passLabels.length) {
               window.gsap.set(passLabels, { autoAlpha: 0, scale: 0.9 });
             }
@@ -3233,7 +3238,16 @@ const legacyPrepFlow = () => {
           collectAt + 0.62
         );
 
-        coverTimeline.call(() => clearSeatHighlights(), null, collectAt + 1.3);
+        // Card pile is gone — announce that the collector (left seat) starts next.
+        coverTimeline.call(
+          () => {
+            clearSeatHighlights();
+            seatFor("left")?.classList.add("is-active");
+            nextLead?.classList.add("is-visible");
+          },
+          null,
+          collectAt + 1.25
+        );
       };
 
       resetSequence();

@@ -4021,7 +4021,7 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 }
 
 .pcs-seat--top {
-  top: 32px;
+  top: 12px;
   left: 50%;
   color: rgb(129 227 170 / 0.72);
   transform: translateX(-50%);
@@ -4068,43 +4068,48 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 
 .pcs-seat--left.is-active,
 .pcs-seat--right.is-active {
+  writing-mode: horizontal-tb;
   transform: translateY(-50%) scale(1.22);
 }
 
 /* "패스" tags that appear after KK, near each passing seat. */
+/* "패스" shown as a bold red circle, placed over each seat's label. */
 .pcs-pass {
   position: absolute;
-  z-index: 7;
-  padding: 2px 9px;
-  border-radius: 999px;
-  border: 1px solid rgb(229 70 76 / 0.7);
-  background: rgb(181 39 52 / 0.92);
+  z-index: 9;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid rgb(255 255 255 / 0.85);
+  background: #d23340;
   color: #fff;
-  font-size: clamp(10px, 2.7vw, 12px);
-  font-weight: 820;
+  font-size: clamp(11px, 2.9vw, 13px);
+  font-weight: 860;
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   white-space: nowrap;
   pointer-events: none;
-  box-shadow: 0 2px 8px rgb(181 39 52 / 0.4);
+  box-shadow: 0 4px 14px rgb(181 39 52 / 0.55);
   opacity: 0;
 }
 
 .pcs-pass--bottom {
-  bottom: 30px;
+  bottom: 8px;
   left: 50%;
   transform: translateX(-50%);
 }
 
 .pcs-pass--top {
-  top: 52px;
+  top: 8px;
   left: 50%;
   transform: translateX(-50%);
 }
 
 .pcs-pass--right {
   top: 50%;
-  right: 30px;
+  right: 6px;
   transform: translateY(-50%);
 }
 
@@ -7488,18 +7493,39 @@ body.gameplay-slides-active {
 }
 
 .play-card-sequence__direction {
-  position: absolute;
-  z-index: 8;
-  top: 15px;
-  left: 50%;
-  margin: 0;
-  color: rgb(255 255 255 / 0.48);
-  font-size: clamp(10px, 2.8vw, 12px);
-  font-weight: 430;
+  position: static;
+  z-index: auto;
+  margin: 0 0 10px;
+  color: rgb(255 255 255 / 0.55);
+  font-size: clamp(11px, 3vw, 13px);
+  font-weight: 500;
   line-height: 1;
   letter-spacing: -0.015em;
+  text-align: center;
   pointer-events: none;
-  transform: translateX(-50%);
+  transform: none;
+}
+
+.play-card-sequence__next-lead {
+  margin: 14px 0 0;
+  color: rgb(255 255 255 / 0.72);
+  font-size: clamp(12px, 3.3vw, 14px);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.025em;
+  text-align: center;
+  text-wrap: balance;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.play-card-sequence__next-lead.is-visible {
+  opacity: 1;
+}
+
+.play-card-sequence__next-lead strong {
+  color: #ff6b6b;
+  font-weight: 820;
 }
 
 .play-card-sequence__replay {
