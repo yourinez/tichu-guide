@@ -2440,6 +2440,12 @@ body.combo-guide-open .quick-reference-bar {
   display: none;
 }
 
+.deal-status,
+.deal-status span,
+.deal-status__arrow {
+  color: #241915;
+}
+
 .deal-status__arrow {
   font-size: 1.25em;
   line-height: 1;
