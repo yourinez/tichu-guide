@@ -4017,6 +4017,7 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 .pcs-seat--bottom {
   bottom: 12px;
   left: 50%;
+  color: rgb(255 210 102 / 0.82);
   transform: translateX(-50%);
 }
 
@@ -4054,6 +4055,11 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 }
 
 .pcs-seat--bottom.is-active {
+  background: #ffd266;
+  color: #4a3410;
+  box-shadow:
+    0 0 0 3px rgb(255 210 102 / 0.35),
+    0 0 18px rgb(255 210 102 / 0.7);
   transform: translateX(-50%) scale(1.22);
 }
 

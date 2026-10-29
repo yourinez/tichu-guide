@@ -3275,6 +3275,15 @@ const legacyPrepFlow = () => {
         );
 
         if (nextCard) {
+          // Left 상대 plays the single card — highlight that seat as it starts.
+          coverTimeline.call(
+            () => {
+              clearSeatHighlights();
+              seatFor("left")?.classList.add("is-active");
+            },
+            null,
+            collectAt + 1.7
+          );
           coverTimeline.fromTo(
             nextCard,
             { autoAlpha: 0, xPercent: -50, yPercent: -50, x: -150, y: 0, scale: 0.94, rotation: -6 },
