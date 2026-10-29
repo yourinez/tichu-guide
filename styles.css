@@ -535,7 +535,7 @@ body:not(.stage-tabs-visible) .prep-stepper {
 }
 
 body[data-active-stage="#game-play"] .floating-tip-button {
-  top: max(202px, calc(env(safe-area-inset-top) + 192px));
+  top: max(138px, calc(env(safe-area-inset-top) + 128px));
   bottom: auto;
   min-width: 0;
   min-height: 32px;
