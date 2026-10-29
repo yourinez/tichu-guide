@@ -5736,6 +5736,7 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 
 .round-end__cards {
   position: relative;
+  z-index: 0;
   display: flex;
   height: 27px;
   align-items: center;
@@ -5780,7 +5781,14 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 
 @keyframes round-end-pass {
   0%, 12% { transform: translateX(0); }
-  100% { transform: translateX(160px); }
+  100% { transform: translateX(74px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .round-end.is-visible .round-end__transfer--hand .round-end__cards,
+  .round-end.is-visible .round-end__transfer--tricks .round-end__cards {
+    animation: none;
+  }
 }
 
 .round-end__double {
@@ -6857,12 +6865,17 @@ body.modal-open {
 
 .score-sheet__note {
   margin: 11px 0 0;
-  color: #625c5e;
+  color: #554d4f;
   font-size: clamp(11px, 3.1vw, 13px);
-  font-weight: 600;
+  font-weight: 680;
   line-height: 1.45;
   letter-spacing: -0.025em;
   text-wrap: balance;
+}
+
+.score-sheet__note strong {
+  color: #a82e39;
+  font-weight: 850;
 }
 
 .score-sheet__total {
@@ -6873,19 +6886,19 @@ body.modal-open {
 .score-sheet__total summary {
   position: relative;
   display: flex;
-  min-height: 52px;
-  padding: 11px 38px 11px 14px;
+  min-height: 40px;
+  padding: 9px 34px 9px 13px;
   align-items: center;
   justify-content: center;
-  border-radius: 13px;
-  background: #a82e39;
-  box-shadow: 0 8px 20px rgb(168 46 57 / 0.24);
-  color: #fff;
+  border: 1px solid #e5d9d3;
+  border-radius: 11px;
+  background: #faf6f1;
+  color: #7a6f68;
   cursor: pointer;
-  font-size: clamp(15px, 4.2vw, 18px);
-  font-weight: 880;
-  line-height: 1.3;
-  letter-spacing: -0.04em;
+  font-size: clamp(12px, 3.3vw, 14px);
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: -0.03em;
   list-style: none;
   text-wrap: balance;
 }
@@ -6896,15 +6909,12 @@ body.modal-open {
 
 .score-sheet__total summary::after {
   position: absolute;
-  right: 14px;
-  content: "+";
-  font-size: 21px;
-  font-weight: 500;
+  right: 13px;
+  content: "?";
+  color: #a0948c;
+  font-size: 16px;
+  font-weight: 700;
   line-height: 1;
-}
-
-.score-sheet__total[open] summary::after {
-  content: "\2212";
 }
 
 .score-sheet__total summary:focus-visible {
@@ -7029,6 +7039,17 @@ body.modal-open {
   font-weight: 850;
   line-height: 1.4;
   letter-spacing: -0.035em;
+}
+
+.score-sheet__memo {
+  margin: 18px 0 0;
+  color: #837771;
+  font-size: clamp(11px, 3.1vw, 13px);
+  font-weight: 650;
+  line-height: 1.5;
+  letter-spacing: -0.025em;
+  text-align: center;
+  text-wrap: balance;
 }
 
 .combo-dictionary__title {
