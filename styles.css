@@ -6389,6 +6389,19 @@ body.modal-open {
   content: "•";
 }
 
+/* '예:' 같은 부연 예시 줄 — 불릿 없이 살짝 들여쓰고 연하게 */
+.special-description li.special-note {
+  margin-top: -3px;
+  padding-left: 18px;
+  color: #8a8486;
+  font-size: clamp(11px, 3vw, 13px);
+  font-weight: 520;
+}
+
+.special-description li.special-note::before {
+  content: none;
+}
+
 .special-dots {
   display: flex;
   align-items: center;
