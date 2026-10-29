@@ -6813,6 +6813,15 @@ body.modal-open {
   word-break: keep-all;
 }
 
+.combo-dictionary__count {
+  padding: 0 2px;
+  border-radius: 2px;
+  background-color: rgb(255 235 120 / 0.35);
+  color: #4a4c50;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
 .combo-dictionary__cards {
   --combo-card-width: clamp(29px, 8.5vw, 36px);
   display: flex;
