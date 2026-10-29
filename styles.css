@@ -1931,18 +1931,18 @@ body.combo-guide-open .quick-reference-bar {
   align-items: center;
   justify-content: center;
   gap: 3px;
-  border: 1px solid rgb(16 94 61 / 0.3);
+  border: 1px solid rgb(113 76 50 / 0.22);
   border-radius: 24px;
-  background: #1f9d63;
-  box-shadow: 0 10px 24px rgb(16 74 48 / 0.28);
-  color: #fff;
+  background: #ffca61;
+  box-shadow: 0 6px 14px rgb(88 54 36 / 0.18);
+  color: #241915;
   cursor: pointer;
   font: inherit;
   text-align: center;
 }
 
 .trick-end__score-link-sub {
-  color: rgb(255 255 255 / 0.85);
+  color: rgb(36 25 21 / 0.72);
   font-size: clamp(11.5px, 3vw, 13px);
   font-weight: 650;
   line-height: 1.2;
@@ -1963,7 +1963,7 @@ body.combo-guide-open .quick-reference-bar {
 }
 
 .trick-end__score-link:focus-visible {
-  outline: 3px solid rgb(31 157 99 / 0.45);
+  outline: 3px solid #b0873f;
   outline-offset: 3px;
 }
 
@@ -2410,21 +2410,21 @@ body.combo-guide-open .quick-reference-bar {
   left: 50%;
   display: inline-flex;
   width: auto;
-  min-width: min(78%, 240px);
-  min-height: 50px;
+  min-width: auto;
+  min-height: 40px;
   margin: 0;
-  padding: 0 20px;
+  padding: 0 18px;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  border: 1px solid rgb(255 255 255 / 0.72);
+  gap: 6px;
+  border: 1px solid rgb(113 76 50 / 0.22);
   border-radius: 999px;
-  background: #382c2d;
-  box-shadow: 0 10px 24px rgb(56 44 45 / 0.22);
-  color: #fff;
+  background: #ffca61;
+  box-shadow: 0 6px 14px rgb(88 54 36 / 0.18);
+  color: #241915;
   cursor: pointer;
   font: inherit;
-  font-size: clamp(17px, 4.8vw, 20px);
+  font-size: clamp(14px, 4vw, 16px);
   font-weight: 790;
   line-height: 1.2;
   letter-spacing: -0.045em;
@@ -2446,11 +2446,11 @@ body.combo-guide-open .quick-reference-bar {
 }
 
 .deal-status:hover {
-  background: #4a383a;
+  background: #ffd277;
 }
 
 .deal-status:focus-visible {
-  outline: 3px solid #a91462;
+  outline: 3px solid #b0873f;
   outline-offset: 4px;
 }
 
@@ -3573,8 +3573,7 @@ body.combo-guide-open .quick-reference-bar {
   top: calc(50% - 16px);
   left: 50%;
   display: flex;
-  width: max-content;
-  max-width: 88%;
+  width: min(88%, 300px);
   margin: 0;
   flex-direction: column;
   align-items: center;
@@ -3583,6 +3582,7 @@ body.combo-guide-open .quick-reference-bar {
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
+  text-align: center;
   transform: translate3d(-50%, -50%, 0);
 }
 
@@ -3593,6 +3593,7 @@ body.combo-guide-open .quick-reference-bar {
 }
 
 .exchange-completion p {
+  width: 100%;
   margin: 0;
   padding: 0;
   background: transparent;
@@ -3601,6 +3602,7 @@ body.combo-guide-open .quick-reference-bar {
   font-weight: 800;
   line-height: 1.2;
   letter-spacing: -0.035em;
+  text-align: center;
   white-space: nowrap;
 }
 
