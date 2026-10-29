@@ -7509,7 +7509,7 @@ body.gameplay-slides-active {
 .play-card-sequence__next-lead {
   position: absolute;
   z-index: 10;
-  top: 50%;
+  top: 36%;
   left: 50%;
   width: max-content;
   max-width: 80%;
@@ -7534,6 +7534,26 @@ body.gameplay-slides-active {
 .play-card-sequence__next-lead.is-visible {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
+}
+
+.play-card-sequence__next-lead strong {
+  color: #ff6b6b;
+  font-weight: 880;
+}
+
+/* Single card the winning 상대 plays to open the next trick. */
+.pcs-next-card {
+  position: absolute;
+  z-index: 9;
+  top: 50%;
+  left: 50%;
+  width: clamp(40px, 12vw, 50px);
+  height: auto;
+  border-radius: 5px;
+  box-shadow: 0 8px 18px rgb(0 0 0 / 0.32);
+  opacity: 0;
+  transform: translate(-50%, 36px) scale(0.9) rotate(-4deg);
+  pointer-events: none;
 }
 
 .play-card-sequence__replay {

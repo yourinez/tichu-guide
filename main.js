@@ -3063,6 +3063,7 @@ const legacyPrepFlow = () => {
     const nextLead = cardSequence
       .closest(".play-card-sequence")
       ?.querySelector(".play-card-sequence__next-lead");
+    const nextCard = cardSequence.querySelector(".pcs-next-card");
     const BACK_SRC = "뒷면.png";
     const showCardBacks = () => pairImages.forEach((img) => img.setAttribute("src", BACK_SRC));
     const showCardFronts = () =>
@@ -3098,6 +3099,16 @@ const legacyPrepFlow = () => {
         clearSeatHighlights();
         showCardFronts();
         nextLead?.classList.remove("is-visible");
+        if (nextCard) {
+          window.gsap.set(nextCard, {
+            autoAlpha: 0,
+            xPercent: -50,
+            yPercent: -50,
+            y: 36,
+            scale: 0.9,
+            rotation: -4
+          });
+        }
         if (passLabels.length) {
           window.gsap.set(passLabels, { autoAlpha: 0, scale: 0.9 });
         }
@@ -3109,11 +3120,21 @@ const legacyPrepFlow = () => {
         resetSequence();
         coverTimeline = window.gsap.timeline({
           repeat: -1,
-          repeatDelay: 5,
+          repeatDelay: 10,
           onRepeat: () => {
             clearSeatHighlights();
             showCardFronts();
             nextLead?.classList.remove("is-visible");
+            if (nextCard) {
+              window.gsap.set(nextCard, {
+                autoAlpha: 0,
+                xPercent: -50,
+                yPercent: -50,
+                y: 36,
+                scale: 0.9,
+                rotation: -4
+              });
+            }
             if (passLabels.length) {
               window.gsap.set(passLabels, { autoAlpha: 0, scale: 0.9 });
             }
@@ -3240,17 +3261,35 @@ const legacyPrepFlow = () => {
 
         // Card pile is gone — show the "whoever wins starts next" note in the
         // center of the board. (No seat highlight here.)
+        // The winning 상대 (left seat) opens the next trick: highlight the
+        // left seat, show the note, and play a single card into the center.
         coverTimeline.call(
           () => {
             clearSeatHighlights();
+            seatFor("left")?.classList.add("is-active");
             nextLead?.classList.add("is-visible");
           },
           null,
           collectAt + 1.25
         );
-        // Keep the timeline alive briefly so the note is reliably shown before
-        // the repeatDelay hold begins.
-        coverTimeline.to({}, { duration: 0.4 }, collectAt + 1.25);
+
+        if (nextCard) {
+          coverTimeline.fromTo(
+            nextCard,
+            { autoAlpha: 0, xPercent: -50, yPercent: -50, y: 36, scale: 0.9, rotation: -4 },
+            {
+              autoAlpha: 1,
+              y: 44,
+              scale: 1,
+              rotation: -2,
+              duration: 0.5,
+              ease: "back.out(1.5)"
+            },
+            collectAt + 1.55
+          );
+        } else {
+          coverTimeline.to({}, { duration: 0.4 }, collectAt + 1.25);
+        }
       };
 
       resetSequence();
