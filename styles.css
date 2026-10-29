@@ -551,6 +551,14 @@ body[data-active-stage="#game-play"] .floating-tip-button {
   visibility: visible;
 }
 
+/* 카드 소개 단계에서는 팁 버튼을 숨긴다(이 화면에선 불필요). */
+body[data-active-stage="#card-guide"] .floating-tip-button,
+body[data-active-stage="#card-reference-intro"] .floating-tip-button {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
 .floating-tip-button:focus-visible {
   outline: 3px solid rgb(168 46 57 / 0.34);
   outline-offset: 3px;
@@ -983,8 +991,9 @@ body[data-active-stage="#game-play"] .floating-tip-button {
 .hero__win-content {
   display: flex;
   width: 100%;
-  height: clamp(520px, 67svh, 650px);
-  padding: clamp(25px, 3.4vh, 30px) clamp(60px, 17.35vw, 76px) 0;
+  min-height: clamp(520px, 67svh, 650px);
+  padding: clamp(25px, 3.4vh, 30px) clamp(60px, 17.35vw, 76px)
+    clamp(150px, 20vh, 170px);
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
@@ -1006,11 +1015,9 @@ body[data-active-stage="#game-play"] .floating-tip-button {
 
 .hero__win-title {
   width: 100%;
-  min-height: clamp(110px, 14.3vh, 122px);
-  padding: clamp(12px, 1.8vh, 16px) 5px;
+  padding: 0 5px;
   margin: 0;
   color: #fff;
-  background: #ff0909;
   font-family: var(--font-display);
   font-size: clamp(31px, 8.8vw, 40px);
   font-weight: 400;
@@ -1020,7 +1027,7 @@ body[data-active-stage="#game-play"] .floating-tip-button {
 }
 
 .hero__win-title strong {
-  color: inherit;
+  color: #ff0909;
   font: inherit;
 }
 
@@ -2309,7 +2316,7 @@ body.combo-guide-open .quick-reference-bar {
 .hand-privacy-note {
   margin: 2px 0 0;
   color: #a72b36;
-  font-size: 12px;
+  font-size: clamp(13px, 3.7vw, 15px);
   font-weight: 760;
   line-height: 1.35;
   letter-spacing: -0.025em;
@@ -8108,7 +8115,7 @@ body.gameplay-slides-active {
 /* 준비 1단계: 타임라인 아래에서 제목과 네 방향 분배 구도가 온전히 보이도록 정렬. */
 .deal-section .deal-content {
   /* 타임라인 바로 아래에서 시작하도록 분배 묶음을 화면 중심보다 위에 둔다. */
-  transform: translateY(-40px);
+  transform: translateY(-56px);
 }
 
 .deal-section .deal-seat--top,
@@ -8198,7 +8205,7 @@ body.gameplay-slides-active {
 }
 
 .deal-section .deal-seat--bottom .deal-seat__label {
-  top: 45px;
+  top: 12px;
   right: auto;
   bottom: auto;
   left: 0;
@@ -8214,7 +8221,7 @@ body.gameplay-slides-active {
 
 .deal-section .deal-seat--bottom .hand-privacy-note {
   position: absolute;
-  top: 78px;
+  top: 40px;
   left: 0;
   width: max-content;
   margin: 0;
@@ -8223,7 +8230,7 @@ body.gameplay-slides-active {
 
 @media (max-height: 720px) {
   .deal-section .deal-content {
-    transform: translateY(-55px);
+    transform: translateY(-68px);
   }
 
   .deal-section .deal-table {
@@ -8231,7 +8238,7 @@ body.gameplay-slides-active {
   }
 
   .deal-section .deal-seat--bottom .hand-privacy-note {
-    top: 72px;
+    top: 38px;
   }
 
 }
@@ -10488,9 +10495,10 @@ body[data-active-stage="#card-guide"] .quick-reference-bar {
   right: 50%;
   bottom: max(104px, calc(env(safe-area-inset-bottom) + 94px));
   display: inline-flex;
+  max-width: calc(100% - 40px);
   min-height: 44px;
   margin: 0;
-  padding: 0 24px;
+  padding: 10px 24px;
   align-items: center;
   justify-content: center;
   gap: 7px;
@@ -10503,6 +10511,10 @@ body[data-active-stage="#card-guide"] .quick-reference-bar {
   font: inherit;
   font-size: clamp(14px, 3.9vw, 16px);
   font-weight: 850;
+  line-height: 1.2;
+  text-align: center;
+  white-space: normal;
+  word-break: keep-all;
   transform: translateX(50%);
 }
 
@@ -10659,6 +10671,20 @@ body[data-active-stage="#game-setup"] .deal-section .deal-content {
   .hero__win-next {
     min-height: 40px;
     bottom: max(92px, calc(env(safe-area-inset-bottom) + 84px));
+  }
+
+  .hero__win-content {
+    min-height: 0;
+    padding-bottom: clamp(132px, 20vh, 150px);
+    transform: translateY(-2svh);
+  }
+
+  .hero__win-kicker {
+    margin-bottom: clamp(20px, 3.2vh, 32px);
+  }
+
+  .hero__win-goal {
+    margin-top: clamp(18px, 3vh, 28px);
   }
 
   body[data-active-stage="#card-guide"] .card-deck-guide {
