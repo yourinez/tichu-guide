@@ -1922,36 +1922,48 @@ body.combo-guide-open .quick-reference-bar {
 }
 
 .trick-end__score-link {
-  display: inline-flex;
+  display: flex;
   width: 100%;
-  max-width: 320px;
-  min-height: 52px;
+  max-width: 340px;
   margin: clamp(24px, 4dvh, 34px) auto 0;
-  padding: 12px 24px;
+  padding: 11px 18px 13px;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  border: 1px solid rgb(255 255 255 / 0.72);
+  gap: 3px;
+  border: 1px solid rgb(16 94 61 / 0.3);
   border-radius: 24px;
-  background: #ffcd70;
-  box-shadow: 0 10px 24px rgb(68 42 39 / 0.22);
-  color: #140d0b;
+  background: #1f9d63;
+  box-shadow: 0 10px 24px rgb(16 74 48 / 0.28);
+  color: #fff;
   cursor: pointer;
   font: inherit;
-  font-size: clamp(14px, 3.8vw, 16px);
-  font-weight: 850;
-  line-height: 1.4;
   text-align: center;
-  white-space: normal;
-  word-break: keep-all;
 }
 
-.trick-end__score-link span {
-  font-size: 1.1em;
+.trick-end__score-link-sub {
+  color: rgb(255 255 255 / 0.85);
+  font-size: clamp(11.5px, 3vw, 13px);
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+.trick-end__score-link-main {
+  font-size: clamp(14px, 3.8vw, 16px);
+  font-weight: 850;
+  line-height: 1.25;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+}
+
+.trick-end__score-link-arrow {
+  margin-left: 2px;
+  font-size: 1.05em;
 }
 
 .trick-end__score-link:focus-visible {
-  outline: 3px solid #b0873f;
+  outline: 3px solid rgb(31 157 99 / 0.45);
   outline-offset: 3px;
 }
 
