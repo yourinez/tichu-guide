@@ -3066,6 +3066,19 @@ body.combo-guide-open .quick-reference-bar {
   color: #171313;
 }
 
+/* 참새 패널(특수카드 모달) 전용: 박스 좌측 정렬 + 그룹 간격 확대.
+   #special-modal로 범위를 한정해 원래 참새 보유자 설명(#sparrow-info-modal 등
+   .tichu-tip 모달)에는 영향을 주지 않도록 함. */
+#special-modal .special-description .tichu-tip__facts {
+  gap: 18px;
+}
+
+#special-modal .special-description .tichu-tip__facts,
+#special-modal .special-description .tichu-tip__facts dt,
+#special-modal .special-description .tichu-tip__facts dd {
+  text-align: left;
+}
+
 #special-modal .special-description__lead {
   color: #971f27;
 }
