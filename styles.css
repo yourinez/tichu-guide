@@ -3948,7 +3948,7 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   position: relative;
   z-index: 1;
   display: grid;
-  width: min(78vw, 306px);
+  width: min(64vw, 250px);
   aspect-ratio: 1;
   margin-inline: auto;
   place-items: center;
