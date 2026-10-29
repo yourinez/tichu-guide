@@ -1,9 +1,6 @@
 (() => {
   "use strict";
 
-  const scoreScrollIsActive = () =>
-    document.documentElement.classList.contains("score-scroll-active") &&
-    !document.documentElement.classList.contains("modal-open");
   const isScrollableOverlayTarget = (target) =>
     target instanceof Element &&
     Boolean(
@@ -15,7 +12,7 @@
   window.addEventListener(
     "wheel",
     (event) => {
-      if (event.ctrlKey || scoreScrollIsActive() || isScrollableOverlayTarget(event.target)) return;
+      if (event.ctrlKey || isScrollableOverlayTarget(event.target)) return;
       event.preventDefault();
       event.stopImmediatePropagation();
     },
@@ -24,7 +21,7 @@
   window.addEventListener(
     "touchmove",
     (event) => {
-      if (scoreScrollIsActive() || isScrollableOverlayTarget(event.target)) return;
+      if (isScrollableOverlayTarget(event.target)) return;
       event.preventDefault();
       event.stopImmediatePropagation();
     },
@@ -39,7 +36,7 @@
       const isEditable =
         event.target instanceof Element &&
         event.target.closest("button, a, input, select, textarea, [contenteditable='true']");
-      if (!verticalKey || scoreScrollIsActive() || isEditable || isScrollableOverlayTarget(event.target)) return;
+      if (!verticalKey || isEditable || isScrollableOverlayTarget(event.target)) return;
       event.preventDefault();
       event.stopImmediatePropagation();
     },
@@ -329,10 +326,7 @@ document.querySelector("[data-receive-six-next]")?.addEventListener("click", () 
       ]
     ],
     ["#game-play", [document.querySelector(".gameplay-carousel")]],
-    [
-      "#score-victory",
-      [document.querySelector("#score-victory"), document.querySelector(".round-finale")]
-    ]
+    ["#score-victory", [document.querySelector("#score-victory")]]
   ]);
   const stageContainers = Array.from(
     new Set(Array.from(stageGroups.values()).flat().filter(Boolean))
@@ -392,8 +386,6 @@ document.querySelector("[data-receive-six-next]")?.addEventListener("click", () 
       quickReferenceBar.inert = !referencesAvailable;
       quickReferenceBar.setAttribute("aria-hidden", String(!referencesAvailable));
     }
-    document.documentElement.classList.toggle("score-scroll-active", target === "#score-victory");
-    document.body.classList.toggle("score-scroll-active", target === "#score-victory");
     syncStageIsolation(target);
     stageTabs.forEach((tab) => {
       const tabTarget = target === "#card-reference-intro" ? "#card-guide" : target;
@@ -440,8 +432,6 @@ document.querySelector("[data-receive-six-next]")?.addEventListener("click", () 
   };
 
   const setMenuScrollLock = (locked) => {
-    document.documentElement.classList.remove("score-scroll-active");
-    document.body.classList.remove("score-scroll-active");
     if (!locked) {
       chapterMenuOnScreen = false;
       document.body.classList.remove("chapter-menu-visible");
@@ -518,37 +508,6 @@ document.querySelector("[data-receive-six-next]")?.addEventListener("click", () 
   window.addEventListener("scroll", updateStageFromScroll, { passive: true });
   window.addEventListener("resize", updateStageFromScroll, { passive: true });
   updateStageFromScroll();
-
-  let correctingScoreBoundary = false;
-  window.addEventListener(
-    "scroll",
-    () => {
-      if (requestedStageTarget !== "#score-victory" || correctingScoreBoundary) {
-        return;
-      }
-      const scoreSections = stageGroups.get("#score-victory") || [];
-      const first = scoreSections[0];
-      const last = scoreSections.at(-1);
-      if (!first || !last) {
-        return;
-      }
-      const min = first.getBoundingClientRect().top + window.scrollY;
-      const max = Math.max(
-        min,
-        last.getBoundingClientRect().bottom + window.scrollY - window.innerHeight
-      );
-      const target = Math.max(min, Math.min(max, window.scrollY));
-      if (Math.abs(target - window.scrollY) <= 1) {
-        return;
-      }
-      correctingScoreBoundary = true;
-      document.scrollingElement.scrollTop = target;
-      window.requestAnimationFrame(() => {
-        correctingScoreBoundary = false;
-      });
-    },
-    { passive: true }
-  );
 
   window.requestAnimationFrame(() => {
     window.tichuStageNav?.goTo?.(initialStage);
@@ -1713,6 +1672,7 @@ const legacyPrepFlow = () => {
       if (section) {
         jumpToDocumentPosition(section.getBoundingClientRect().top + window.scrollY);
       }
+      window.tichuScoreSlides?.goToSlide(0);
     }
   };
 
@@ -3549,6 +3509,91 @@ const legacyPrepFlow = () => {
 (() => {
   "use strict";
 
+  // 점수 화면 전용 가로 캐러셀 컨트롤러. 게임 진행 캐러셀 컨트롤러에서 일반화했다.
+  // 게임 진행 전용 결합(gameStart 체크, setScrollLock/gameplay-slides-active/game-start-active,
+  // IntersectionObserver 스크롤 잠금, gameplay:slide-enter/exit 이벤트, 추가 wheel preventDefault)은
+  // 모두 제거했다. 점수 화면은 더 이상 스크롤에 의존하지 않고 다른 스테이지처럼 뷰포트에 맞으므로,
+  // 캐러셀은 슬라이드 전환만 담당한다.
+  const carousel = document.querySelector(".score-carousel");
+  const viewport = carousel?.querySelector(".score-carousel__viewport");
+  const track = carousel?.querySelector(".score-carousel__track");
+  const slides = Array.from(carousel?.querySelectorAll(".score-carousel__slide") || []);
+  const previousButton = carousel?.querySelector(".score-carousel__nav--previous");
+  const nextButton = carousel?.querySelector(".score-carousel__nav--next");
+  const dots = Array.from(carousel?.querySelectorAll(".score-carousel__dots button") || []);
+
+  if (
+    !carousel ||
+    !viewport ||
+    !track ||
+    slides.length === 0 ||
+    dots.length !== slides.length ||
+    !previousButton ||
+    !nextButton
+  ) {
+    return;
+  }
+
+  let currentIndex = 0;
+
+  const goToSlide = (nextIndex) => {
+    const lastIndex = slides.length - 1;
+    const boundedIndex = Math.max(0, Math.min(lastIndex, nextIndex));
+
+    const moveFocusToViewport = slides[currentIndex]?.contains(document.activeElement);
+    if (moveFocusToViewport) {
+      viewport.focus({ preventScroll: true });
+    }
+    currentIndex = boundedIndex;
+    carousel.dataset.activeSlide = String(currentIndex);
+    track.style.transform = `translate3d(-${currentIndex * 100}%, 0, 0)`;
+
+    const slideLabelId = slides[currentIndex].getAttribute("aria-labelledby");
+    const slideLabel = slides[currentIndex].getAttribute("aria-label") ||
+      document.getElementById(slideLabelId)?.textContent.trim().replace(/\s+/g, " ") ||
+      "점수 안내";
+    viewport.setAttribute(
+      "aria-label",
+      `점수 안내 ${currentIndex + 1}/${slides.length}: ${slideLabel}`
+    );
+
+    slides.forEach((slide, index) => {
+      const isCurrent = index === currentIndex;
+      slide.setAttribute("aria-hidden", String(!isCurrent));
+      slide.inert = !isCurrent;
+      // 가로 캐러셀 안에서는 스크롤이 없으므로, 현재 보이는 슬라이드에
+      // is-visible 진입 애니메이션 클래스를 직접 붙여 준다(.round-end/.round-finale 관찰자 보완).
+      if (isCurrent) {
+        slide.classList.add("is-visible");
+      }
+    });
+    previousButton.disabled = currentIndex === 0;
+    nextButton.disabled = currentIndex === lastIndex;
+    dots.forEach((dot, index) => {
+      const isCurrent = index === currentIndex;
+      dot.classList.toggle("is-active", isCurrent);
+      if (isCurrent) {
+        dot.setAttribute("aria-current", "page");
+      } else {
+        dot.removeAttribute("aria-current");
+      }
+    });
+  };
+
+  window.tichuScoreSlides = { goToSlide, current: () => currentIndex };
+  previousButton.addEventListener("click", () => goToSlide(currentIndex - 1));
+  nextButton.addEventListener("click", () => goToSlide(currentIndex + 1));
+
+  dots.forEach((dot, index) => {
+    dot.addEventListener("click", () => goToSlide(index));
+  });
+
+  goToSlide(0);
+})();
+
+(() => {
+  "use strict";
+
   const guide = document.querySelector(".combo-guide");
 
   if (!guide) {
@@ -4111,103 +4156,4 @@ const legacyPrepFlow = () => {
   window.addEventListener("scroll", update, { passive: true });
   window.addEventListener("resize", update);
   update();
-})();
-
-(() => {
-  "use strict";
-
-  const scoreStart = document.querySelector("#score-victory");
-  const scoreEnd = document.querySelector(".round-finale");
-
-  if (!scoreStart || !scoreEnd) {
-    return;
-  }
-
-  let touchStartY = null;
-  let correcting = false;
-
-  const isScoreActive = () =>
-    document.body.dataset.activeStage === "#score-victory" &&
-    document.body.classList.contains("stage-tabs-visible") &&
-    !document.documentElement.classList.contains("modal-open");
-
-  const documentTop = (element) => element.getBoundingClientRect().top + window.scrollY;
-  const bounds = () => ({
-    min: documentTop(scoreStart),
-    max: Math.max(
-      documentTop(scoreStart),
-      documentTop(scoreEnd) + scoreEnd.offsetHeight - window.innerHeight
-    )
-  });
-
-  const atBoundary = (direction) => {
-    const { min, max } = bounds();
-    return (direction < 0 && window.scrollY <= min + 1) ||
-      (direction > 0 && window.scrollY >= max - 1);
-  };
-
-  window.addEventListener(
-    "wheel",
-    (event) => {
-      if (!isScoreActive() || !event.deltaY || !atBoundary(Math.sign(event.deltaY))) {
-        return;
-      }
-      event.preventDefault();
-      event.stopImmediatePropagation();
-    },
-    { passive: false, capture: true }
-  );
-
-  window.addEventListener(
-    "touchstart",
-    (event) => {
-      touchStartY = isScoreActive() ? event.touches[0]?.clientY ?? null : null;
-    },
-    { passive: true, capture: true }
-  );
-
-  window.addEventListener(
-    "touchmove",
-    (event) => {
-      if (!isScoreActive() || touchStartY === null) {
-        return;
-      }
-      const currentY = event.touches[0]?.clientY;
-      if (currentY === undefined) {
-        return;
-      }
-      const direction = Math.sign(touchStartY - currentY);
-      if (direction && atBoundary(direction)) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-      }
-    },
-    { passive: false, capture: true }
-  );
-
-  const clearTouch = () => {
-    touchStartY = null;
-  };
-  window.addEventListener("touchend", clearTouch, { passive: true, capture: true });
-  window.addEventListener("touchcancel", clearTouch, { passive: true, capture: true });
-
-  window.addEventListener(
-    "scroll",
-    () => {
-      if (!isScoreActive() || correcting) {
-        return;
-      }
-      const { min, max } = bounds();
-      const target = Math.max(min, Math.min(max, window.scrollY));
-      if (Math.abs(target - window.scrollY) <= 1) {
-        return;
-      }
-      correcting = true;
-      window.scrollTo({ top: target, left: 0, behavior: "auto" });
-      window.requestAnimationFrame(() => {
-        correcting = false;
-      });
-    },
-    { passive: true }
-  );
 })();

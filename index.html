@@ -21,7 +21,7 @@
       crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
     />
-    <link rel="stylesheet" href="styles.css?v=20261104-deal-status-dark-1" />
+    <link rel="stylesheet" href="styles.css?v=20261105-score-carousel-1" />
   </head>
   <body>
     <div class="splash-screen">
@@ -952,84 +952,100 @@
         </div>
       </section>
 
-      <section class="round-end" id="score-victory" aria-labelledby="round-end-title">
-        <div class="round-end__inner">
-          <p class="round-end__eyebrow">라운드 종료</p>
-          <h2 id="round-end-title">한 명만 카드가 남으면 <strong>라운드 끝!</strong></h2>
-          <p class="round-end__lead">네 명 중 세 명이 카드를 다 비우면 끝나요.</p>
+      <section class="score-carousel" id="score-victory" aria-label="점수와 최종 승리 안내">
+        <div class="score-carousel__viewport" tabindex="0" aria-label="가로로 넘기는 점수 안내">
+          <div class="score-carousel__track">
+            <section class="round-end score-carousel__slide" aria-labelledby="round-end-title">
+              <div class="round-end__inner">
+                <p class="round-end__eyebrow">라운드 종료</p>
+                <h2 id="round-end-title">한 명만 카드가 남으면 <strong>라운드 끝!</strong></h2>
+                <p class="round-end__lead">네 명 중 세 명이 카드를 다 비우면 끝나요.</p>
 
-          <div class="round-end__transfers" aria-label="꼴찌가 넘기는 두 가지">
-            <p class="round-end__transfer-intro">마지막까지 남은 사람(꼴찌)은 두 가지를 넘겨요</p>
+                <div class="round-end__transfers" aria-label="꼴찌가 넘기는 두 가지">
+                  <p class="round-end__transfer-intro">마지막까지 남은 사람(꼴찌)은 두 가지를 넘겨요</p>
 
-            <article class="round-end__transfer round-end__transfer--hand">
-              <div class="round-end__player">
-                <span class="round-end__cards" aria-hidden="true">
-                  <img src="별7.png" alt="" />
-                  <img src="옥9.png" alt="" />
-                </span>
-                <span>손에 남은 카드</span>
-              </div>
-              <span class="round-end__transfer-arrow" aria-hidden="true">→</span>
-              <div class="round-end__recipient">
-                <span class="round-end__team-mark" aria-hidden="true">2</span>
-                <span>상대팀에게</span>
-              </div>
-            </article>
+                  <article class="round-end__transfer round-end__transfer--hand">
+                    <div class="round-end__player">
+                      <span class="round-end__cards" aria-hidden="true">
+                        <img src="별7.png" alt="" />
+                        <img src="옥9.png" alt="" />
+                      </span>
+                      <span>손에 남은 카드</span>
+                    </div>
+                    <span class="round-end__transfer-arrow" aria-hidden="true">→</span>
+                    <div class="round-end__recipient">
+                      <span>상대팀에게</span>
+                    </div>
+                  </article>
 
-            <article class="round-end__transfer round-end__transfer--tricks">
-              <div class="round-end__player">
-                <span class="round-end__cards round-end__cards--backs" aria-hidden="true">
-                  <img src="뒷면.png" alt="" />
-                  <img src="뒷면.png" alt="" />
-                </span>
-                <span>그동안 딴 트릭</span>
+                  <article class="round-end__transfer round-end__transfer--tricks">
+                    <div class="round-end__player">
+                      <span class="round-end__cards round-end__cards--backs" aria-hidden="true">
+                        <img src="뒷면.png" alt="" />
+                        <img src="뒷면.png" alt="" />
+                      </span>
+                      <span>그동안 딴 트릭</span>
+                    </div>
+                    <span class="round-end__transfer-arrow" aria-hidden="true">→</span>
+                    <div class="round-end__recipient">
+                      <span>1등에게</span>
+                    </div>
+                  </article>
+                </div>
+
+                <aside class="round-end__double" aria-labelledby="round-end-double-title">
+                  <p class="round-end__double-label">특별 케이스</p>
+                  <h3 id="round-end-double-title">같은 팀이 1등·2등을 모두 하면? <strong>더블승!</strong></h3>
+                  <p>그 즉시 라운드 끝, 그 팀이 <strong>200점!</strong></p>
+                  <small>카드 점수 계산은 생략해요.</small>
+                </aside>
+                <button
+                  class="round-end__score-button"
+                  type="button"
+                  data-open="score"
+                  aria-haspopup="dialog"
+                  aria-controls="score-modal"
+                  aria-expanded="false"
+                >
+                  점수 표 보기
+                </button>
               </div>
-              <span class="round-end__transfer-arrow" aria-hidden="true">→</span>
-              <div class="round-end__recipient">
-                <span class="round-end__team-mark round-end__team-mark--first" aria-hidden="true">1</span>
-                <span>1등에게</span>
+            </section>
+
+            <section class="round-finale score-carousel__slide" aria-labelledby="round-finale-title">
+              <div class="round-finale__inner">
+                <p class="round-finale__lead">한 라운드가 끝나면, 카드를 다시 섞어 또 시작해요</p>
+
+                <div class="round-finale__cycle" aria-label="한 라운드는 분배부터 플레이와 점수 계산까지 한 번입니다">
+                  <div class="round-finale__steps" aria-hidden="true">
+                    <span>분배</span>
+                    <i>→</i>
+                    <span>플레이</span>
+                    <i>→</i>
+                    <span>점수</span>
+                    <strong class="round-finale__loop">↻</strong>
+                  </div>
+                  <p>한 라운드 = 분배부터 점수까지 한 번</p>
+                </div>
+
+                <p class="round-finale__repeat">이렇게 여러 라운드를 반복합니다</p>
+                <p class="round-finale__note">라운드가 끝날 때마다 점수를 계산해 적어 두고, 그 점수를 계속 더해요.</p>
+                <h2 id="round-finale-title">먼저 <strong>1000점</strong>을 넘긴 팀이<br />최종 승리! 🏆</h2>
               </div>
-            </article>
+            </section>
           </div>
-
-          <aside class="round-end__double" aria-labelledby="round-end-double-title">
-            <p class="round-end__double-label">특별 케이스</p>
-            <h3 id="round-end-double-title">같은 팀이 1등·2등을 모두 하면? <strong>더블승!</strong></h3>
-            <p>그 즉시 라운드 끝, 그 팀이 <strong>200점!</strong></p>
-            <small>카드 점수 계산은 생략해요.</small>
-          </aside>
-          <button
-            class="round-end__score-button"
-            type="button"
-            data-open="score"
-            aria-haspopup="dialog"
-            aria-controls="score-modal"
-            aria-expanded="false"
-          >
-            점수 표 보기
-          </button>
         </div>
-      </section>
 
-      <section class="round-finale" aria-labelledby="round-finale-title">
-        <div class="round-finale__inner">
-          <p class="round-finale__lead">한 라운드가 끝나면, 카드를 다시 섞어 또 시작해요</p>
-
-          <div class="round-finale__cycle" aria-label="한 라운드는 분배부터 플레이와 점수 계산까지 한 번입니다">
-            <div class="round-finale__steps" aria-hidden="true">
-              <span>분배</span>
-              <i>→</i>
-              <span>플레이</span>
-              <i>→</i>
-              <span>점수</span>
-              <strong class="round-finale__loop">↻</strong>
-            </div>
-            <p>한 라운드 = 분배부터 점수까지 한 번</p>
-          </div>
-
-          <p class="round-finale__repeat">이렇게 여러 라운드를 반복합니다</p>
-          <h2 id="round-finale-title">먼저 <strong>1000점</strong>을 넘긴 팀이<br />최종 승리! 🏆</h2>
-        </div>
+        <button class="score-carousel__nav score-carousel__nav--previous" type="button" aria-label="이전 점수 안내 화면으로 이동">
+          <span aria-hidden="true"></span>
+        </button>
+        <nav class="score-carousel__dots" aria-label="점수 안내 슬라이드 선택">
+          <button type="button" aria-label="1 / 2: 라운드 끝" aria-current="true"></button>
+          <button type="button" aria-label="2 / 2: 라운드 반복과 최종 승리"></button>
+        </nav>
+        <button class="score-carousel__nav score-carousel__nav--next" type="button" aria-label="다음 점수 안내 화면으로 이동">
+          <span aria-hidden="true"></span>
+        </button>
       </section>
     </main>
 

@@ -5477,19 +5477,26 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 
 .round-end {
   display: grid;
-  min-height: 100svh;
-  padding: 56px clamp(18px, 5vw, 24px);
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  padding: max(104px, calc(env(safe-area-inset-top) + 94px)) clamp(18px, 5vw, 24px)
+    max(118px, calc(env(safe-area-inset-bottom) + 104px));
   place-items: center;
   border-top: 0;
   background: #fdf6ec;
   color: #29231f;
   text-align: center;
+  overflow: hidden;
 }
 
 .round-finale {
   display: grid;
-  min-height: 82svh;
-  padding: 64px clamp(18px, 5vw, 24px) 72px;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  padding: max(104px, calc(env(safe-area-inset-top) + 94px)) clamp(18px, 5vw, 24px)
+    max(118px, calc(env(safe-area-inset-bottom) + 104px));
   place-items: center;
   background:
     radial-gradient(circle at 50% 63%, rgb(231 178 75 / 0.16), transparent 34%),
@@ -5577,6 +5584,17 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   font-size: clamp(14px, 4vw, 17px);
 }
 
+.round-finale__note {
+  margin: 10px auto 0;
+  max-width: 320px;
+  color: #6c5848;
+  font-size: clamp(12px, 3.4vw, 14px);
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
 .round-finale h2 {
   margin: 16px 0 0;
   color: #2f2722;
@@ -5596,6 +5614,7 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 .round-finale__lead,
 .round-finale__cycle,
 .round-finale__repeat,
+.round-finale__note,
 .round-finale h2 {
   opacity: 0;
   transform: translate3d(0, 24px, 0);
@@ -5604,6 +5623,7 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 .round-finale.is-visible .round-finale__lead,
 .round-finale.is-visible .round-finale__cycle,
 .round-finale.is-visible .round-finale__repeat,
+.round-finale.is-visible .round-finale__note,
 .round-finale.is-visible h2 {
   animation: round-finale-rise 650ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
@@ -5616,8 +5636,12 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   animation-delay: 330ms;
 }
 
+.round-finale.is-visible .round-finale__note {
+  animation-delay: 420ms;
+}
+
 .round-finale.is-visible h2 {
-  animation-delay: 480ms;
+  animation-delay: 520ms;
 }
 
 .round-finale.is-visible .round-finale__loop {
@@ -5744,25 +5768,6 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   font-size: 28px;
   font-weight: 800;
   line-height: 1;
-}
-
-.round-end__team-mark {
-  display: grid;
-  width: 27px;
-  height: 27px;
-  place-items: center;
-  border: 1px solid rgb(168 46 57 / 0.22);
-  border-radius: 50%;
-  background: #fff1e6;
-  color: #a82e39;
-  font-size: 15px;
-  font-weight: 900;
-}
-
-.round-end__team-mark--first {
-  border-color: rgb(185 139 85 / 0.38);
-  background: #fff2cb;
-  color: #8b651f;
 }
 
 .round-end.is-visible .round-end__transfer--hand .round-end__cards {
@@ -6367,6 +6372,111 @@ body.modal-open {
 .round-end__score-button:focus-visible {
   outline: 2px solid #a82e39;
   outline-offset: 4px;
+}
+
+/* 짧은 뷰포트(~700px 이하)에서 두 점수 슬라이드가 세로 스크롤 없이
+   한 화면에 들어오도록 간격·크기를 압축한다. 상단 단계 바(top fixed)와
+   하단 참조 바/도트(bottom fixed)에 가려지지 않도록 슬라이드 패딩도 줄인다.
+   슬라이드 1(.round-end: eyebrow+h2+lead+전달 2행+더블승+버튼)이 가장 빡빡하다. */
+@media (max-height: 700px) {
+  .round-end,
+  .round-finale {
+    padding-top: max(76px, calc(env(safe-area-inset-top) + 68px));
+    padding-bottom: max(100px, calc(env(safe-area-inset-bottom) + 90px));
+  }
+
+  .round-end h2 {
+    font-size: clamp(20px, 5.4vw, 25px);
+  }
+
+  .round-end h2 strong {
+    font-size: clamp(27px, 7.4vw, 34px);
+  }
+
+  .round-end__transfers {
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .round-end__transfer {
+    min-height: 68px;
+    padding: 8px 12px;
+  }
+
+  .round-end__player,
+  .round-end__recipient {
+    min-height: 48px;
+  }
+
+  .round-end__double {
+    margin-top: 12px;
+    padding: 11px 13px;
+  }
+
+  .round-end__double > p {
+    margin-top: 6px;
+  }
+
+  .round-end__score-button {
+    margin-top: 12px;
+  }
+
+  .round-finale__cycle {
+    margin: 16px auto;
+    padding: 14px 12px 12px;
+  }
+
+  .round-finale h2 {
+    margin-top: 12px;
+    font-size: clamp(26px, 7vw, 33px);
+  }
+}
+
+@media (max-height: 640px) {
+  .round-end,
+  .round-finale {
+    padding-top: max(70px, calc(env(safe-area-inset-top) + 62px));
+    padding-bottom: max(92px, calc(env(safe-area-inset-bottom) + 84px));
+  }
+
+  .round-end__lead {
+    margin-top: 4px;
+  }
+
+  .round-end__transfers {
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .round-end__transfer {
+    min-height: 60px;
+  }
+
+  .round-end__transfer-intro {
+    margin-bottom: 0;
+  }
+
+  .round-end__double {
+    margin-top: 10px;
+    padding: 9px 12px;
+  }
+
+  .round-end__double small {
+    display: none;
+  }
+
+  .round-end__score-button {
+    margin-top: 10px;
+    min-height: 40px;
+  }
+
+  .round-finale__cycle {
+    margin: 12px auto;
+  }
+
+  .round-finale__note {
+    margin-top: 8px;
+  }
 }
 
 .score-modal__dialog {
@@ -8235,6 +8345,130 @@ body.game-start-active .gameplay-carousel__nav--next {
   transform: translate(-50%, -50%) scale(1.35);
 }
 
+/* Score stage mirrors the gameplay carousel: one horizontal, viewport-sized slide deck. */
+.score-carousel {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  overflow: hidden;
+  background: #fdf6ec;
+}
+
+.score-carousel__viewport {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.score-carousel__track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 620ms cubic-bezier(0.65, 0, 0.35, 1);
+  will-change: transform;
+}
+
+.score-carousel__slide {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 100%;
+  flex: 0 0 100%;
+  overflow: hidden;
+}
+
+.score-carousel__nav {
+  position: absolute;
+  z-index: 12;
+  top: 50%;
+  display: grid;
+  width: 46px;
+  height: 58px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: #44393a;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.score-carousel__nav span {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-top: 3px solid currentColor;
+  border-right: 3px solid currentColor;
+}
+
+.score-carousel__nav--previous {
+  left: 0;
+}
+
+.score-carousel__nav--previous span {
+  margin-left: 7px;
+  transform: rotate(-135deg);
+}
+
+.score-carousel__nav--next {
+  right: 0;
+}
+
+.score-carousel__nav--next span {
+  margin-right: 7px;
+  transform: rotate(45deg);
+}
+
+.score-carousel__nav:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.score-carousel__nav:focus-visible {
+  outline: 3px solid rgb(68 57 58 / 0.42);
+  outline-offset: -4px;
+}
+
+.score-carousel__dots {
+  position: absolute;
+  z-index: 12;
+  bottom: max(58px, calc(env(safe-area-inset-bottom) + 48px));
+  left: 50%;
+  display: flex;
+  gap: 4px;
+  transform: translateX(-50%);
+}
+
+.score-carousel__dots button {
+  position: relative;
+  width: 30px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.score-carousel__dots button::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgb(68 57 58 / 0.25);
+  content: "";
+  transform: translate(-50%, -50%);
+  transition: background-color 220ms ease, transform 220ms ease;
+}
+
+.score-carousel__dots button.is-active::after {
+  background: #44393a;
+  transform: translate(-50%, -50%) scale(1.35);
+}
+
 .gameplay-card-zones {
   display: grid;
   padding: max(104px, calc(env(safe-area-inset-top) + 94px)) 28px
@@ -8570,24 +8804,12 @@ body.game-start-active .gameplay-carousel__nav--next {
   transition-duration: 0s !important;
 }
 
-/* Page changes are button-driven. Only the score stage keeps document scrolling. */
-html:not(.score-scroll-active),
-html:not(.score-scroll-active) body {
+/* Page changes are button-driven; every stage (incl. 점수) now fits the viewport,
+   so vertical document scrolling stays disabled everywhere. */
+html,
+body {
   overflow-y: hidden;
   overscroll-behavior-y: none;
-}
-
-html.score-scroll-active,
-html.score-scroll-active body {
-  height: auto;
-  min-height: 100%;
-  overflow-y: auto;
-  overscroll-behavior-y: contain;
-}
-
-body.score-scroll-active .chapter-menu,
-body.score-scroll-active .is-stage-inactive {
-  display: none !important;
 }
 
 body.stage-isolated .chapter-menu {
@@ -8621,7 +8843,7 @@ body:is([data-active-stage="#game-intro"], [data-active-stage="#card-guide"]) .h
   transform: none !important;
 }
 
-body:not(.score-scroll-active) {
+body {
   touch-action: pan-x;
 }
 
