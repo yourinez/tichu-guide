@@ -6414,12 +6414,17 @@ body.modal-open {
 
 /* '예:' 같은 부연 예시 줄 — 불릿 없이 살짝 들여쓰고 연하게 */
 .special-description li.special-note {
-  margin-top: -6px;
+  margin-top: 6px;
   padding-left: 18px;
+  padding-bottom: 4px;
   color: #8a8486;
   font-size: clamp(11px, 3vw, 13px);
   font-weight: 520;
   line-height: 1.4;
+  text-decoration: underline;
+  text-decoration-color: #d14b4b;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
 }
 
 .special-description li.special-note::before {
