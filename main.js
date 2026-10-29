@@ -301,7 +301,7 @@ document.querySelector("[data-receive-six-next]")?.addEventListener("click", () 
         }
       });
     }, 680);
-  }, 1000);
+  }, 2000);
 })();
 
 (() => {
