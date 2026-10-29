@@ -3054,6 +3054,17 @@ const legacyPrepFlow = () => {
         .forEach((seat) => seat.classList.remove("is-active"));
     };
 
+    // Remember each pair image's original (front) src so we can flip to the
+    // card back during the "collect" step and restore it when the loop resets.
+    const pairImages = Array.from(cardSequence.querySelectorAll(".play-card-sequence__pair img"));
+    pairImages.forEach((img) => {
+      if (!img.dataset.frontSrc) img.dataset.frontSrc = img.getAttribute("src");
+    });
+    const BACK_SRC = "뒷면.png";
+    const showCardBacks = () => pairImages.forEach((img) => img.setAttribute("src", BACK_SRC));
+    const showCardFronts = () =>
+      pairImages.forEach((img) => img.setAttribute("src", img.dataset.frontSrc));
+
     if (reducedMotion || !window.gsap) {
       pairs.forEach((pair) => {
         pair.style.opacity = "1";
@@ -3082,9 +3093,11 @@ const legacyPrepFlow = () => {
         coverTimeline?.kill();
         coverTimeline = null;
         clearSeatHighlights();
+        showCardFronts();
         if (passLabels.length) {
           window.gsap.set(passLabels, { autoAlpha: 0, scale: 0.9 });
         }
+        window.gsap.set(pairs, { rotationY: 0 });
         setSequenceStart();
       };
 
@@ -3095,9 +3108,11 @@ const legacyPrepFlow = () => {
           repeatDelay: 0.3,
           onRepeat: () => {
             clearSeatHighlights();
+            showCardFronts();
             if (passLabels.length) {
               window.gsap.set(passLabels, { autoAlpha: 0, scale: 0.9 });
             }
+            window.gsap.set(pairs, { rotationY: 0 });
           }
         });
 
@@ -3157,44 +3172,68 @@ const legacyPrepFlow = () => {
           );
         });
 
-        // The left seat (last to play) scoops up the whole trick: the pile
-        // flips to card backs and slides off toward the left, then clears.
-        const collectAt = afterKk + 0.1 + passOrder.length * 0.34 + 0.55;
+        // The left seat (last to play) scoops up the whole trick:
+        // 1) the whole pile flips over to show card backs,
+        // 2) then slides off toward the left seat and clears.
+        const collectAt = afterKk + 0.1 + passOrder.length * 0.34 + 0.6;
 
+        // Flip the pile over. At the half-way point (edge-on) swap the images
+        // to the card back so it reads as "turned face-down".
         coverTimeline.to(
           pairs,
           {
             rotationY: 90,
-            duration: 0.26,
-            ease: "power1.in",
-            stagger: 0.03
+            duration: 0.22,
+            ease: "power1.in"
           },
           collectAt
         );
-
+        coverTimeline.call(() => showCardBacks(), null, collectAt + 0.22);
         coverTimeline.to(
           pairs,
           {
-            x: -210,
-            y: 0,
-            rotation: -8,
-            autoAlpha: 0,
-            duration: 0.5,
-            ease: "power2.in",
-            stagger: 0.03
+            rotationY: 0,
+            duration: 0.22,
+            ease: "power1.out"
           },
           collectAt + 0.22
         );
 
+        // Highlight the left seat (the winner who collects the trick).
+        coverTimeline.call(
+          () => {
+            clearSeatHighlights();
+            seatFor("left")?.classList.add("is-active");
+          },
+          null,
+          collectAt + 0.22
+        );
+
+        // Fade the pass tags out as the trick gets collected.
         if (passLabels.length) {
           coverTimeline.to(
             passLabels,
             { autoAlpha: 0, duration: 0.3, ease: "power1.out" },
-            collectAt + 0.22
+            collectAt + 0.5
           );
         }
 
-        coverTimeline.call(() => clearSeatHighlights(), null, collectAt + 0.72);
+        // Slide the whole face-down pile off toward the left seat, then clear.
+        coverTimeline.to(
+          pairs,
+          {
+            x: -230,
+            y: 0,
+            rotation: -10,
+            autoAlpha: 0,
+            duration: 0.56,
+            ease: "power2.in",
+            stagger: 0.035
+          },
+          collectAt + 0.62
+        );
+
+        coverTimeline.call(() => clearSeatHighlights(), null, collectAt + 1.3);
       };
 
       resetSequence();

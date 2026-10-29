@@ -3944,6 +3944,10 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   isolation: isolate;
 }
 
+.play-card-sequence__board {
+  perspective: 900px;
+}
+
 .play-card-sequence__pair {
   position: absolute;
   z-index: var(--pair-layer, 1);
@@ -3953,6 +3957,7 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   gap: 8px;
   align-items: center;
   justify-content: center;
+  transform-style: preserve-3d;
   transform:
     translate(calc(-50% + var(--pair-x, 0px)), calc(-50% + var(--pair-y, 0px)))
     rotate(var(--pair-rotation, 0deg));
@@ -4038,38 +4043,50 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
 
 /* Active highlight when that seat plays its pair. */
 .pcs-seat.is-active {
-  color: #fff;
-  text-shadow: 0 0 10px rgb(255 255 255 / 0.55);
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.95);
+  color: #2a2324;
+  text-shadow: none;
+  box-shadow:
+    0 0 0 3px rgb(255 255 255 / 0.3),
+    0 0 18px rgb(255 255 255 / 0.65);
 }
 
 .pcs-seat--bottom.is-active {
-  transform: translateX(-50%) scale(1.14);
+  transform: translateX(-50%) scale(1.22);
 }
 
 .pcs-seat--top.is-active {
-  color: #a6f0c6;
-  transform: translateX(-50%) scale(1.14);
+  background: #a6f0c6;
+  color: #0f3d26;
+  box-shadow:
+    0 0 0 3px rgb(166 240 198 / 0.35),
+    0 0 18px rgb(129 227 170 / 0.75);
+  transform: translateX(-50%) scale(1.22);
 }
 
 .pcs-seat--left.is-active,
 .pcs-seat--right.is-active {
-  transform: translateY(-50%) scale(1.14);
+  transform: translateY(-50%) scale(1.22);
 }
 
 /* "패스" tags that appear after KK, near each passing seat. */
 .pcs-pass {
   position: absolute;
   z-index: 7;
-  padding: 2px 8px;
+  padding: 2px 9px;
   border-radius: 999px;
-  background: rgb(255 255 255 / 0.14);
-  color: rgb(255 255 255 / 0.82);
+  border: 1px solid rgb(229 70 76 / 0.7);
+  background: rgb(181 39 52 / 0.92);
+  color: #fff;
   font-size: clamp(10px, 2.7vw, 12px);
-  font-weight: 780;
+  font-weight: 820;
   line-height: 1;
   letter-spacing: -0.02em;
   white-space: nowrap;
   pointer-events: none;
+  box-shadow: 0 2px 8px rgb(181 39 52 / 0.4);
   opacity: 0;
 }
 
@@ -7487,12 +7504,14 @@ body.gameplay-slides-active {
 
 .play-card-sequence__replay {
   position: absolute;
-  z-index: 8;
-  bottom: 14px;
-  left: 50%;
+  z-index: 9;
+  top: 12px;
+  right: 12px;
+  left: auto;
+  bottom: auto;
   display: grid;
-  width: 35px;
-  height: 35px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   place-items: center;
   border: 1px solid rgb(255 255 255 / 0.28);
@@ -7501,9 +7520,9 @@ body.gameplay-slides-active {
   color: rgb(255 255 255 / 0.78);
   cursor: pointer;
   font: inherit;
-  font-size: 19px;
+  font-size: 17px;
   line-height: 1;
-  transform: translateX(-50%);
+  transform: none;
 }
 
 .play-card-sequence__replay:hover {
