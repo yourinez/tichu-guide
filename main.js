@@ -3029,6 +3029,10 @@ const legacyPrepFlow = () => {
   if (cardSequence) {
     const pairs = Array.from(cardSequence.querySelectorAll(".play-card-sequence__pair"));
     const replayButton = cardSequence.querySelector(".play-card-sequence__replay");
+    const board = cardSequence.querySelector(".play-card-sequence__board");
+    const seatFor = (entry) =>
+      cardSequence.querySelector(`.pcs-seat[data-seat="${entry}"]`);
+    const passLabels = Array.from(cardSequence.querySelectorAll(".pcs-pass"));
     let coverTimeline = null;
 
     const entryPositions = {
@@ -3043,6 +3047,12 @@ const legacyPrepFlow = () => {
       y: Number(pair.dataset.finalY || 0),
       rotation: Number(pair.dataset.finalRotation || 0)
     });
+
+    const clearSeatHighlights = () => {
+      cardSequence
+        .querySelectorAll(".pcs-seat.is-active")
+        .forEach((seat) => seat.classList.remove("is-active"));
+    };
 
     if (reducedMotion || !window.gsap) {
       pairs.forEach((pair) => {
@@ -3071,6 +3081,10 @@ const legacyPrepFlow = () => {
       const resetSequence = () => {
         coverTimeline?.kill();
         coverTimeline = null;
+        clearSeatHighlights();
+        if (passLabels.length) {
+          window.gsap.set(passLabels, { autoAlpha: 0, scale: 0.9 });
+        }
         setSequenceStart();
       };
 
@@ -3078,7 +3092,13 @@ const legacyPrepFlow = () => {
         resetSequence();
         coverTimeline = window.gsap.timeline({
           repeat: -1,
-          repeatDelay: 0.2
+          repeatDelay: 0.3,
+          onRepeat: () => {
+            clearSeatHighlights();
+            if (passLabels.length) {
+              window.gsap.set(passLabels, { autoAlpha: 0, scale: 0.9 });
+            }
+          }
         });
 
         pairs.forEach((pair) => {
@@ -3088,6 +3108,17 @@ const legacyPrepFlow = () => {
         pairs.forEach((pair, index) => {
           const finalState = getFinalState(pair);
           const startAt = 0.25 + index * 1.2;
+          const entry = pair.dataset.entry;
+
+          // Highlight the seat that is playing this pair.
+          coverTimeline.call(
+            () => {
+              clearSeatHighlights();
+              seatFor(entry)?.classList.add("is-active");
+            },
+            null,
+            startAt
+          );
 
           coverTimeline.fromTo(
             pair,
@@ -3104,11 +3135,66 @@ const legacyPrepFlow = () => {
           );
         });
 
+        // After KK, the three non-left seats (bottom, right, top) pass — in
+        // counter-clockwise order — while the left seat (who played KK) does not.
+        const afterKk = 0.25 + pairs.length * 1.2 + 0.2;
+        coverTimeline.call(() => clearSeatHighlights(), null, afterKk);
+
+        const passOrder = ["bottom", "right", "top"];
+        passOrder.forEach((seat, index) => {
+          const label = passLabels.find((el) => el.dataset.pass === seat);
+          if (!label) return;
+          coverTimeline.fromTo(
+            label,
+            { autoAlpha: 0, scale: 0.9 },
+            {
+              autoAlpha: 1,
+              scale: 1,
+              duration: 0.26,
+              ease: "back.out(1.7)"
+            },
+            afterKk + 0.1 + index * 0.34
+          );
+        });
+
+        // The left seat (last to play) scoops up the whole trick: the pile
+        // flips to card backs and slides off toward the left, then clears.
+        const collectAt = afterKk + 0.1 + passOrder.length * 0.34 + 0.55;
+
         coverTimeline.to(
           pairs,
-          { autoAlpha: 0, duration: 0.4, ease: "power1.out" },
-          ">+=1"
+          {
+            rotationY: 90,
+            duration: 0.26,
+            ease: "power1.in",
+            stagger: 0.03
+          },
+          collectAt
         );
+
+        coverTimeline.to(
+          pairs,
+          {
+            x: -210,
+            y: 0,
+            rotation: -8,
+            autoAlpha: 0,
+            duration: 0.5,
+            ease: "power2.in",
+            stagger: 0.03
+          },
+          collectAt + 0.22
+        );
+
+        if (passLabels.length) {
+          coverTimeline.to(
+            passLabels,
+            { autoAlpha: 0, duration: 0.3, ease: "power1.out" },
+            collectAt + 0.22
+          );
+        }
+
+        coverTimeline.call(() => clearSeatHighlights(), null, collectAt + 0.72);
       };
 
       resetSequence();

@@ -3995,6 +3995,102 @@ body.game-start-active .quick-reference-bar__button[data-open="special"] {
   box-shadow: 0 8px 16px rgb(0 0 0 / 0.26);
 }
 
+/* Seat labels around the inner edges of the board (board has overflow:hidden). */
+.pcs-seat {
+  position: absolute;
+  z-index: 7;
+  color: rgb(255 255 255 / 0.5);
+  font-size: clamp(11px, 3vw, 13px);
+  font-weight: 760;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: color 0.28s ease, text-shadow 0.28s ease, transform 0.28s ease;
+}
+
+.pcs-seat--bottom {
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.pcs-seat--top {
+  top: 32px;
+  left: 50%;
+  color: rgb(129 227 170 / 0.72);
+  transform: translateX(-50%);
+}
+
+.pcs-seat--left {
+  top: 50%;
+  left: 11px;
+  writing-mode: vertical-rl;
+  transform: translateY(-50%);
+}
+
+.pcs-seat--right {
+  top: 50%;
+  right: 11px;
+  writing-mode: vertical-rl;
+  transform: translateY(-50%);
+}
+
+/* Active highlight when that seat plays its pair. */
+.pcs-seat.is-active {
+  color: #fff;
+  text-shadow: 0 0 10px rgb(255 255 255 / 0.55);
+}
+
+.pcs-seat--bottom.is-active {
+  transform: translateX(-50%) scale(1.14);
+}
+
+.pcs-seat--top.is-active {
+  color: #a6f0c6;
+  transform: translateX(-50%) scale(1.14);
+}
+
+.pcs-seat--left.is-active,
+.pcs-seat--right.is-active {
+  transform: translateY(-50%) scale(1.14);
+}
+
+/* "패스" tags that appear after KK, near each passing seat. */
+.pcs-pass {
+  position: absolute;
+  z-index: 7;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.14);
+  color: rgb(255 255 255 / 0.82);
+  font-size: clamp(10px, 2.7vw, 12px);
+  font-weight: 780;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.pcs-pass--bottom {
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.pcs-pass--top {
+  top: 52px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.pcs-pass--right {
+  top: 50%;
+  right: 30px;
+  transform: translateY(-50%);
+}
+
 .play-card-sequence__direction {
   position: relative;
   z-index: 3;
@@ -7789,7 +7885,7 @@ body.game-start-active .gameplay-carousel__nav--next {
 .gameplay-carousel__dots {
   position: absolute;
   z-index: 12;
-  bottom: max(88px, calc(env(safe-area-inset-bottom) + 78px));
+  bottom: max(58px, calc(env(safe-area-inset-bottom) + 48px));
   left: 50%;
   display: flex;
   gap: 4px;
@@ -7948,13 +8044,13 @@ body.game-start-active .gameplay-carousel__nav--next {
 /* Game play main slide: keep the controls clear of the page dots. */
 .gameplay-carousel .play-card-sequence {
   padding-top: max(82px, calc(env(safe-area-inset-top) + 72px));
-  padding-bottom: max(194px, calc(env(safe-area-inset-bottom) + 182px));
+  padding-bottom: max(150px, calc(env(safe-area-inset-bottom) + 138px));
 }
 
 .gameplay-carousel .play-card-sequence__caption,
 .gameplay-carousel .play-card-sequence__board-wrap,
 .gameplay-carousel .play-card-sequence__rules {
-  transform: translateY(20px);
+  transform: translateY(6px);
 }
 
 .play-card-sequence__actions .combo-guide-jump:not(.pass-guide-trigger) {
@@ -7972,6 +8068,7 @@ body.game-start-active .gameplay-carousel__nav--next {
   background: #827c7e;
   border-color: rgb(255 255 255 / 0.38);
   box-shadow: 0 5px 12px rgb(45 39 40 / 0.14);
+  animation: none;
 }
 
 .play-card-sequence__actions .combo-guide-jump:not(.pass-guide-trigger):focus-visible {
@@ -7982,13 +8079,13 @@ body.game-start-active .gameplay-carousel__nav--next {
 @media (max-height: 780px) {
   .gameplay-carousel .play-card-sequence {
     padding-top: max(70px, calc(env(safe-area-inset-top) + 62px));
-    padding-bottom: max(194px, calc(env(safe-area-inset-bottom) + 182px));
+    padding-bottom: max(150px, calc(env(safe-area-inset-bottom) + 138px));
   }
 
   .gameplay-carousel .play-card-sequence__caption,
   .gameplay-carousel .play-card-sequence__board-wrap,
   .gameplay-carousel .play-card-sequence__rules {
-    transform: translateY(16px);
+    transform: translateY(4px);
   }
 }
 
