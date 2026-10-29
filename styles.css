@@ -551,6 +551,14 @@ body[data-active-stage="#game-play"] .floating-tip-button {
   visibility: visible;
 }
 
+/* 카드 소개 단계에서는 팁 버튼을 숨긴다(이 화면에선 불필요). */
+body[data-active-stage="#card-guide"] .floating-tip-button,
+body[data-active-stage="#card-reference-intro"] .floating-tip-button {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
 .floating-tip-button:focus-visible {
   outline: 3px solid rgb(168 46 57 / 0.34);
   outline-offset: 3px;
