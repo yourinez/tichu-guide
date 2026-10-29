@@ -3262,12 +3262,11 @@ const legacyPrepFlow = () => {
         );
 
         // Card pile is gone — show the "whoever wins starts next" note in the
-        // center of the board. (No seat highlight here.)
-        // The winning player opens the next trick: show the note, and the
-        // left seat plays a single card that flies in from the left to center.
+        // The left seat stays highlighted from the moment it collects the
+        // trick, through the note, until it plays the next single card — no
+        // flicker. Just show the note here (keep the existing highlight).
         coverTimeline.call(
           () => {
-            clearSeatHighlights();
             nextLead?.classList.add("is-visible");
           },
           null,
@@ -3275,15 +3274,6 @@ const legacyPrepFlow = () => {
         );
 
         if (nextCard) {
-          // Left 상대 plays the single card — highlight that seat as it starts.
-          coverTimeline.call(
-            () => {
-              clearSeatHighlights();
-              seatFor("left")?.classList.add("is-active");
-            },
-            null,
-            collectAt + 1.7
-          );
           coverTimeline.fromTo(
             nextCard,
             { autoAlpha: 0, xPercent: -50, yPercent: -50, x: -150, y: 0, scale: 0.94, rotation: -6 },
