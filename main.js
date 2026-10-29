@@ -342,10 +342,19 @@ document.querySelector("[data-receive-six-next]")?.addEventListener("click", () 
     const activeContainers = new Set(stageGroups.get(target) || []);
     const isolated = activeContainers.size > 0;
 
+    // 상단 바(참조/일반) 모달이 열려 페이지 잠금이 걸린 동안에는 lockPage()가
+    // <main> 하위 요소의 inert/aria-hidden을 전적으로 소유한다. 이때 스크롤·리사이즈로
+    // 발동하는 stage isolation이 같은 속성을 덮어쓰면 모달 뒤 영역이 살아나거나(상호작용 누수),
+    // 잠금 해제 시 복원되는 스냅샷이 어긋나 빈 화면이 된다. 따라서 잠금 중에는 시각용 클래스만
+    // 갱신하고 inert/aria-hidden 기록은 건드리지 않는다. 올바른 값은 unlockPage()가
+    // 잠금 해제 직후 이 함수를 다시 호출해 복원한다.
+    const pageLocked = document.documentElement.classList.contains("modal-open");
+
     document.body.classList.toggle("stage-isolated", isolated);
     stageContainers.forEach((container) => {
       const inactive = isolated && !activeContainers.has(container);
       container.classList.toggle("is-stage-inactive", inactive);
+      if (pageLocked) return;
       container.inert = inactive;
       if (inactive) {
         container.setAttribute("aria-hidden", "true");
@@ -361,6 +370,7 @@ document.querySelector("[data-receive-six-next]")?.addEventListener("click", () 
       if (!view) return;
       const inactive = isolated && inactiveForTarget;
       view.classList.toggle("is-stage-subview-inactive", inactive);
+      if (pageLocked) return;
       view.inert = inactive;
       if (inactive) view.setAttribute("aria-hidden", "true");
       else view.removeAttribute("aria-hidden");
@@ -3759,6 +3769,7 @@ const legacyPrepFlow = () => {
   let lockedScrollY = 0;
   let closeTimer = null;
   let inertBackground = [];
+  let pageLockCount = 0;
 
   const modalFor = (name) =>
     Array.from(document.querySelectorAll("[data-modal]")).find(
@@ -3802,6 +3813,7 @@ const legacyPrepFlow = () => {
     if (!state) return;
 
     openReferences.delete(name);
+    unlockPage();
     state.modal.classList.remove("is-open", "is-front");
     setReferenceActive();
     window.clearTimeout(referenceCloseTimers.get(name));
@@ -3832,6 +3844,7 @@ const legacyPrepFlow = () => {
 
     window.clearTimeout(referenceCloseTimers.get(name));
     referenceCloseTimers.delete(name);
+    lockPage();
     const opener = trigger instanceof HTMLElement
       ? trigger
       : referenceButtons.find((button) => button.dataset.open === name) || null;
@@ -3854,6 +3867,10 @@ const legacyPrepFlow = () => {
   };
 
   const lockPage = () => {
+    pageLockCount += 1;
+    if (pageLockCount > 1) {
+      return;
+    }
     lockedScrollY = window.scrollY;
     document.documentElement.classList.add("modal-open");
     document.body.classList.add("modal-open");
@@ -3868,6 +3885,13 @@ const legacyPrepFlow = () => {
   };
 
   const unlockPage = () => {
+    if (pageLockCount === 0) {
+      return;
+    }
+    pageLockCount -= 1;
+    if (pageLockCount > 0) {
+      return;
+    }
     const restoreScrollY = lockedScrollY;
     document.documentElement.classList.remove("modal-open");
     document.body.classList.remove("modal-open");
@@ -3875,6 +3899,11 @@ const legacyPrepFlow = () => {
       element.inert = wasInert;
     });
     inertBackground = [];
+
+    // 잠금 중에는 stage isolation이 inert/aria-hidden을 건드리지 않았으므로, 위에서 복원한
+    // 스냅샷은 잠금 시점의 값이다. 그 사이 스크롤/리사이즈/단계 이동으로 단계 의도가 바뀌었을 수
+    // 있으니, 현재 단계 상태를 다시 계산해 배경의 inert/aria-hidden을 올바른 값으로 맞춘다.
+    window.tichuStageNav?.setActive?.(document.body.dataset.activeStage);
 
     if (Math.abs(window.scrollY - restoreScrollY) > 1) {
       window.scrollTo({ top: restoreScrollY, left: 0, behavior: "auto" });
