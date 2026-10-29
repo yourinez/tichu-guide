@@ -21,7 +21,7 @@
       crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
     />
-    <link rel="stylesheet" href="styles.css?v=20261102-gameplay-layout-2" />
+    <link rel="stylesheet" href="styles.css?v=20261102-pass-tip-1" />
   </head>
   <body>
     <div class="splash-screen">
@@ -1747,11 +1747,21 @@
         <button class="app-modal__close" type="button" data-close-modal aria-label="패스 설명 닫기">×</button>
         <section class="tichu-tip pass-tip" aria-labelledby="pass-tip-title">
           <h2 id="pass-tip-title">낼 게 없다면? 패스!</h2>
-          <p>
-            낼 조합이 없으면 <strong>패스!</strong><br />
-            패스해도 끝이 아니라, 다음 차례에 다시 낼 수 있어요.<br />
-            <strong>3명이 연속 패스하면 트릭 종료.</strong>
-          </p>
+          <p class="tichu-tip__lead">낼 수 있는 조합이 없으면 <strong>"패스!"</strong></p>
+          <dl class="tichu-tip__facts">
+            <div>
+              <dt>🙅 낼 게 없어요</dt>
+              <dd>그럴 땐 <strong>"패스!"</strong> 라고 말하면 돼요</dd>
+            </div>
+            <div>
+              <dt>🔄 끝이 아니에요</dt>
+              <dd>패스해도 다음 차례에 <strong>다시 낼 수 있어요</strong></dd>
+            </div>
+            <div>
+              <dt>🏁 3명 연속 패스</dt>
+              <dd>이 판(트릭)이 끝나요<br /><strong>마지막에 낸 사람</strong>이 바닥 카드를 가져가요</dd>
+            </div>
+          </dl>
         </section>
       </div>
     </div>

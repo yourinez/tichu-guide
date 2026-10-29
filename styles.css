@@ -7711,24 +7711,12 @@ body.gameplay-slides-active {
   color: #b00050;
 }
 
-.pass-tip p {
-  margin: 0;
-  padding: 21px 18px;
-  border: 1px solid rgb(108 76 60 / 0.15);
-  border-radius: 18px;
-  background: #fff;
-  color: #4b4140;
-  font-size: clamp(14px, 4vw, 17px);
-  font-weight: 620;
-  line-height: 1.75;
-  letter-spacing: -0.035em;
-  text-align: center;
-  word-break: keep-all;
+.pass-tip .tichu-tip__lead strong {
+  color: #b00050;
 }
 
-.pass-tip p strong {
-  color: #b00050;
-  font-weight: 850;
+.pass-tip .tichu-tip__facts > div {
+  grid-template-columns: 92px 1fr;
 }
 
 @media (prefers-reduced-motion: reduce) {
