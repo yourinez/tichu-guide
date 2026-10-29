@@ -3066,6 +3066,19 @@ body.combo-guide-open .quick-reference-bar {
   color: #171313;
 }
 
+/* 참새 패널(특수카드 모달) 전용: 박스 좌측 정렬 + 그룹 간격 확대.
+   #special-modal로 범위를 한정해 원래 참새 보유자 설명(#sparrow-info-modal 등
+   .tichu-tip 모달)에는 영향을 주지 않도록 함. */
+#special-modal .special-description .tichu-tip__facts {
+  gap: 18px;
+}
+
+#special-modal .special-description .tichu-tip__facts,
+#special-modal .special-description .tichu-tip__facts dt,
+#special-modal .special-description .tichu-tip__facts dd {
+  text-align: left;
+}
+
 #special-modal .special-description__lead {
   color: #971f27;
 }
@@ -6177,7 +6190,7 @@ body.modal-open {
   min-height: min(760px, calc(100svh - 16px));
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   overflow-x: clip;
   padding: max(24px, env(safe-area-inset-top)) 0
     max(26px, env(safe-area-inset-bottom));
@@ -6291,8 +6304,9 @@ body.modal-open {
   color: #fff;
   font-size: clamp(19px, 5.4vw, 24px);
   font-weight: 820;
-  line-height: 1.18;
+  line-height: 1.3;
   letter-spacing: -0.05em;
+  text-align: center;
   text-wrap: balance;
 }
 
@@ -6305,23 +6319,90 @@ body.modal-open {
   letter-spacing: -0.025em;
 }
 
+.special-example {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  margin: clamp(16px, 3vh, 24px) auto 0;
+}
+
+.special-example__cards {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.special-example__cards img {
+  width: clamp(34px, 10vw, 44px);
+  height: auto;
+  border-radius: 5px;
+  box-shadow: 0 4px 10px rgb(0 0 0 / 0.35);
+}
+
+.special-example__cards .special-example__wild {
+  outline: 2px solid #ffd27a;
+  outline-offset: 1px;
+  transform: translateY(-4px);
+}
+
+.special-example small {
+  color: #c9c5c6;
+  font-size: clamp(11px, 3vw, 13px);
+  font-weight: 560;
+  line-height: 1.4;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
 .special-description ul {
   display: grid;
-  gap: 5px;
-  margin: 12px 0 0;
-  padding: 0;
-  color: #c9c5c6;
-  font-size: clamp(12px, 3.25vw, 14px);
-  font-weight: 540;
-  line-height: 1.38;
+  gap: 15px;
+  width: 100%;
+  max-width: 420px;
+  margin: clamp(40px, 12dvh, 120px) auto 0;
+  padding: 0 4px;
+  color: #555052;
+  font-size: clamp(13px, 3.7vw, 15px);
+  font-weight: 560;
+  line-height: 1.5;
   letter-spacing: -0.025em;
   list-style: none;
-  text-align: center;
+  text-align: left;
 }
 
 .special-description li {
+  position: relative;
   margin: 0;
-  text-wrap: balance;
+  padding-left: 14px;
+  text-wrap: pretty;
+}
+
+.special-description li strong {
+  color: #2d2521;
+  font-weight: 820;
+}
+
+.special-description li::before {
+  position: absolute;
+  top: 0;
+  left: 2px;
+  color: #9a9597;
+  content: "•";
+}
+
+/* '예:' 같은 부연 예시 줄 — 불릿 없이 살짝 들여쓰고 연하게 */
+.special-description li.special-note {
+  margin-top: -6px;
+  padding-left: 18px;
+  color: #8a8486;
+  font-size: clamp(11px, 3vw, 13px);
+  font-weight: 520;
+  line-height: 1.4;
+}
+
+.special-description li.special-note::before {
+  content: none;
 }
 
 .special-dots {
