@@ -21,7 +21,7 @@
       crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
     />
-    <link rel="stylesheet" href="styles.css?v=20261031-cover-seats-8" />
+    <link rel="stylesheet" href="styles.css?v=20261031-choice-buttons-1" />
   </head>
   <body>
     <div class="splash-screen">
@@ -630,19 +630,47 @@
                   <strong>첫 사람(참새 보유자)이 낸 ‘장 수’가 그 판의 기준!</strong>
                   <span>나머지 사람은 같은 장수로만<br />앞의 카드를 덮을 수 있어요</span>
                 </p>
-                <div class="play-card-sequence__actions">
-                  <button class="combo-guide-jump" type="button" data-scroll-to-combo>
-                    그래서 뭘 낼 수 있나요?
-                  </button>
+
+                <p class="play-card-sequence__choice-lead">내 차례! 셋 중 하나를 골라요</p>
+
+                <div class="play-card-sequence__actions play-card-sequence__actions--choices">
                   <button
-                    class="combo-guide-jump pass-guide-trigger"
+                    class="choice-jump choice-jump--primary"
+                    type="button"
+                    data-scroll-to-combo
+                    aria-label="더 센 조합 자세히 보기"
+                  >
+                    <span class="choice-jump__num" aria-hidden="true">1</span>
+                    <span class="choice-jump__label">그래서 뭘 낼 수 있나요?</span>
+                    <span class="choice-jump__help" aria-hidden="true">?</span>
+                  </button>
+
+                  <button
+                    class="choice-jump choice-jump--pass"
                     type="button"
                     data-open="pass-tip"
                     aria-haspopup="dialog"
                     aria-controls="pass-tip-modal"
                     aria-expanded="false"
+                    aria-label="패스 자세히 보기"
                   >
-                    낼 게 없다면? 패스!
+                    <span class="choice-jump__num" aria-hidden="true">2</span>
+                    <span class="choice-jump__label">낼 게 없다면? 패스!</span>
+                    <span class="choice-jump__help" aria-hidden="true">?</span>
+                  </button>
+
+                  <button
+                    class="choice-jump choice-jump--bomb"
+                    type="button"
+                    data-open="bomb"
+                    aria-haspopup="dialog"
+                    aria-controls="bomb-modal"
+                    aria-expanded="false"
+                    aria-label="폭탄 투척 자세히 보기"
+                  >
+                    <span class="choice-jump__num" aria-hidden="true">3</span>
+                    <span class="choice-jump__label">폭탄 투척하기 💣</span>
+                    <span class="choice-jump__help" aria-hidden="true">?</span>
                   </button>
                 </div>
               </div>

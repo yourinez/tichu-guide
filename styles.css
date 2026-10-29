@@ -8146,6 +8146,118 @@ body.game-start-active .gameplay-carousel__nav--next {
   outline-offset: 3px;
 }
 
+/* ── "내 차례! 셋 중 하나" choice buttons ── */
+.play-card-sequence__choice-lead {
+  margin: 16px 0 10px;
+  color: rgb(255 255 255 / 0.85);
+  font-size: clamp(13px, 3.7vw, 15px);
+  font-weight: 760;
+  line-height: 1.3;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+
+.play-card-sequence__actions--choices {
+  display: grid;
+  gap: 9px;
+  width: min(100%, 300px);
+  margin: 0 auto;
+}
+
+.choice-jump {
+  display: grid;
+  grid-template-columns: 26px 1fr 24px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 50px;
+  padding: 0 14px;
+  border: 1px solid rgb(255 255 255 / 0.3);
+  border-radius: 14px;
+  background: #3a3031;
+  box-shadow: 0 8px 18px rgb(61 36 38 / 0.2);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.choice-jump__num {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.16);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 860;
+  line-height: 1;
+}
+
+.choice-jump__label {
+  font-size: clamp(13px, 3.7vw, 15px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.25;
+}
+
+.choice-jump__help {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+.choice-jump:focus-visible {
+  outline: 3px solid rgb(255 255 255 / 0.5);
+  outline-offset: 3px;
+}
+
+/* ① primary — 조합: emphasized + gentle float to invite the tap. */
+.choice-jump--primary {
+  background: linear-gradient(135deg, #d00063 0%, #a9004f 100%);
+  border-color: rgb(255 255 255 / 0.62);
+  box-shadow:
+    0 0 0 2px rgb(208 0 99 / 0.16),
+    0 0 20px rgb(208 0 99 / 0.34),
+    0 9px 20px rgb(64 21 40 / 0.2);
+  animation: combo-guide-jump-float 2.2s ease-in-out infinite;
+}
+
+.choice-jump--primary .choice-jump__num {
+  background: rgb(255 255 255 / 0.28);
+}
+
+/* ② pass — calm, static. */
+.choice-jump--pass {
+  background: #6f696b;
+  border-color: rgb(255 255 255 / 0.3);
+}
+
+/* ③ bomb — red, special. */
+.choice-jump--bomb {
+  background: linear-gradient(135deg, #c0243a 0%, #8f1020 100%);
+  border-color: rgb(255 180 180 / 0.6);
+  box-shadow: 0 8px 18px rgb(120 16 32 / 0.3);
+}
+
+.choice-jump--bomb .choice-jump__num {
+  background: rgb(255 255 255 / 0.24);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .choice-jump--primary {
+    animation: none;
+  }
+}
+
 @media (max-height: 780px) {
   .gameplay-carousel .play-card-sequence {
     padding-top: max(90px, calc(env(safe-area-inset-top) + 80px));
